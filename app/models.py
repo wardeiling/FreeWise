@@ -23,6 +23,8 @@ class Highlight(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str = Field(index=True)
     source: Optional[str] = None
+    note: Optional[str] = None  # Additional notes or annotations
+    author: Optional[str] = None  # Book/article author
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     status: str = Field(default="active")  # active | discarded

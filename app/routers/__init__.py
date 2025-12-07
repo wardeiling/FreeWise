@@ -1,4 +1,4 @@
 # Router package exports
-from app.routers import highlights, settings
+from app.routers import highlights, settings, importer
 
-__all__ = ["highlights", "settings"]
+__all__ = ["highlights", "settings", "importer"]

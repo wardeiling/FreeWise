@@ -171,6 +171,7 @@
         <nav style="margin-top: 10px;">
             <a href="/" style="margin-right: 15px;">Home</a>
             <a href="/highlights/ui/review" style="margin-right: 15px;">Review</a>
+            <a href="/import/ui" style="margin-right: 15px;">Import</a>
             <a href="/settings/ui">Settings</a>
         </nav>
     </div>
@@ -180,6 +181,11 @@
     <a href="/highlights/ui/review" style="font-size: 1.1em;">
         → Start Daily Review
         {% if settings %}({{ settings.daily_review_count }} highlights){% endif %}
+    </a>
+</div>
+<div style="margin-top: 15px;">
+    <a href="/import/ui" style="font-size: 1em;">
+        📥 Import from Readwise
     </a>
 </div>
 {% endblock %}
