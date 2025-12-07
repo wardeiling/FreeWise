@@ -112,13 +112,13 @@ def update_highlight(
     return highlight
 
 
-@router.post("/{id}/favorite", response_model=Highlight)
+@router.post("/{id}/favorite/json", response_model=Highlight)
 def toggle_favorite(
     id: int,
     favorite_data: FavoriteToggle,
     session: Session = Depends(get_session)
 ):
-    """Toggle favorite status of a highlight."""
+    """Toggle favorite status of a highlight (JSON API)."""
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
@@ -131,9 +131,9 @@ def toggle_favorite(
     return highlight
 
 
-@router.post("/{id}/discard", response_model=Highlight)
+@router.post("/{id}/discard/json", response_model=Highlight)
 def discard_highlight(id: int, session: Session = Depends(get_session)):
-    """Mark a highlight as discarded."""
+    """Mark a highlight as discarded (JSON API)."""
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")

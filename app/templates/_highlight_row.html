@@ -3,11 +3,17 @@
     {% if highlight.source %}
         <div class="highlight-source">Source: {{ highlight.source }}</div>
     {% endif %}
+    {% if highlight.author %}
+        <div class="highlight-source">Author: {{ highlight.author }}</div>
+    {% endif %}
+    {% if highlight.note %}
+        <div class="highlight-source">Note: {{ highlight.note }}</div>
+    {% endif %}
     <div class="highlight-actions">
         <button 
             class="btn-favorite {% if highlight.favorite %}active{% endif %}"
             hx-post="/highlights/{{ highlight.id }}/favorite"
-            hx-vals='{"favorite": {{ "false" if highlight.favorite else "true" }}}'
+            hx-vals='{"favorite": "{{ "false" if highlight.favorite else "true" }}"}'
             hx-target="#highlight-{{ highlight.id }}"
             hx-swap="outerHTML">
             {% if highlight.favorite %}★ Favorited{% else %}☆ Favorite{% endif %}
@@ -28,4 +34,5 @@
             ✕ Discard
         </button>
     </div>
+</div>
 </div>
