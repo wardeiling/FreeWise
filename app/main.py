@@ -2,7 +2,7 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -47,14 +47,5 @@ app.include_router(library.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    """Root endpoint returning simple HTML."""
-    from sqlmodel import Session, select
-    engine = get_engine()
-    with Session(engine) as session:
-        statement = select(Settings)
-        settings = session.exec(statement).first()
-    
-    return templates.TemplateResponse("base.html", {
-        "request": request,
-        "settings": settings,
-    })
+    """Root endpoint redirects to dashboard."""
+    return RedirectResponse(url="/dashboard/ui", status_code=302)
