@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.db import get_engine
 from app.models import SQLModel, Settings
-from app.routers import highlights, settings, importer, library, dashboard
+from app.routers import highlights, settings, importer, library, dashboard, export
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,6 +43,7 @@ app.include_router(highlights.router)
 app.include_router(settings.router)
 app.include_router(importer.router)
 app.include_router(library.router)
+app.include_router(export.router)
 
 
 @app.get("/", response_class=HTMLResponse)

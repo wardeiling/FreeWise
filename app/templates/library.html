@@ -5,11 +5,9 @@
 {% block heading %}Library{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 20px;">
-    <p style="color: var(--muted-text);">
-        Browse your collection of {{ books|length }} book{{ 's' if books|length != 1 else '' }}.
-    </p>
-</div>
+<p style="color: var(--muted-text); margin-bottom: 20px;">
+    Browse your collection of {{ books|length }} book{{ 's' if books|length != 1 else '' }}.
+</p>
 
 {% if books %}
 <div style="overflow-x: auto;">

@@ -91,6 +91,32 @@
     </div>
 </form>
 
+<!-- Export Section -->
+<div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--border-color);">
+    <h2 style="margin-bottom: 20px; color: var(--text-color);">📥 Export Data</h2>
+    
+    <div style="max-width: 500px; background: var(--highlight-bg); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <p style="margin: 0 0 20px 0; color: var(--muted-text); line-height: 1.6;">
+            Download all your highlights and metadata as a CSV file. The export includes 
+            highlight text, notes, book information, tags, favorite/discard status, and timestamps.
+        </p>
+        
+        <a href="/export/csv" 
+           style="display: inline-block; background: var(--link-color); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 1em; font-weight: 500; transition: all 0.2s;"
+           onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)'">
+            📥 Download CSV Export
+        </a>
+        
+        <div style="margin-top: 20px; padding: 15px; background: var(--bg-color); border-radius: 4px; border-left: 4px solid var(--link-color);">
+            <small style="color: var(--muted-text); line-height: 1.5;">
+                <strong>Note:</strong> The exported CSV can be imported back into FreeWise or used with other tools. 
+                File format is compatible with standard spreadsheet applications.
+            </small>
+        </div>
+    </div>
+</div>
+
 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
     <a href="/">← Back to Home</a>
 </div>

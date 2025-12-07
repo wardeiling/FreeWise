@@ -190,7 +190,23 @@ async def process_import(
                     document_tags=document_tags_str if document_tags_str else None
                 )
             
-            # Create highlight
+            # Parse tags and check for special tags (favorite, discard)
+            is_favorited = False
+            is_discarded = False
+            regular_tags = []
+            
+            if tags_str:
+                tag_names = parse_tags(tags_str)
+                for tag_name in tag_names:
+                    tag_lower = tag_name.lower()
+                    if tag_lower == "favorite":
+                        is_favorited = True
+                    elif tag_lower == "discard":
+                        is_discarded = True
+                    else:
+                        regular_tags.append(tag_name)
+            
+            # Create highlight with appropriate boolean flags
             highlight = Highlight(
                 text=highlight_text,
                 source=book_title if book_title else None,  # Keep for backwards compatibility
@@ -200,28 +216,28 @@ async def process_import(
                 created_at=created_at,
                 updated_at=datetime.utcnow(),
                 user_id=1,  # Default user for single-user mode
-                status="active",
-                is_favorited=False,
-                is_discarded=False
+                status="discarded" if is_discarded else "active",
+                is_favorited=is_favorited,
+                is_discarded=is_discarded,
+                favorite=is_favorited  # Set the favorite alias field too
             )
             
             session.add(highlight)
             session.commit()
             session.refresh(highlight)
             
-            # Process tags if present (using utility function)
-            if tags_str:
-                tag_names = parse_tags(tags_str)
-                for tag_name in tag_names:
-                    tag = get_or_create_tag(session, tag_name)
-                    if tag:
-                        # Create highlight-tag relationship
-                        highlight_tag = HighlightTag(
-                            highlight_id=highlight.id,
-                            tag_id=tag.id
-                        )
-                        session.add(highlight_tag)
-                
+            # Process regular tags (excluding favorite/discard which are now boolean fields)
+            for tag_name in regular_tags:
+                tag = get_or_create_tag(session, tag_name)
+                if tag:
+                    # Create highlight-tag relationship
+                    highlight_tag = HighlightTag(
+                        highlight_id=highlight.id,
+                        tag_id=tag.id
+                    )
+                    session.add(highlight_tag)
+            
+            if regular_tags:
                 session.commit()
             
             imported_count += 1
