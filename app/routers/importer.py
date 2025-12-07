@@ -22,27 +22,28 @@ def get_session():
     with Session(engine) as session:
         yield session
 
-
-def parse_readwise_datetime(date_str: str) -> Optional[datetime]:
-    """
-    Parse Readwise datetime formats.
-    Common formats: "2024-12-01 14:30:00", "December 1, 2024", etc.
-    """
-    if not date_str or date_str.strip() == "":
-        return None
+def parse_readwise_datetime(dt_str: str) -> datetime:
+    """Parse various datetime formats from Readwise CSV."""
+    if not dt_str or dt_str.strip() == "":
+        return datetime.utcnow()
     
-    # Try various datetime formats
     formats = [
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d",
-        "%B %d, %Y",
-        "%m/%d/%Y",
-        "%d/%m/%Y",
+        "%B %d, %Y %I:%M:%S %p",      # January 15, 2024 10:30:00 AM
+        "%Y-%m-%d %H:%M:%S",           # 2024-01-15 10:30:00
+        "%Y-%m-%dT%H:%M:%S",           # 2024-01-15T10:30:00
+        "%Y-%m-%d %H:%M:%S%z",         # 2025-12-10 14:18:00+00:00
+        "%Y-%m-%dT%H:%M:%S%z",         # 2025-12-10T14:18:00+00:00
+        "%Y-%m-%d %H:%M:%S.%f",        # 2024-01-15 10:30:00.000000
+        "%Y-%m-%d %H:%M:%S.%f%z",      # 2024-01-15 10:30:00.000000+00:00
     ]
     
     for fmt in formats:
         try:
-            return datetime.strptime(date_str.strip(), fmt)
+            parsed = datetime.strptime(dt_str.strip(), fmt)
+            # Convert timezone-aware datetime to UTC naive datetime
+            if parsed.tzinfo is not None:
+                parsed = parsed.replace(tzinfo=None)
+            return parsed
         except ValueError:
             continue
     

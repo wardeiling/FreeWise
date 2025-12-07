@@ -39,7 +39,7 @@ async def ui_library(
     
     # Get all books with aggregated data
     highlight_count_col = func.count(Highlight.id).label("highlight_count")
-    last_highlight_col = func.max(Highlight.updated_at).label("last_highlight_update")
+    last_highlight_col = func.max(Highlight.created_at).label("last_highlight_date")
     
     books_query = (
         select(
@@ -57,7 +57,7 @@ async def ui_library(
     )
     
     # Apply sorting
-    valid_sorts = ["title", "author", "highlight_count", "last_updated"]
+    valid_sorts = ["title", "author", "highlight_count", "date_added", "last_highlight"]
     if sort not in valid_sorts:
         sort = "title"
     
@@ -70,7 +70,9 @@ async def ui_library(
         sort_col = Book.author
     elif sort == "highlight_count":
         sort_col = highlight_count_col
-    elif sort == "last_updated":
+    elif sort == "date_added":
+        sort_col = Book.created_at
+    elif sort == "last_highlight":
         sort_col = last_highlight_col
     else:
         sort_col = Book.title
@@ -91,8 +93,8 @@ async def ui_library(
             "author": result.author or "Unknown",
             "document_tags": result.document_tags,
             "highlight_count": result.highlight_count,
-            "last_updated": result.last_highlight_update or result.updated_at,
-            "created_at": result.created_at
+            "last_highlight_date": result.last_highlight_date,
+            "date_added": result.created_at
         })
     
     return templates.TemplateResponse("library.html", {

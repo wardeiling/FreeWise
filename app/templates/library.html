@@ -44,10 +44,19 @@
                     </a>
                 </th>
                 <th style="padding: 12px; text-align: left;">
-                    <a href="/library/ui?sort=last_updated&order={{ 'desc' if current_sort == 'last_updated' and current_order == 'asc' else 'asc' }}" 
+                    <a href="/library/ui?sort=date_added&order={{ 'desc' if current_sort == 'date_added' and current_order == 'asc' else 'asc' }}" 
                        style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-                        Last Updated
-                        {% if current_sort == 'last_updated' %}
+                        Date Added
+                        {% if current_sort == 'date_added' %}
+                            {{ '↓' if current_order == 'desc' else '↑' }}
+                        {% endif %}
+                    </a>
+                </th>
+                <th style="padding: 12px; text-align: left;">
+                    <a href="/library/ui?sort=last_highlight&order={{ 'desc' if current_sort == 'last_highlight' and current_order == 'asc' else 'asc' }}" 
+                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
+                        Last Highlight
+                        {% if current_sort == 'last_highlight' %}
                             {{ '↓' if current_order == 'desc' else '↑' }}
                         {% endif %}
                     </a>
@@ -78,7 +87,10 @@
                     </span>
                 </td>
                 <td style="padding: 12px; color: var(--muted-text); font-size: 0.9em;">
-                    {{ book.last_updated.strftime('%Y-%m-%d %H:%M') if book.last_updated else 'Never' }}
+                    {{ book.date_added.strftime('%Y-%m-%d') if book.date_added else 'Unknown' }}
+                </td>
+                <td style="padding: 12px; color: var(--muted-text); font-size: 0.9em;">
+                    {{ book.last_highlight_date.strftime('%Y-%m-%d') if book.last_highlight_date else 'None' }}
                 </td>
             </tr>
             {% endfor %}
