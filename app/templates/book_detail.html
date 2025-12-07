@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - FreeWise{% endblock %}
+
+{% block heading %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px; padding: 15px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+    {% if book.author %}
+    <div style="margin-bottom: 10px;">
+        <strong>Author:</strong> {{ book.author }}
+    </div>
+    {% endif %}
+    {% if book.document_tags %}
+    <div style="margin-bottom: 10px;">
+        <strong>Tags:</strong> {{ book.document_tags }}
+    </div>
+    {% endif %}
+    <div style="margin-bottom: 10px; color: var(--muted-text); font-size: 0.9em;">
+        <strong>Total Highlights:</strong> {{ highlights|length }}
+    </div>
+    <div style="color: var(--muted-text); font-size: 0.9em;">
+        <strong>Added:</strong> {{ book.created_at.strftime('%Y-%m-%d %H:%M') }}
+    </div>
+</div>
+
+{% if highlights %}
+<h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.2em;">Highlights</h2>
+<div id="highlights-container">
+    {% for highlight in highlights %}
+        {% include "_highlight_row.html" %}
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 40px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+    <p>No highlights found for this book.</p>
+</div>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="/library/ui">← Back to Library</a>
+</div>
+{% endblock %}

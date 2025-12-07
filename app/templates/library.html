@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Library - FreeWise{% endblock %}
+
+{% block heading %}Library{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <p style="color: var(--muted-text);">
+        Browse your collection of {{ books|length }} book{{ 's' if books|length != 1 else '' }}.
+    </p>
+</div>
+
+{% if books %}
+<div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; background: var(--highlight-bg); border-radius: 8px; overflow: hidden;">
+        <thead>
+            <tr style="background: var(--bg-color); border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 12px; text-align: left;">
+                    <a href="/library/ui?sort=title&order={{ 'desc' if current_sort == 'title' and current_order == 'asc' else 'asc' }}" 
+                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
+                        Title 
+                        {% if current_sort == 'title' %}
+                            {{ '↓' if current_order == 'desc' else '↑' }}
+                        {% endif %}
+                    </a>
+                </th>
+                <th style="padding: 12px; text-align: left;">
+                    <a href="/library/ui?sort=author&order={{ 'desc' if current_sort == 'author' and current_order == 'asc' else 'asc' }}" 
+                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
+                        Author
+                        {% if current_sort == 'author' %}
+                            {{ '↓' if current_order == 'desc' else '↑' }}
+                        {% endif %}
+                    </a>
+                </th>
+                <th style="padding: 12px; text-align: center;">
+                    <a href="/library/ui?sort=highlight_count&order={{ 'desc' if current_sort == 'highlight_count' and current_order == 'asc' else 'asc' }}" 
+                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
+                        Highlights
+                        {% if current_sort == 'highlight_count' %}
+                            {{ '↓' if current_order == 'desc' else '↑' }}
+                        {% endif %}
+                    </a>
+                </th>
+                <th style="padding: 12px; text-align: left;">
+                    <a href="/library/ui?sort=last_updated&order={{ 'desc' if current_sort == 'last_updated' and current_order == 'asc' else 'asc' }}" 
+                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
+                        Last Updated
+                        {% if current_sort == 'last_updated' %}
+                            {{ '↓' if current_order == 'desc' else '↑' }}
+                        {% endif %}
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;"
+                onmouseover="this.style.backgroundColor='var(--border-color)'"
+                onmouseout="this.style.backgroundColor='transparent'">
+                <td style="padding: 12px;">
+                    <a href="/library/ui/book/{{ book.id }}" style="color: var(--link-color); text-decoration: none; font-weight: 500;">
+                        {{ book.title }}
+                    </a>
+                    {% if book.document_tags %}
+                    <div style="margin-top: 4px; font-size: 0.85em; color: var(--muted-text);">
+                        🏷️ {{ book.document_tags }}
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="padding: 12px; color: var(--muted-text);">
+                    {{ book.author }}
+                </td>
+                <td style="padding: 12px; text-align: center;">
+                    <span style="background: var(--bg-color); padding: 4px 12px; border-radius: 12px; font-weight: bold;">
+                        {{ book.highlight_count }}
+                    </span>
+                </td>
+                <td style="padding: 12px; color: var(--muted-text); font-size: 0.9em;">
+                    {{ book.last_updated.strftime('%Y-%m-%d %H:%M') if book.last_updated else 'Never' }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div style="text-align: center; padding: 40px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+    <p style="font-size: 1.2em; margin-bottom: 20px;">📚 Your library is empty</p>
+    <p style="color: var(--muted-text); margin-bottom: 20px;">Import highlights from Readwise to get started!</p>
+    <a href="/import/ui" style="background: #007bff; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; display: inline-block;">
+        Import Highlights
+    </a>
+</div>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="/">← Back to Home</a>
+</div>
+{% endblock %}
