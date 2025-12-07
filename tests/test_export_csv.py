@@ -59,12 +59,12 @@ def test_export_csv_has_attachment_header(client: TestClient):
     response = client.get("/export/csv")
     assert "content-disposition" in response.headers
     assert "attachment" in response.headers["content-disposition"]
-    assert "highlights_export_" in response.headers["content-disposition"]
+    assert "freewise_export_" in response.headers["content-disposition"]
     assert ".csv" in response.headers["content-disposition"]
 
 
 def test_export_csv_headers(client: TestClient):
-    """Test that the CSV includes all expected column headers."""
+    """Test that the CSV includes all expected column headers in Readwise-compatible order."""
     response = client.get("/export/csv")
     
     # Parse CSV
@@ -73,22 +73,29 @@ def test_export_csv_headers(client: TestClient):
     headers = next(reader)
     
     expected_headers = [
+        # Readwise-compatible columns (exact naming and order)
+        'Highlight',
+        'Book Title',
+        'Book Author',
+        'Amazon Book ID',
+        'Note',
+        'Color',
+        'Tags',
+        'Location Type',
+        'Location',
+        'Highlighted at',
+        'Document tags',
+        # Extended FreeWise columns
         'highlight_id',
-        'highlight_text',
-        'highlight_note',
+        'book_id',
         'is_favorited',
         'is_discarded',
-        'highlight_created_at',
-        'highlight_updated_at',
-        'book_id',
-        'book_title',
-        'book_author',
-        'document_tags',
-        'book_created_at',
-        'book_updated_at',
-        'highlight_tags',
         'last_reviewed_at',
-        'review_count'
+        'review_count',
+        'created_at',
+        'updated_at',
+        'book_created_at',
+        'book_updated_at'
     ]
     
     assert headers == expected_headers
@@ -144,24 +151,24 @@ def test_export_csv_with_sample_data(session: Session, client: TestClient):
     
     # Check first highlight (most recent first, so highlight2)
     row1 = rows[0]
-    assert row1['highlight_text'] == "Another test highlight"
-    assert row1['highlight_note'] == ""
+    assert row1['Highlight'] == "Another test highlight"
+    assert row1['Note'] == ""
     assert row1['is_favorited'] == "false"
     assert row1['is_discarded'] == "true"
-    assert row1['book_title'] == "Test Book"
-    assert row1['book_author'] == "Test Author"
-    assert row1['document_tags'] == "philosophy, science"
-    assert "2024-01-16" in row1['highlight_created_at']
+    assert row1['Book Title'] == "Test Book"
+    assert row1['Book Author'] == "Test Author"
+    assert row1['Document tags'] == "philosophy, science"
+    assert "2024-01-16" in row1['Highlighted at']
     
     # Check second highlight
     row2 = rows[1]
-    assert row2['highlight_text'] == "This is a test highlight"
-    assert row2['highlight_note'] == "This is a test note"
+    assert row2['Highlight'] == "This is a test highlight"
+    assert row2['Note'] == "This is a test note"
     assert row2['is_favorited'] == "true"
     assert row2['is_discarded'] == "false"
-    assert row2['book_title'] == "Test Book"
-    assert row2['book_author'] == "Test Author"
-    assert "2024-01-15" in row2['highlight_created_at']
+    assert row2['Book Title'] == "Test Book"
+    assert row2['Book Author'] == "Test Author"
+    assert "2024-01-15" in row2['Highlighted at']
 
 
 def test_export_csv_favorite_discarded_fields(session: Session, client: TestClient):
@@ -188,7 +195,7 @@ def test_export_csv_favorite_discarded_fields(session: Session, client: TestClie
     assert len(rows) == 4
     
     # Find each row by text
-    rows_by_text = {row['highlight_text']: row for row in rows}
+    rows_by_text = {row['Highlight']: row for row in rows}
     
     assert rows_by_text['Favorited']['is_favorited'] == 'true'
     assert rows_by_text['Favorited']['is_discarded'] == 'false'
@@ -236,7 +243,7 @@ def test_export_csv_with_highlight_tags(session: Session, client: TestClient):
     assert len(rows) == 1
     
     # Check tags are in CSV (order may vary)
-    highlight_tags = rows[0]['highlight_tags']
+    highlight_tags = rows[0]['Tags']
     assert 'important' in highlight_tags
     assert 'review-later' in highlight_tags
 
@@ -259,11 +266,11 @@ def test_export_csv_without_book(session: Session, client: TestClient):
     rows = list(reader)
     
     assert len(rows) == 1
-    assert rows[0]['highlight_text'] == "Orphan highlight"
+    assert rows[0]['Highlight'] == "Orphan highlight"
     assert rows[0]['book_id'] == ""
-    assert rows[0]['book_title'] == "Legacy Source"
-    assert rows[0]['book_author'] == "Legacy Author"
-    assert rows[0]['highlight_note'] == "Legacy note"
+    assert rows[0]['Book Title'] == "Legacy Source"
+    assert rows[0]['Book Author'] == "Legacy Author"
+    assert rows[0]['Note'] == "Legacy note"
 
 
 def test_export_csv_empty_database(client: TestClient):

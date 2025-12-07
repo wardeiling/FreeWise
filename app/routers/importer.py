@@ -130,11 +130,19 @@ async def process_import(
     session: Session = Depends(get_session)
 ):
     """
-    Process uploaded Readwise CSV file and import highlights.
+    Process uploaded CSV file and import highlights.
     
-    Expected CSV columns:
-    Highlight,Book Title,Book Author,Amazon Book ID,Note,Color,Tags,
-    Location Type,Location,Highlighted at,Document tags
+    Accepts both:
+    1. Standard Readwise CSV exports with columns:
+       Highlight, Book Title, Book Author, Amazon Book ID, Note, Color, Tags,
+       Location Type, Location, Highlighted at, Document tags
+    
+    2. Extended FreeWise CSV exports with additional columns:
+       highlight_id, book_id, is_favorited, is_discarded, last_reviewed_at,
+       review_count, created_at, updated_at, book_created_at, book_updated_at
+    
+    The importer is backwards-compatible and will use extended metadata if present,
+    or fall back to defaults if columns are missing.
     """
     # Validate file type
     if not file.filename.endswith('.csv'):
@@ -149,7 +157,7 @@ async def process_import(
         # Parse CSV
         reader = csv.DictReader(csv_file)
         
-        # Validate required columns
+        # Validate required columns (must have at least Highlight column)
         required_columns = ['Highlight']
         if not all(col in reader.fieldnames for col in required_columns):
             raise HTTPException(
@@ -166,7 +174,7 @@ async def process_import(
                 skipped_count += 1
                 continue
             
-            # Extract data from CSV
+            # Extract data from CSV - support both Readwise and extended format
             highlight_text = row.get('Highlight', '').strip()
             book_title = row.get('Book Title', '').strip()
             book_author = row.get('Book Author', '').strip()
@@ -175,10 +183,21 @@ async def process_import(
             document_tags_str = row.get('Document tags', '').strip()
             highlighted_at_str = row.get('Highlighted at', '').strip()
             
-            # Parse datetime
-            created_at = parse_readwise_datetime(highlighted_at_str)
+            # Extended columns (optional - only in FreeWise exports)
+            is_favorited_str = row.get('is_favorited', '').strip().lower()
+            is_discarded_str = row.get('is_discarded', '').strip().lower()
+            created_at_str = row.get('created_at', '').strip()
+            updated_at_str = row.get('updated_at', '').strip()
+            # review_count and last_reviewed_at are reserved for future use
+            
+            # Parse datetime - prefer 'Highlighted at' (Readwise), fallback to 'created_at' (extended)
+            datetime_str = highlighted_at_str or created_at_str
+            created_at = parse_readwise_datetime(datetime_str)
             if not created_at:
                 created_at = datetime.utcnow()
+            
+            # Parse updated_at if available (extended format only)
+            updated_at = parse_readwise_datetime(updated_at_str) if updated_at_str else datetime.utcnow()
             
             # Get or create book
             book = None
@@ -191,17 +210,27 @@ async def process_import(
                 )
             
             # Parse tags and check for special tags (favorite, discard)
+            # Extended format: use explicit is_favorited/is_discarded columns if present
+            # Standard format: parse from tags
             is_favorited = False
             is_discarded = False
             regular_tags = []
             
+            # Check extended columns first (takes precedence)
+            if is_favorited_str in ['true', '1', 'yes']:
+                is_favorited = True
+            if is_discarded_str in ['true', '1', 'yes']:
+                is_discarded = True
+            
+            # Parse tags string for both tag creation and legacy favorite/discard detection
             if tags_str:
                 tag_names = parse_tags(tags_str)
                 for tag_name in tag_names:
                     tag_lower = tag_name.lower()
-                    if tag_lower == "favorite":
+                    # Only use tag-based favorite/discard if extended columns not present
+                    if tag_lower == "favorite" and not is_favorited_str:
                         is_favorited = True
-                    elif tag_lower == "discard":
+                    elif tag_lower == "discard" and not is_discarded_str:
                         is_discarded = True
                     else:
                         regular_tags.append(tag_name)
@@ -214,7 +243,7 @@ async def process_import(
                 book_id=book.id if book else None,
                 note=note if note else None,
                 created_at=created_at,
-                updated_at=datetime.utcnow(),
+                updated_at=updated_at,
                 user_id=1,  # Default user for single-user mode
                 status="discarded" if is_discarded else "active",
                 is_favorited=is_favorited,
