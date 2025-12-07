@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - FreeWise{% endblock %}
+
+{% block heading %}Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 30px;">
+    <p style="color: var(--muted-text);">
+        Overview of your reading highlights and collection.
+    </p>
+</div>
+
+<!-- Statistics Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <!-- Total Books Card -->
+    <a href="/library/ui" style="text-decoration: none; color: inherit;">
+        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
+             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--link-color)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+            <div style="font-size: 3em; margin-bottom: 10px;">📚</div>
+            <div style="font-size: 2.5em; font-weight: bold; color: var(--text-color); margin-bottom: 5px;">
+                {{ total_books }}
+            </div>
+            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+                Total Books
+            </div>
+        </div>
+    </a>
+    
+    <!-- Total Highlights Card -->
+    <a href="/highlights/ui/review" style="text-decoration: none; color: inherit;">
+        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
+             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--link-color)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+            <div style="font-size: 3em; margin-bottom: 10px;">💡</div>
+            <div style="font-size: 2.5em; font-weight: bold; color: var(--text-color); margin-bottom: 5px;">
+                {{ total_highlights }}
+            </div>
+            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+                Total Highlights
+            </div>
+        </div>
+    </a>
+    
+    <!-- Favorites Card -->
+    <a href="/highlights/ui/review?filter=favorited" style="text-decoration: none; color: inherit;">
+        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
+             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#ffd700'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+            <div style="font-size: 3em; margin-bottom: 10px;">⭐</div>
+            <div style="font-size: 2.5em; font-weight: bold; color: #ffd700; margin-bottom: 5px;">
+                {{ total_favorited }}
+            </div>
+            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+                Favorites
+            </div>
+        </div>
+    </a>
+    
+    <!-- Discarded Card -->
+    <a href="/highlights/ui/review?filter=discarded" style="text-decoration: none; color: inherit;">
+        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
+             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#dc3545'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+            <div style="font-size: 3em; margin-bottom: 10px;">🗑️</div>
+            <div style="font-size: 2.5em; font-weight: bold; color: #dc3545; margin-bottom: 5px;">
+                {{ total_discarded }}
+            </div>
+            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+                Discarded
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Visualization Section -->
+{% if total_highlights > 0 %}
+<div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+    <h2 style="margin-top: 0; margin-bottom: 25px; font-size: 1.3em;">Highlights Breakdown</h2>
+    
+    <div style="margin-bottom: 30px;">
+        <!-- Active Highlights Bar -->
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 500; color: var(--text-color);">Active Highlights</span>
+                <span style="color: var(--muted-text);">{{ active_highlights }} ({{ "%.1f"|format(active_percentage) }}%)</span>
+            </div>
+            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color);">
+                <div style="width: {{ active_percentage }}%; height: 100%; background: linear-gradient(90deg, #007bff, #0056b3); transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+        
+        <!-- Favorites Bar -->
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 500; color: var(--text-color);">⭐ Favorites</span>
+                <span style="color: var(--muted-text);">{{ total_favorited }} ({{ "%.1f"|format(favorited_percentage) }}%)</span>
+            </div>
+            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color);">
+                <div style="width: {{ favorited_percentage }}%; height: 100%; background: linear-gradient(90deg, #ffd700, #ffaa00); transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+        
+        <!-- Discarded Bar -->
+        <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 500; color: var(--text-color);">🗑️ Discarded</span>
+                <span style="color: var(--muted-text);">{{ total_discarded }} ({{ "%.1f"|format(discarded_percentage) }}%)</span>
+            </div>
+            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color);">
+                <div style="width: {{ discarded_percentage }}%; height: 100%; background: linear-gradient(90deg, #dc3545, #a02834); transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div style="text-align: center; padding: 60px 20px; background: var(--highlight-bg); border-radius: 12px; border: 1px solid var(--border-color);">
+    <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">📖</div>
+    <h3 style="margin-bottom: 15px; color: var(--text-color);">No Highlights Yet</h3>
+    <p style="color: var(--muted-text); margin-bottom: 25px; max-width: 400px; margin-left: auto; margin-right: auto;">
+        Start building your knowledge library by importing highlights from Readwise or other sources.
+    </p>
+    <a href="/import/ui" style="background: var(--link-color); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 500; transition: opacity 0.2s;"
+       onmouseover="this.style.opacity='0.9'"
+       onmouseout="this.style.opacity='1'">
+        Import Highlights
+    </a>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 30px;">
+    <a href="/highlights/ui/review" style="text-decoration: none;">
+        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
+             onmouseover="this.style.background='var(--border-color)'"
+             onmouseout="this.style.background='var(--highlight-bg)'">
+            <div style="font-size: 1.5em; margin-bottom: 8px;">📝</div>
+            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Review Highlights</div>
+            <div style="font-size: 0.85em; color: var(--muted-text);">Review your daily highlights</div>
+        </div>
+    </a>
+    
+    <a href="/library/ui" style="text-decoration: none;">
+        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
+             onmouseover="this.style.background='var(--border-color)'"
+             onmouseout="this.style.background='var(--highlight-bg)'">
+            <div style="font-size: 1.5em; margin-bottom: 8px;">📚</div>
+            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Browse Library</div>
+            <div style="font-size: 0.85em; color: var(--muted-text);">Explore your book collection</div>
+        </div>
+    </a>
+    
+    <a href="/import/ui" style="text-decoration: none;">
+        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
+             onmouseover="this.style.background='var(--border-color)'"
+             onmouseout="this.style.background='var(--highlight-bg)'">
+            <div style="font-size: 1.5em; margin-bottom: 8px;">📥</div>
+            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Import Data</div>
+            <div style="font-size: 0.85em; color: var(--muted-text);">Add new highlights from CSV</div>
+        </div>
+    </a>
+    
+    <a href="/settings/ui" style="text-decoration: none;">
+        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
+             onmouseover="this.style.background='var(--border-color)'"
+             onmouseout="this.style.background='var(--highlight-bg)'">
+            <div style="font-size: 1.5em; margin-bottom: 8px;">⚙️</div>
+            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Settings</div>
+            <div style="font-size: 0.85em; color: var(--muted-text);">Configure your preferences</div>
+        </div>
+    </a>
+</div>
+{% endblock %}
