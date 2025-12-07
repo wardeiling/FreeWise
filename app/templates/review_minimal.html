@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Review - FreeWise</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .highlight {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            background: #f9f9f9;
+        }
+        .highlight-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .highlight-source {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .highlight-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .btn-favorite {
+            background: #ffd700;
+            color: #333;
+        }
+        .btn-favorite.active {
+            background: #ff8c00;
+            color: white;
+        }
+        .btn-discard {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-edit {
+            background: #007bff;
+            color: white;
+        }
+        .btn-save {
+            background: #28a745;
+            color: white;
+        }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        .edit-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .edit-form input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Daily Review</h1>
+    <div id="highlights-container">
+        {% if highlights %}
+            {% for highlight in highlights %}
+                {% include "_highlight_row.html" %}
+            {% endfor %}
+        {% else %}
+            <p>No highlights available for review today. Great job staying on top of things!</p>
+        {% endif %}
+    </div>
+</body>
+</html>

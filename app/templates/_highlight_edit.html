@@ -1,0 +1,19 @@
+<div class="highlight" id="highlight-{{ highlight.id }}">
+    <form class="edit-form" 
+          hx-post="/highlights/{{ highlight.id }}/edit"
+          hx-target="#highlight-{{ highlight.id }}"
+          hx-swap="outerHTML">
+        <textarea name="text" required>{{ highlight.text }}</textarea>
+        <input type="text" name="source" placeholder="Source (optional)" value="{{ highlight.source or '' }}">
+        <div class="highlight-actions">
+            <button type="submit" class="btn-save">💾 Save</button>
+            <button type="button" 
+                    class="btn-cancel"
+                    hx-get="/highlights/{{ highlight.id }}/view"
+                    hx-target="#highlight-{{ highlight.id }}"
+                    hx-swap="outerHTML">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+jinja2
+aiofiles
+aiosmtplib
+python-multipart
+httpx
+pytest
+pytest-asyncio
+apscheduler

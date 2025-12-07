@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Review - FreeWise{% endblock %}
+
+{% block heading %}Daily Review{% endblock %}
+
+{% block content %}
+<div id="highlights-container">
+    {% if highlights %}
+        {% for highlight in highlights %}
+            {% include "_highlight_row.html" %}
+        {% endfor %}
+    {% else %}
+        <p>No highlights available for review today. Great job staying on top of things!</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 30px;">
+    <a href="/" style="color: #007bff; text-decoration: none;">← Back to Home</a>
+</div>
+{% endblock %}

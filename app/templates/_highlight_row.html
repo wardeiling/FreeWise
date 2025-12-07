@@ -1,0 +1,31 @@
+<div class="highlight" id="highlight-{{ highlight.id }}">
+    <div class="highlight-text">{{ highlight.text }}</div>
+    {% if highlight.source %}
+        <div class="highlight-source">Source: {{ highlight.source }}</div>
+    {% endif %}
+    <div class="highlight-actions">
+        <button 
+            class="btn-favorite {% if highlight.favorite %}active{% endif %}"
+            hx-post="/highlights/{{ highlight.id }}/favorite"
+            hx-vals='{"favorite": {{ "false" if highlight.favorite else "true" }}}'
+            hx-target="#highlight-{{ highlight.id }}"
+            hx-swap="outerHTML">
+            {% if highlight.favorite %}★ Favorited{% else %}☆ Favorite{% endif %}
+        </button>
+        <button 
+            class="btn-edit"
+            hx-get="/highlights/{{ highlight.id }}/edit"
+            hx-target="#highlight-{{ highlight.id }}"
+            hx-swap="outerHTML">
+            ✎ Edit
+        </button>
+        <button 
+            class="btn-discard"
+            hx-post="/highlights/{{ highlight.id }}/discard"
+            hx-target="#highlight-{{ highlight.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="Are you sure you want to discard this highlight?">
+            ✕ Discard
+        </button>
+    </div>
+</div>

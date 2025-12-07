@@ -1,0 +1,71 @@
+/* FreeWise Styles */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.highlight {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    background: #f9f9f9;
+}
+
+.highlight-text {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.highlight-source {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.highlight-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn-favorite {
+    background: #ffd700;
+    color: #333;
+}
+
+.btn-favorite.active {
+    background: #ff8c00;
+    color: white;
+}
+
+.btn-discard {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-edit {
+    background: #007bff;
+    color: white;
+}
+
+.btn-save {
+    background: #28a745;
+    color: white;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
