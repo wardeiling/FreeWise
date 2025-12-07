@@ -19,27 +19,34 @@
     
     <!-- Document Tags Section -->
     <div id="document-tags-section" style="margin-top: 20px;">
-        {% if book.document_tags %}
-        <div style="display: inline-block; padding: 8px 16px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px; margin-bottom: 10px;">
-            <span style="margin-right: 10px;">🏷️</span>
-            <span id="document-tags-display">{{ book.document_tags }}</span>
+        <div id="tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px;">
+            {% if book.document_tags %}
+                {% for tag in book.document_tags.split(',') %}
+                <div style="display: inline-flex; align-items: center; padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px;">
+                    <span style="margin-right: 8px;">🏷️ {{ tag.strip() }}</span>
+                    <button 
+                        style="background: transparent; border: none; cursor: pointer; color: #dc3545; padding: 0; font-size: 1.2em; line-height: 1;"
+                        hx-post="/library/ui/book/{{ book.id }}/remove-tag"
+                        hx-vals='{"tag": "{{ tag.strip() }}"}'
+                        hx-target="#document-tags-section"
+                        hx-swap="innerHTML"
+                        title="Remove tag">
+                        ×
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div style="text-align: center;">
             <button 
-                style="margin-left: 10px; background: transparent; border: none; cursor: pointer; color: var(--link-color); padding: 0;"
-                hx-get="/library/ui/book/{{ book.id }}/edit-tags"
-                hx-target="#document-tags-section"
+                style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
+                hx-get="/library/ui/book/{{ book.id }}/add-tag"
+                hx-target="#add-tag-form"
                 hx-swap="innerHTML">
-                ✎
+                + Add document tags
             </button>
         </div>
-        {% else %}
-        <button 
-            style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
-            hx-get="/library/ui/book/{{ book.id }}/edit-tags"
-            hx-target="#document-tags-section"
-            hx-swap="innerHTML">
-            + Add document tags
-        </button>
-        {% endif %}
+        <div id="add-tag-form" style="margin-top: 10px; text-align: center;"></div>
     </div>
     
     <div style="margin-top: 20px; color: var(--muted-text); font-size: 0.9em;">

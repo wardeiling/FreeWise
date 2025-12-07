@@ -134,125 +134,145 @@ async def ui_book_detail(
     })
 
 
-@router.get("/ui/book/{book_id}/edit-tags", response_class=HTMLResponse)
-async def ui_book_edit_tags_form(
+@router.get("/ui/book/{book_id}/add-tag", response_class=HTMLResponse)
+async def ui_book_add_tag_form(
     request: Request,
     book_id: int,
     session: Session = Depends(get_session)
 ):
-    """Return inline form for editing book document tags."""
+    """Return inline form for adding a new tag."""
     book = session.get(Book, book_id)
     if not book:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Book not found")
     
     form_html = f"""
-    <form hx-post="/library/ui/book/{book_id}/edit-tags" hx-target="#document-tags-section" hx-swap="innerHTML">
-        <div style="display: inline-block;">
-            <input 
-                type="text" 
-                name="document_tags" 
-                value="{book.document_tags or ''}"
-                placeholder="Enter tags..."
-                style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); min-width: 300px;"
-                autofocus>
-            <button type="submit" style="margin-left: 8px; padding: 8px 16px; background: var(--link-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
-            <button type="button" 
-                hx-get="/library/ui/book/{book_id}/cancel-edit-tags" 
-                hx-target="#document-tags-section" 
-                hx-swap="innerHTML"
-                style="margin-left: 8px; padding: 8px 16px; background: transparent; color: var(--muted-text); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">Cancel</button>
-        </div>
+    <form hx-post="/library/ui/book/{book_id}/add-tag" hx-target="#document-tags-section" hx-swap="innerHTML" style="display: inline-block;">
+        <input 
+            type="text" 
+            name="new_tag" 
+            placeholder="Enter new tag..."
+            style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); min-width: 200px;"
+            autofocus>
+        <button type="submit" style="margin-left: 8px; padding: 8px 16px; background: var(--link-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Add</button>
+        <button type="button" 
+            hx-get="/library/ui/book/{book_id}/cancel-add-tag" 
+            hx-target="#add-tag-form" 
+            hx-swap="innerHTML"
+            style="margin-left: 8px; padding: 8px 16px; background: transparent; color: var(--muted-text); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">Cancel</button>
     </form>
     """
     return HTMLResponse(content=form_html)
 
 
-@router.post("/ui/book/{book_id}/edit-tags", response_class=HTMLResponse)
-async def ui_book_save_tags(
+@router.post("/ui/book/{book_id}/add-tag", response_class=HTMLResponse)
+async def ui_book_add_tag(
     request: Request,
     book_id: int,
-    document_tags: str = Form(""),
+    new_tag: str = Form(""),
     session: Session = Depends(get_session)
 ):
-    """Save edited book document tags and return updated display."""
+    """Add a new tag to the book and return updated tags section."""
     book = session.get(Book, book_id)
     if not book:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Book not found")
     
-    # Update tags
-    book.document_tags = document_tags.strip() or None
-    book.updated_at = datetime.utcnow()
-    session.add(book)
-    session.commit()
-    session.refresh(book)
+    # Add new tag
+    new_tag = new_tag.strip()
+    if new_tag:
+        if book.document_tags:
+            # Split existing tags, add new one, deduplicate
+            existing_tags = [t.strip() for t in book.document_tags.split(',')]
+            if new_tag not in existing_tags:
+                existing_tags.append(new_tag)
+            book.document_tags = ', '.join(existing_tags)
+        else:
+            book.document_tags = new_tag
+        
+        book.updated_at = datetime.utcnow()
+        session.add(book)
+        session.commit()
+        session.refresh(book)
     
-    # Return updated display
-    if book.document_tags:
-        display_html = f"""
-        <div style="display: inline-block; padding: 8px 16px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px; margin-bottom: 10px;">
-            <span style="margin-right: 10px;">🏷️</span>
-            <span id="document-tags-display">{book.document_tags}</span>
-            <button 
-                style="margin-left: 10px; background: transparent; border: none; cursor: pointer; color: var(--link-color); padding: 0;"
-                hx-get="/library/ui/book/{book.id}/edit-tags"
-                hx-target="#document-tags-section"
-                hx-swap="innerHTML">
-                ✎
-            </button>
-        </div>
-        """
-    else:
-        display_html = f"""
-        <button 
-            style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
-            hx-get="/library/ui/book/{book.id}/edit-tags"
-            hx-target="#document-tags-section"
-            hx-swap="innerHTML">
-            + Add document tags
-        </button>
-        """
-    
-    return HTMLResponse(content=display_html)
+    # Return updated tags section
+    return _render_tags_section(book)
 
 
-@router.get("/ui/book/{book_id}/cancel-edit-tags", response_class=HTMLResponse)
-async def ui_book_cancel_edit_tags(
+@router.post("/ui/book/{book_id}/remove-tag", response_class=HTMLResponse)
+async def ui_book_remove_tag(
     request: Request,
     book_id: int,
+    tag: str = Form(...),
     session: Session = Depends(get_session)
 ):
-    """Cancel editing and return original display."""
+    """Remove a tag from the book and return updated tags section."""
     book = session.get(Book, book_id)
     if not book:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Book not found")
     
-    # Return original display
+    # Remove tag
     if book.document_tags:
-        display_html = f"""
-        <div style="display: inline-block; padding: 8px 16px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px; margin-bottom: 10px;">
-            <span style="margin-right: 10px;">🏷️</span>
-            <span id="document-tags-display">{book.document_tags}</span>
-            <button 
-                style="margin-left: 10px; background: transparent; border: none; cursor: pointer; color: var(--link-color); padding: 0;"
-                hx-get="/library/ui/book/{book.id}/edit-tags"
-                hx-target="#document-tags-section"
-                hx-swap="innerHTML">
-                ✎
-            </button>
-        </div>
-        """
-    else:
-        display_html = f"""
+        existing_tags = [t.strip() for t in book.document_tags.split(',')]
+        existing_tags = [t for t in existing_tags if t != tag.strip()]
+        book.document_tags = ', '.join(existing_tags) if existing_tags else None
+        
+        book.updated_at = datetime.utcnow()
+        session.add(book)
+        session.commit()
+        session.refresh(book)
+    
+    # Return updated tags section
+    return _render_tags_section(book)
+
+
+@router.get("/ui/book/{book_id}/cancel-add-tag", response_class=HTMLResponse)
+async def ui_book_cancel_add_tag(
+    request: Request,
+    book_id: int,
+    session: Session = Depends(get_session)
+):
+    """Cancel adding a tag."""
+    return HTMLResponse(content="")
+
+
+def _render_tags_section(book: Book) -> HTMLResponse:
+    """Helper function to render the tags section."""
+    tags_html = ""
+    if book.document_tags:
+        tags = book.document_tags.split(',')
+        for tag in tags:
+            tag_stripped = tag.strip()
+            tags_html += f"""
+            <div style="display: inline-flex; align-items: center; padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px;">
+                <span style="margin-right: 8px;">🏷️ {tag_stripped}</span>
+                <button 
+                    style="background: transparent; border: none; cursor: pointer; color: #dc3545; padding: 0; font-size: 1.2em; line-height: 1;"
+                    hx-post="/library/ui/book/{book.id}/remove-tag"
+                    hx-vals='{{"tag": "{tag_stripped}"}}'
+                    hx-target="#document-tags-section"
+                    hx-swap="innerHTML"
+                    title="Remove tag">
+                    ×
+                </button>
+            </div>
+            """
+    
+    full_html = f"""
+    <div id="tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px;">
+        {tags_html}
+    </div>
+    <div style="text-align: center;">
         <button 
             style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
-            hx-get="/library/ui/book/{book.id}/edit-tags"
-            hx-target="#document-tags-section"
+            hx-get="/library/ui/book/{book.id}/add-tag"
+            hx-target="#add-tag-form"
             hx-swap="innerHTML">
             + Add document tags
         </button>
-        """
+    </div>
+    <div id="add-tag-form" style="margin-top: 10px; text-align: center;"></div>
+    """
     
-    return HTMLResponse(content=display_html)
+    return HTMLResponse(content=full_html)
