@@ -18,17 +18,34 @@ class User(SQLModel, table=True):
         return f"User(id={self.id}, email={self.email})"
 
 
+class Book(SQLModel, table=True):
+    """Book model for organizing highlights by source."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str = Field(index=True)
+    author: Optional[str] = Field(default=None, index=True)
+    document_tags: Optional[str] = None  # comma-separated tags
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    def __repr__(self) -> str:
+        author_str = f" by {self.author}" if self.author else ""
+        return f"Book(id={self.id}, title='{self.title}'{author_str})"
+
+
 class Highlight(SQLModel, table=True):
     """Highlight model for storing text excerpts with review scheduling."""
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str = Field(index=True)
-    source: Optional[str] = None
+    source: Optional[str] = None  # Deprecated: use book_id instead
     note: Optional[str] = None  # Additional notes or annotations
-    author: Optional[str] = None  # Book/article author
+    author: Optional[str] = None  # Deprecated: use book.author instead
+    book_id: Optional[int] = Field(default=None, foreign_key="book.id", index=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     status: str = Field(default="active")  # active | discarded
     favorite: bool = Field(default=False, index=True)
+    is_favorited: bool = Field(default=False, index=True)  # Alias for favorite
+    is_discarded: bool = Field(default=False, index=True)  # Derived from status
     next_review: Optional[datetime] = Field(default=None, index=True)
     user_id: int = Field(foreign_key="user.id", index=True)
     

@@ -8,7 +8,8 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 
 from app.db import get_engine
-from app.models import Highlight, Tag, HighlightTag, Settings
+from app.models import Highlight, Tag, HighlightTag, Settings, Book
+from app.utils.tags import parse_tags, join_tags
 
 
 router = APIRouter(prefix="/import", tags=["import"])
@@ -66,6 +67,43 @@ def get_or_create_tag(session: Session, tag_name: str) -> Tag:
         session.refresh(tag)
     
     return tag
+
+
+def get_or_create_book(session: Session, title: str, author: Optional[str] = None, document_tags: Optional[str] = None) -> Optional[Book]:
+    """Get existing book or create new one based on title and author."""
+    if not title or not title.strip():
+        return None
+    
+    title = title.strip()
+    author = author.strip() if author else None
+    
+    # Check if book exists (match on title and author)
+    statement = select(Book).where(Book.title == title)
+    if author:
+        statement = statement.where(Book.author == author)
+    else:
+        statement = statement.where(Book.author == None)
+    
+    book = session.exec(statement).first()
+    
+    if not book:
+        book = Book(
+            title=title,
+            author=author,
+            document_tags=document_tags
+        )
+        session.add(book)
+        session.commit()
+        session.refresh(book)
+    elif document_tags and not book.document_tags:
+        # Update document tags if they weren't set before
+        book.document_tags = document_tags
+        book.updated_at = datetime.utcnow()
+        session.add(book)
+        session.commit()
+        session.refresh(book)
+    
+    return book
 
 
 @router.get("/ui", response_class=HTMLResponse)
@@ -133,6 +171,7 @@ async def process_import(
             book_author = row.get('Book Author', '').strip()
             note = row.get('Note', '').strip()
             tags_str = row.get('Tags', '').strip()
+            document_tags_str = row.get('Document tags', '').strip()
             highlighted_at_str = row.get('Highlighted at', '').strip()
             
             # Parse datetime
@@ -140,25 +179,38 @@ async def process_import(
             if not created_at:
                 created_at = datetime.utcnow()
             
+            # Get or create book
+            book = None
+            if book_title:
+                book = get_or_create_book(
+                    session=session,
+                    title=book_title,
+                    author=book_author if book_author else None,
+                    document_tags=document_tags_str if document_tags_str else None
+                )
+            
             # Create highlight
             highlight = Highlight(
                 text=highlight_text,
-                source=book_title if book_title else None,
-                author=book_author if book_author else None,
+                source=book_title if book_title else None,  # Keep for backwards compatibility
+                author=book_author if book_author else None,  # Keep for backwards compatibility
+                book_id=book.id if book else None,
                 note=note if note else None,
                 created_at=created_at,
                 updated_at=datetime.utcnow(),
                 user_id=1,  # Default user for single-user mode
-                status="active"
+                status="active",
+                is_favorited=False,
+                is_discarded=False
             )
             
             session.add(highlight)
             session.commit()
             session.refresh(highlight)
             
-            # Process tags if present
+            # Process tags if present (using utility function)
             if tags_str:
-                tag_names = [t.strip() for t in tags_str.split(',') if t.strip()]
+                tag_names = parse_tags(tags_str)
                 for tag_name in tag_names:
                     tag = get_or_create_tag(session, tag_name)
                     if tag:

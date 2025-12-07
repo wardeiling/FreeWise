@@ -9,14 +9,17 @@
     {% if highlight.note %}
         <div class="highlight-source">Note: {{ highlight.note }}</div>
     {% endif %}
+    {% if highlight.book_id %}
+        <div class="highlight-source">📚 Book ID: {{ highlight.book_id }}</div>
+    {% endif %}
     <div class="highlight-actions">
         <button 
-            class="btn-favorite {% if highlight.favorite %}active{% endif %}"
+            class="btn-favorite {% if highlight.favorite or highlight.is_favorited %}active{% endif %}"
             hx-post="/highlights/{{ highlight.id }}/favorite"
-            hx-vals='{"favorite": "{{ "false" if highlight.favorite else "true" }}"}'
+            hx-vals='{"favorite": "{{ "false" if (highlight.favorite or highlight.is_favorited) else "true" }}"}'
             hx-target="#highlight-{{ highlight.id }}"
             hx-swap="outerHTML">
-            {% if highlight.favorite %}★ Favorited{% else %}☆ Favorite{% endif %}
+            {% if highlight.favorite or highlight.is_favorited %}★ Favorited{% else %}☆ Favorite{% endif %}
         </button>
         <button 
             class="btn-edit"
