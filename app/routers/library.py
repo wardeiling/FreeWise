@@ -2,7 +2,7 @@ from typing import Optional, List
 from fastapi import APIRouter, Depends, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlmodel import Session, select, func, col
+from sqlmodel import Session, select, func
 from datetime import datetime
 
 from app.db import get_engine
@@ -38,6 +38,9 @@ async def ui_library(
     settings = session.exec(settings_stmt).first()
     
     # Get all books with aggregated data
+    highlight_count_col = func.count(Highlight.id).label("highlight_count")
+    last_highlight_col = func.max(Highlight.updated_at).label("last_highlight_update")
+    
     books_query = (
         select(
             Book.id,
@@ -46,8 +49,8 @@ async def ui_library(
             Book.document_tags,
             Book.created_at,
             Book.updated_at,
-            func.count(Highlight.id).label("highlight_count"),
-            func.max(Highlight.updated_at).label("last_highlight_update")
+            highlight_count_col,
+            last_highlight_col
         )
         .outerjoin(Highlight, Book.id == Highlight.book_id)
         .group_by(Book.id)
@@ -66,9 +69,9 @@ async def ui_library(
     elif sort == "author":
         sort_col = Book.author
     elif sort == "highlight_count":
-        sort_col = col("highlight_count")
+        sort_col = highlight_count_col
     elif sort == "last_updated":
-        sort_col = col("last_highlight_update")
+        sort_col = last_highlight_col
     else:
         sort_col = Book.title
     
