@@ -5,11 +5,14 @@
           hx-swap="outerHTML">
         <textarea name="text" required>{{ highlight.text }}</textarea>
         <input type="text" name="source" placeholder="Source (optional)" value="{{ highlight.source or '' }}">
+        {% if context %}
+        <input type="hidden" name="context" value="{{ context }}">
+        {% endif %}
         <div class="highlight-actions">
             <button type="submit" class="btn-save">💾 Save</button>
             <button type="button" 
                     class="btn-cancel"
-                    hx-get="/highlights/{{ highlight.id }}/view"
+                    hx-get="/highlights/{{ highlight.id }}/view?context={{ context or '' }}"
                     hx-target="#highlight-{{ highlight.id }}"
                     hx-swap="outerHTML">
                 Cancel

@@ -229,6 +229,7 @@ async def ui_review(
 async def view_highlight_partial(
     request: Request,
     id: int,
+    context: Optional[str] = None,
     session: Session = Depends(get_session)
 ):
     """Return HTML partial for a single highlight (read-only view)."""
@@ -236,26 +237,32 @@ async def view_highlight_partial(
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
     
-    return templates.TemplateResponse("_highlight_row.html", {
+    # Choose template based on context
+    template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
+    
+    return templates.TemplateResponse(template_name, {
         "request": request,
         "highlight": highlight
     })
 
 
 @router.get("/{id}/edit", response_class=HTMLResponse)
-async def edit_highlight_form(
+async def get_highlight_edit_form(
     request: Request,
     id: int,
+    context: Optional[str] = None,
     session: Session = Depends(get_session)
 ):
-    """Return HTML form fragment for editing a highlight."""
+    """Return edit form for highlight."""
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
     
+    # Store context in the form for use after save
     return templates.TemplateResponse("_highlight_edit.html", {
         "request": request,
-        "highlight": highlight
+        "highlight": highlight,
+        "context": context
     })
 
 
@@ -265,6 +272,7 @@ async def save_highlight_edit(
     id: int,
     text: str = Form(...),
     source: Optional[str] = Form(None),
+    context: Optional[str] = Form(None),
     session: Session = Depends(get_session)
 ):
     """Accept form submission and return updated highlight partial."""
@@ -280,7 +288,10 @@ async def save_highlight_edit(
     session.commit()
     session.refresh(highlight)
     
-    return templates.TemplateResponse("_highlight_row.html", {
+    # Choose template based on context
+    template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
+    
+    return templates.TemplateResponse(template_name, {
         "request": request,
         "highlight": highlight
     })
@@ -291,6 +302,7 @@ async def toggle_favorite_html(
     request: Request,
     id: int,
     favorite: bool = Form(...),
+    context: Optional[str] = Form(None),
     session: Session = Depends(get_session)
 ):
     """Toggle favorite status and return updated highlight partial."""
@@ -304,7 +316,10 @@ async def toggle_favorite_html(
     session.commit()
     session.refresh(highlight)
     
-    return templates.TemplateResponse("_highlight_row.html", {
+    # Choose template based on context
+    template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
+    
+    return templates.TemplateResponse(template_name, {
         "request": request,
         "highlight": highlight
     })
@@ -314,6 +329,7 @@ async def toggle_favorite_html(
 async def discard_highlight_html(
     request: Request,
     id: int,
+    context: Optional[str] = Form(None),
     session: Session = Depends(get_session)
 ):
     """Toggle is_discarded status and return updated highlight partial."""
@@ -328,8 +344,11 @@ async def discard_highlight_html(
     session.commit()
     session.refresh(highlight)
     
+    # Choose template based on context
+    template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
+    
     # Return updated highlight with badge
-    return templates.TemplateResponse("_highlight_row.html", {
+    return templates.TemplateResponse(template_name, {
         "request": request,
         "highlight": highlight
     })
