@@ -38,26 +38,53 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9em;
+    transition: all 0.2s ease;
 }
 
 .btn-favorite {
-    background: #ffd700;
-    color: #333;
+    background: transparent;
+    color: var(--muted-text);
+    font-size: 1.5em;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+}
+
+.btn-favorite:hover {
+    background: var(--highlight-bg);
+    transform: scale(1.1);
 }
 
 .btn-favorite.active {
-    background: #ff8c00;
-    color: white;
+    color: #ffd700;
+    background: transparent;
 }
 
 .btn-discard {
+    background: transparent;
+    color: var(--muted-text);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    font-size: 0.85em;
+}
+
+.btn-discard:hover {
     background: #dc3545;
     color: white;
+    border-color: #dc3545;
 }
 
 .btn-edit {
-    background: #007bff;
+    background: transparent;
+    color: var(--muted-text);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
+.btn-edit:hover {
+    background: var(--link-color);
     color: white;
+    border-color: var(--link-color);
 }
 
 .btn-save {
@@ -65,7 +92,15 @@ button {
     color: white;
 }
 
+.btn-save:hover {
+    background: #218838;
+}
+
 .btn-cancel {
     background: #6c757d;
     color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
 }

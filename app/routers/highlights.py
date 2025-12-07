@@ -316,16 +316,21 @@ async def discard_highlight_html(
     id: int,
     session: Session = Depends(get_session)
 ):
-    """Mark highlight as discarded and return empty div."""
+    """Toggle is_discarded status and return updated highlight partial."""
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
     
-    highlight.status = "discarded"
+    # Toggle the is_discarded field
+    highlight.is_discarded = not highlight.is_discarded
     highlight.updated_at = datetime.utcnow()
     session.add(highlight)
     session.commit()
+    session.refresh(highlight)
     
-    # Return empty div to remove the highlight from view
-    return HTMLResponse(content=f'<div id="highlight-{id}" style="display:none;"></div>')
+    # Return updated highlight with badge
+    return templates.TemplateResponse("_highlight_row.html", {
+        "request": request,
+        "highlight": highlight
+    })
 

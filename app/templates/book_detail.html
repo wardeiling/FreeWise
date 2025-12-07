@@ -2,42 +2,127 @@
 
 {% block title %}{{ book.title }} - FreeWise{% endblock %}
 
-{% block heading %}{{ book.title }}{% endblock %}
+{% block heading %}{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 20px; padding: 15px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+<!-- Book Header (Centered) -->
+<div style="text-align: center; margin-bottom: 30px; padding: 30px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+    <h1 style="margin: 0 0 15px 0; font-size: 2em; color: var(--text-color);">
+        {{ book.title }}
+    </h1>
+    
     {% if book.author %}
-    <div style="margin-bottom: 10px;">
-        <strong>Author:</strong> {{ book.author }}
+    <div style="margin-bottom: 15px; font-size: 1.2em; color: var(--muted-text);">
+        by {{ book.author }}
     </div>
     {% endif %}
-    {% if book.document_tags %}
-    <div style="margin-bottom: 10px;">
-        <strong>Tags:</strong> {{ book.document_tags }}
+    
+    <!-- Document Tags Section -->
+    <div id="document-tags-section" style="margin-top: 20px;">
+        {% if book.document_tags %}
+        <div style="display: inline-block; padding: 8px 16px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px; margin-bottom: 10px;">
+            <span style="margin-right: 10px;">🏷️</span>
+            <span id="document-tags-display">{{ book.document_tags }}</span>
+            <button 
+                style="margin-left: 10px; background: transparent; border: none; cursor: pointer; color: var(--link-color); padding: 0;"
+                hx-get="/library/ui/book/{{ book.id }}/edit-tags"
+                hx-target="#document-tags-section"
+                hx-swap="innerHTML">
+                ✎
+            </button>
+        </div>
+        {% else %}
+        <button 
+            style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
+            hx-get="/library/ui/book/{{ book.id }}/edit-tags"
+            hx-target="#document-tags-section"
+            hx-swap="innerHTML">
+            + Add document tags
+        </button>
+        {% endif %}
     </div>
-    {% endif %}
-    <div style="margin-bottom: 10px; color: var(--muted-text); font-size: 0.9em;">
-        <strong>Total Highlights:</strong> {{ highlights|length }}
-    </div>
-    <div style="color: var(--muted-text); font-size: 0.9em;">
-        <strong>Added:</strong> {{ book.created_at.strftime('%Y-%m-%d %H:%M') }}
+    
+    <div style="margin-top: 20px; color: var(--muted-text); font-size: 0.9em;">
+        <strong>{{ highlights|length }}</strong> highlight{{ 's' if highlights|length != 1 else '' }} 
+        • Added {{ book.created_at.strftime('%B %d, %Y') }}
     </div>
 </div>
 
+<!-- Highlights List -->
 {% if highlights %}
-<h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.2em;">Highlights</h2>
 <div id="highlights-container">
     {% for highlight in highlights %}
-        {% include "_highlight_row.html" %}
+    <div class="highlight" id="highlight-{{ highlight.id }}" style="position: relative;">
+        <div class="highlight-text">{{ highlight.text }}</div>
+        
+        {% if highlight.note %}
+        <div class="highlight-source" style="font-style: italic; margin-top: 8px;">
+            💭 {{ highlight.note }}
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <!-- Favorite Star -->
+                <button 
+                    class="{% if highlight.favorite or highlight.is_favorited %}btn-favorite active{% else %}btn-favorite{% endif %}"
+                    hx-post="/highlights/{{ highlight.id }}/favorite"
+                    hx-vals='{"favorite": "{{ "false" if (highlight.favorite or highlight.is_favorited) else "true" }}"}'
+                    hx-target="#highlight-{{ highlight.id }}"
+                    hx-swap="outerHTML"
+                    title="Toggle favorite">
+                    {% if highlight.favorite or highlight.is_favorited %}★{% else %}☆{% endif %}
+                </button>
+                
+                <!-- Edit Button -->
+                <button 
+                    class="btn-edit"
+                    hx-get="/highlights/{{ highlight.id }}/edit"
+                    hx-target="#highlight-{{ highlight.id }}"
+                    hx-swap="outerHTML"
+                    title="Edit highlight">
+                    ✎
+                </button>
+                
+                <!-- Discard Toggle -->
+                <button 
+                    class="btn-discard"
+                    hx-post="/highlights/{{ highlight.id }}/discard"
+                    hx-target="#highlight-{{ highlight.id }}"
+                    hx-swap="outerHTML"
+                    hx-confirm="Are you sure you want to {{ 'restore' if highlight.is_discarded else 'discard' }} this highlight?"
+                    title="{{ 'Restore' if highlight.is_discarded else 'Discard' }} highlight">
+                    {% if highlight.is_discarded %}
+                    ↻ Restore
+                    {% else %}
+                    ✕ Discard
+                    {% endif %}
+                </button>
+            </div>
+            
+            <!-- Status Badges -->
+            <div style="display: flex; gap: 8px; align-items: center;">
+                {% if highlight.is_discarded %}
+                <span style="background: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold;">
+                    Discarded
+                </span>
+                {% endif %}
+                <span style="color: var(--muted-text); font-size: 0.8em;">
+                    {{ highlight.created_at.strftime('%b %d, %Y') }}
+                </span>
+            </div>
+        </div>
+    </div>
     {% endfor %}
 </div>
 {% else %}
 <div style="text-align: center; padding: 40px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-    <p>No highlights found for this book.</p>
+    <p style="font-size: 1.2em; margin-bottom: 10px;">No highlights yet</p>
+    <p style="color: var(--muted-text);">Import highlights to get started.</p>
 </div>
 {% endif %}
 
-<div style="margin-top: 30px;">
+<div style="margin-top: 30px; text-align: center;">
     <a href="/library/ui">← Back to Library</a>
 </div>
 {% endblock %}
