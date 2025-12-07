@@ -148,16 +148,24 @@ def discard_highlight(id: int, session: Session = Depends(get_session)):
 
 @router.get("/review/", response_model=List[Highlight])
 def get_review_highlights(
-    n: int = 5,
+    n: Optional[int] = None,
     session: Session = Depends(get_session)
 ):
     """
     Return up to n highlights for review.
     
+    If n is not provided, uses Settings.daily_review_count.
+    
     Priority order:
     1. Active highlights with next_review <= now or next_review is NULL
     2. Fill remaining slots with random active highlights
     """
+    # Load n from settings if not provided
+    if n is None:
+        settings_stmt = select(Settings)
+        settings = session.exec(settings_stmt).first()
+        n = settings.daily_review_count if settings else 5
+    
     now = datetime.utcnow()
     
     # Get highlights due for review
@@ -198,15 +206,16 @@ def get_review_highlights(
 @router.get("/ui/review", response_class=HTMLResponse)
 async def ui_review(
     request: Request,
-    n: int = 5,
     session: Session = Depends(get_session)
 ):
     """Render HTML page with highlights for review."""
-    highlights = get_review_highlights(n=n, session=session)
-    
-    # Get settings for theme
+    # Get settings for theme and daily review count
     settings_stmt = select(Settings)
     settings = session.exec(settings_stmt).first()
+    
+    # Use daily_review_count from settings
+    n = settings.daily_review_count if settings else 5
+    highlights = get_review_highlights(n=n, session=session)
     
     return templates.TemplateResponse("review.html", {
         "request": request,

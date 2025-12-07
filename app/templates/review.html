@@ -2,7 +2,7 @@
 
 {% block title %}Daily Review - FreeWise{% endblock %}
 
-{% block heading %}Daily Review{% endblock %}
+{% block heading %}Daily Review ({{ highlights|length }} of {{ n }} highlights){% endblock %}
 
 {% block content %}
 <div id="highlights-container">
@@ -16,6 +16,10 @@
 </div>
 
 <div style="margin-top: 30px;">
+    <p style="color: var(--muted-text); font-size: 0.9em;">
+        Showing {{ highlights|length }} highlight(s) based on your daily review count setting ({{ n }}).
+        <a href="/settings/ui">Change in settings</a>
+    </p>
     <a href="/">← Back to Home</a>
 </div>
 {% endblock %}

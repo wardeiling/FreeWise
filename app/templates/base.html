@@ -170,14 +170,17 @@
         <h1>{% block heading %}FreeWise{% endblock %}</h1>
         <nav style="margin-top: 10px;">
             <a href="/" style="margin-right: 15px;">Home</a>
-            <a href="/highlights/ui/review?n=5" style="margin-right: 15px;">Review</a>
+            <a href="/highlights/ui/review" style="margin-right: 15px;">Review</a>
             <a href="/settings/ui">Settings</a>
         </nav>
     </div>
     {% block content %}
 <p>Welcome to FreeWise - your personal highlight manager.</p>
 <div style="margin-top: 20px;">
-    <a href="/highlights/ui/review?n=5" style="font-size: 1.1em;">→ Start Daily Review (5 highlights)</a>
+    <a href="/highlights/ui/review" style="font-size: 1.1em;">
+        → Start Daily Review
+        {% if settings %}({{ settings.daily_review_count }} highlights){% endif %}
+    </a>
 </div>
 {% endblock %}
 </body>
