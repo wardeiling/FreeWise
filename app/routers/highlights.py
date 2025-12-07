@@ -225,6 +225,56 @@ async def ui_review(
     })
 
 
+@router.get("/ui/favorites", response_class=HTMLResponse)
+async def ui_favorites(
+    request: Request,
+    session: Session = Depends(get_session)
+):
+    """Render HTML page with all favorite highlights."""
+    # Get settings for theme
+    settings_stmt = select(Settings)
+    settings = session.exec(settings_stmt).first()
+    
+    # Query all favorited highlights, ordered by most recent first
+    statement = (
+        select(Highlight)
+        .where(Highlight.is_favorited == True)
+        .order_by(Highlight.created_at.desc())
+    )
+    highlights = session.exec(statement).all()
+    
+    return templates.TemplateResponse("favorites.html", {
+        "request": request,
+        "highlights": highlights,
+        "settings": settings
+    })
+
+
+@router.get("/ui/discarded", response_class=HTMLResponse)
+async def ui_discarded(
+    request: Request,
+    session: Session = Depends(get_session)
+):
+    """Render HTML page with all discarded highlights."""
+    # Get settings for theme
+    settings_stmt = select(Settings)
+    settings = session.exec(settings_stmt).first()
+    
+    # Query all discarded highlights, ordered by most recent first
+    statement = (
+        select(Highlight)
+        .where(Highlight.is_discarded == True)
+        .order_by(Highlight.created_at.desc())
+    )
+    highlights = session.exec(statement).all()
+    
+    return templates.TemplateResponse("discarded.html", {
+        "request": request,
+        "highlights": highlights,
+        "settings": settings
+    })
+
+
 @router.get("/{id}/view", response_class=HTMLResponse)
 async def view_highlight_partial(
     request: Request,
