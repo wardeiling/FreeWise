@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     # Initialize default settings if not exists
     from sqlmodel import Session, select
     with Session(engine) as session:
-        statement = select(Settings)
+v        statement = select(Settings)
         existing_settings = session.exec(statement).first()
         if not existing_settings:
             default_settings = Settings()

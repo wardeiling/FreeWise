@@ -10,6 +10,21 @@
         {% for highlight in highlights %}
             {% include "_highlight_row.html" %}
         {% endfor %}
+        
+        <!-- Complete Review Button -->
+        <div style="margin-top: 40px; text-align: center; padding: 30px; background: var(--highlight-bg); border-radius: 12px; border: 2px dashed var(--border-color);">
+            <div style="font-size: 2em; margin-bottom: 15px;">🎉</div>
+            <h3 style="margin: 0 0 15px 0; color: var(--text-color);">Finished reviewing?</h3>
+            <p style="color: var(--muted-text); margin-bottom: 20px;">
+                Mark this session as complete to track your progress.
+            </p>
+            <a href="/dashboard/ui?reviewed=complete" 
+               style="display: inline-block; background: #28a745; color: white; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.2s;"
+               onmouseover="this.style.background='#218838'; this.style.transform='scale(1.05)'"
+               onmouseout="this.style.background='#28a745'; this.style.transform='scale(1)'">
+                ✓ Mark as Complete
+            </a>
+        </div>
     {% else %}
         <p>No highlights available for review today. Great job staying on top of things!</p>
     {% endif %}
@@ -20,6 +35,6 @@
         Showing {{ highlights|length }} highlight(s) based on your daily review count setting ({{ n }}).
         <a href="/settings/ui">Change in settings</a>
     </p>
-    <a href="/">← Back to Home</a>
+    <a href="/dashboard/ui">← Back to Dashboard</a>
 </div>
 {% endblock %}
