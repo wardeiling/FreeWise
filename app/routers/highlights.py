@@ -7,7 +7,7 @@ from sqlmodel import Session, select, func
 from pydantic import BaseModel
 
 from app.db import get_engine
-from app.models import Highlight
+from app.models import Highlight, Settings
 
 
 router = APIRouter(prefix="/highlights", tags=["highlights"])
@@ -203,10 +203,16 @@ async def ui_review(
 ):
     """Render HTML page with highlights for review."""
     highlights = get_review_highlights(n=n, session=session)
+    
+    # Get settings for theme
+    settings_stmt = select(Settings)
+    settings = session.exec(settings_stmt).first()
+    
     return templates.TemplateResponse("review.html", {
         "request": request,
         "highlights": highlights,
-        "n": n
+        "n": n,
+        "settings": settings
     })
 
 

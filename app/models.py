@@ -48,3 +48,14 @@ class HighlightTag(SQLModel, table=True):
     """Many-to-many relationship between highlights and tags."""
     highlight_id: int = Field(foreign_key="highlight.id", primary_key=True)
     tag_id: int = Field(foreign_key="tag.id", primary_key=True)
+
+
+class Settings(SQLModel, table=True):
+    """Application settings for customizing behavior."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    daily_review_count: int = Field(default=5)
+    default_sort: str = Field(default="next_review")
+    theme: str = Field(default="light")
+    
+    def __repr__(self) -> str:
+        return f"Settings(id={self.id}, daily_review_count={self.daily_review_count})"

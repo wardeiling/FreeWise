@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - FreeWise{% endblock %}
+
+{% block heading %}Settings{% endblock %}
+
+{% block content %}
+{% if success_message %}
+<div class="success-message" style="padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+    {{ success_message }}
+</div>
+{% endif %}
+
+<form method="post" action="/settings/ui" style="max-width: 500px;">
+    <div style="margin-bottom: 20px;">
+        <label for="daily_review_count" style="display: block; margin-bottom: 5px; font-weight: bold;">
+            Daily Review Count
+        </label>
+        <input 
+            type="number" 
+            id="daily_review_count" 
+            name="daily_review_count" 
+            value="{{ settings.daily_review_count }}"
+            min="1"
+            max="50"
+            required
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+        <small style="display: block; margin-top: 5px;">
+            Number of highlights to show in daily review (1-50)
+        </small>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="default_sort" style="display: block; margin-bottom: 5px; font-weight: bold;">
+            Default Sort Order
+        </label>
+        <select 
+            id="default_sort" 
+            name="default_sort" 
+            required
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+            <option value="next_review" {% if settings.default_sort == "next_review" %}selected{% endif %}>
+                Next Review Date
+            </option>
+            <option value="created_at" {% if settings.default_sort == "created_at" %}selected{% endif %}>
+                Creation Date
+            </option>
+            <option value="updated_at" {% if settings.default_sort == "updated_at" %}selected{% endif %}>
+                Last Updated
+            </option>
+            <option value="favorite" {% if settings.default_sort == "favorite" %}selected{% endif %}>
+                Favorites First
+            </option>
+        </select>
+        <small style="display: block; margin-top: 5px;">
+            How highlights are sorted in list views
+        </small>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="theme" style="display: block; margin-bottom: 5px; font-weight: bold;">
+            Theme
+        </label>
+        <select 
+            id="theme" 
+            name="theme" 
+            required
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+            <option value="light" {% if settings.theme == "light" %}selected{% endif %}>
+                Light
+            </option>
+            <option value="dark" {% if settings.theme == "dark" %}selected{% endif %}>
+                Dark
+            </option>
+            <option value="auto" {% if settings.theme == "auto" %}selected{% endif %}>
+                Auto (System)
+            </option>
+        </select>
+        <small style="display: block; margin-top: 5px;">
+            Visual theme for the application
+        </small>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <button type="submit" style="background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;">
+            💾 Save Settings
+        </button>
+        <a href="/" style="margin-left: 15px;">
+            Cancel
+        </a>
+    </div>
+</form>
+
+<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+    <a href="/">← Back to Home</a>
+</div>
+{% endblock %}
