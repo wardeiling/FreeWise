@@ -10,6 +10,24 @@ docker compose up
 
 The application will be available at http://localhost:8000
 
+## Testing and Development
+
+For testing and development, clone the repository and install the required dependencies:
+
+```bash
+git clone
+cd freewise
+pip install -r requirements.txt
+```
+
+Run the application using Uvicorn:
+
+```bash
+uvicorn main:app --reload
+```
+
+The application will be available at http://localhost:8000
+
 ## To-Do
 
 - [ ] if there is no date available for import (e.g., empty entry) set to null and also don't show them in the book UI
