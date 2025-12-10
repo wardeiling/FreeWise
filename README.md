@@ -12,7 +12,7 @@ The application will be available at http://localhost:8000
 
 ## To-Do
 
-- [ ] if there is no date available for import set to null and also don't show them in the book UI
+- [ ] if there is no date available for import (e.g., empty entry) set to null and also don't show them in the book UI
 - [ ] improve the UI: 
     - [ ] remove text of symbols (or make it show when hovering on it)
     - [ ] remove book ID
