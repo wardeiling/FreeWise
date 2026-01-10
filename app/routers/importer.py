@@ -25,7 +25,7 @@ def get_session():
 def parse_readwise_datetime(dt_str: str) -> datetime:
     """Parse various datetime formats from Readwise CSV."""
     if not dt_str or dt_str.strip() == "":
-        return datetime.utcnow()
+        return ""
     
     formats = [
         "%B %d, %Y %I:%M:%S %p",      # January 15, 2024 10:30:00 AM
@@ -48,7 +48,7 @@ def parse_readwise_datetime(dt_str: str) -> datetime:
             continue
     
     # If all formats fail, return None
-    return None
+    return ""
 
 
 def get_or_create_tag(session: Session, tag_name: str) -> Tag:
@@ -138,8 +138,7 @@ async def process_import(
        Location Type, Location, Highlighted at, Document tags
     
     2. Extended FreeWise CSV exports with additional columns:
-       highlight_id, book_id, is_favorited, is_discarded, last_reviewed_at,
-       review_count, created_at, updated_at, book_created_at, book_updated_at
+       is_favorited, is_discarded
     
     The importer is backwards-compatible and will use extended metadata if present,
     or fall back to defaults if columns are missing.
@@ -186,18 +185,12 @@ async def process_import(
             # Extended columns (optional - only in FreeWise exports)
             is_favorited_str = row.get('is_favorited', '').strip().lower()
             is_discarded_str = row.get('is_discarded', '').strip().lower()
-            created_at_str = row.get('created_at', '').strip()
-            updated_at_str = row.get('updated_at', '').strip()
-            # review_count and last_reviewed_at are reserved for future use
             
-            # Parse datetime - prefer 'Highlighted at' (Readwise), fallback to 'created_at' (extended)
-            datetime_str = highlighted_at_str or created_at_str
+            # Parse datetime
+            datetime_str = highlighted_at_str
             created_at = parse_readwise_datetime(datetime_str)
             if not created_at:
                 created_at = datetime.utcnow()
-            
-            # Parse updated_at if available (extended format only)
-            updated_at = parse_readwise_datetime(updated_at_str) if updated_at_str else datetime.utcnow()
             
             # Get or create book
             book = None

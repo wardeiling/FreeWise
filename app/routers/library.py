@@ -242,6 +242,35 @@ async def ui_book_cancel_add_tag(
     return HTMLResponse(content="")
 
 
+@router.delete("/ui/book/{book_id}", response_class=HTMLResponse)
+async def ui_book_delete(
+    request: Request,
+    book_id: int,
+    session: Session = Depends(get_session)
+):
+    """Delete a book and all its highlights from the library."""
+    book = session.get(Book, book_id)
+    if not book:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    # Delete all highlights associated with this book
+    highlights_stmt = select(Highlight).where(Highlight.book_id == book_id)
+    highlights = session.exec(highlights_stmt).all()
+    for highlight in highlights:
+        session.delete(highlight)
+    
+    # Delete the book
+    session.delete(book)
+    session.commit()
+    
+    # Return response that triggers redirect to library
+    return HTMLResponse(
+        content="",
+        headers={"HX-Redirect": "/library/ui"}
+    )
+
+
 def _render_tags_section(book: Book) -> HTMLResponse:
     """Helper function to render the tags section."""
     tags_html = ""

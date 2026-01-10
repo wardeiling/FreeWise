@@ -34,9 +34,8 @@ async def export_highlights_csv(
     - Highlight, Book Title, Book Author, Amazon Book ID, Note, Color,
       Tags, Location Type, Location, Highlighted at, Document tags
     
-    Extended columns (12+):
-    - highlight_id, book_id, is_favorited, is_discarded, last_reviewed_at,
-      review_count, created_at, updated_at, book_created_at, book_updated_at
+    Extended columns (12-13):
+    - is_favorited, is_discarded
     """
     # Query all highlights with their associated books
     statement = (
@@ -65,16 +64,8 @@ async def export_highlights_csv(
         'Highlighted at',
         'Document tags',
         # Extended FreeWise columns
-        'highlight_id',
-        'book_id',
         'is_favorited',
         'is_discarded',
-        'last_reviewed_at',
-        'review_count',
-        'created_at',
-        'updated_at',
-        'book_created_at',
-        'book_updated_at'
     ]
     writer.writerow(headers)
     
@@ -96,10 +87,6 @@ async def export_highlights_csv(
         
         # Format timestamps in ISO format for consistency
         highlighted_at = highlight.created_at.isoformat() if highlight.created_at else ''
-        created_at = highlight.created_at.isoformat() if highlight.created_at else ''
-        updated_at = highlight.updated_at.isoformat() if highlight.updated_at else ''
-        book_created_at = book.created_at.isoformat() if book and book.created_at else ''
-        book_updated_at = book.updated_at.isoformat() if book and book.updated_at else ''
         
         row = [
             # Readwise-compatible columns
@@ -115,16 +102,8 @@ async def export_highlights_csv(
             highlighted_at,                                                 # Highlighted at (ISO format)
             book.document_tags if book and book.document_tags else '',     # Document tags (book-level)
             # Extended FreeWise columns
-            highlight.id,                                                   # highlight_id
-            book.id if book else '',                                        # book_id
             'true' if is_favorited else 'false',                           # is_favorited
             'true' if highlight.is_discarded else 'false',                 # is_discarded
-            '',                                                             # last_reviewed_at (placeholder)
-            '',                                                             # review_count (placeholder)
-            created_at,                                                     # created_at
-            updated_at,                                                     # updated_at
-            book_created_at,                                                # book_created_at
-            book_updated_at                                                 # book_updated_at
         ]
         writer.writerow(row)
     

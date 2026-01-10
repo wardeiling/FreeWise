@@ -42,15 +42,6 @@
                     </a>
                 </th>
                 <th style="padding: 12px; text-align: left;">
-                    <a href="/library/ui?sort=date_added&order={{ 'desc' if current_sort == 'date_added' and current_order == 'asc' else 'asc' }}" 
-                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-                        Date Added
-                        {% if current_sort == 'date_added' %}
-                            {{ '↓' if current_order == 'desc' else '↑' }}
-                        {% endif %}
-                    </a>
-                </th>
-                <th style="padding: 12px; text-align: left;">
                     <a href="/library/ui?sort=last_highlight&order={{ 'desc' if current_sort == 'last_highlight' and current_order == 'asc' else 'asc' }}" 
                        style="color: var(--text-color); text-decoration: none; font-weight: bold;">
                         Last Highlight
@@ -83,9 +74,6 @@
                     <span style="background: var(--bg-color); padding: 4px 12px; border-radius: 12px; font-weight: bold;">
                         {{ book.highlight_count }}
                     </span>
-                </td>
-                <td style="padding: 12px; color: var(--muted-text); font-size: 0.9em;">
-                    {{ book.date_added.strftime('%Y-%m-%d') if book.date_added else 'Unknown' }}
                 </td>
                 <td style="padding: 12px; color: var(--muted-text); font-size: 0.9em;">
                     {{ book.last_highlight_date.strftime('%Y-%m-%d') if book.last_highlight_date else 'None' }}
