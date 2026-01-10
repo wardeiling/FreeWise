@@ -9,9 +9,6 @@
     {% if highlight.note %}
         <div class="highlight-source">Note: {{ highlight.note }}</div>
     {% endif %}
-    {% if highlight.book_id %}
-        <div class="highlight-source">📚 Book ID: {{ highlight.book_id }}</div>
-    {% endif %}
     <div class="highlight-actions">
         <button 
             class="btn-favorite {% if highlight.favorite or highlight.is_favorited %}active{% endif %}"
