@@ -107,7 +107,7 @@
             // Show progress container
             document.getElementById('progress-container').style.display = 'block';
             
-            // Simulate progress (since we can't get real progress from server easily)
+            // Simulate progress
             let progress = 0;
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
@@ -118,25 +118,34 @@
                 'Creating books...',
                 'Importing highlights...',
                 'Parsing tags...',
-                'Finalizing import...'
+                'Finalizing import...',
+                'Import complete!'
             ];
             
             let messageIndex = 0;
+            progressText.textContent = messages[0];
             
             const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 90) progress = 90; // Stop at 90% until actual completion
+                progress += Math.random() * 12 + 5;
+                if (progress > 100) progress = 100;
                 
                 progressBar.style.width = progress + '%';
                 
                 // Update message periodically
-                if (progress > (messageIndex + 1) * 15 && messageIndex < messages.length - 1) {
+                const messageThreshold = (messageIndex + 1) * (100 / messages.length);
+                if (progress > messageThreshold && messageIndex < messages.length - 1) {
                     messageIndex++;
                     progressText.textContent = messages[messageIndex];
                 }
-            }, 500);
+                
+                // Complete - the form submission will navigate to success page
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressText.textContent = 'Import complete! Redirecting...';
+                }
+            }, 300);
             
-            // Store interval ID to clear it when form actually submits
+            // Store interval ID to clear it if needed
             window.progressInterval = interval;
         }
     </script>

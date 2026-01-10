@@ -54,5 +54,5 @@ The application will be available at http://localhost:8000
     - [ ] Define a separate function for readwise import and book import
     - [ ] For book import, allow for import with book section information and page numbers (annoyingly ReadWise does not provide this for export of csv)
     - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
-- [ ] Add progress bar for imports (of lage files)
+- [X] Add progress bar for imports (of large files)
 - [X] Allow users to edit book information (e.g., author name, title) after import.
