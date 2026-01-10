@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select, func
 from datetime import datetime
+import html
 
 from app.db import get_engine
 from app.models import Book, Highlight, Settings
@@ -132,6 +133,119 @@ async def ui_book_detail(
         "book": book,
         "highlights": highlights
     })
+
+
+@router.get("/ui/book/{book_id}/edit", response_class=HTMLResponse)
+async def ui_book_edit_form(
+    request: Request,
+    book_id: int,
+    session: Session = Depends(get_session)
+):
+    """Return inline form for editing book metadata."""
+    book = session.get(Book, book_id)
+    if not book:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    # Get highlight count for the book
+    highlights_stmt = select(Highlight).where(Highlight.book_id == book_id)
+    highlights = session.exec(highlights_stmt).all()
+    highlight_count = len(highlights)
+    
+    # Escape HTML entities to prevent quote issues
+    escaped_title = html.escape(book.title, quote=True)
+    escaped_author = html.escape(book.author or '', quote=True)
+    
+    form_html = f"""
+    <div id="book-header" style="position: relative; text-align: center; margin-bottom: 30px; padding: 30px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+        <form hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" style="max-width: 500px; margin: 0 auto;">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; text-align: left; margin-bottom: 5px; font-weight: bold; color: var(--text-color);">Book Title</label>
+                <input 
+                    type="text" 
+                    name="title" 
+                    value="{escaped_title}" 
+                    required
+                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); font-size: 1em;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; text-align: left; margin-bottom: 5px; font-weight: bold; color: var(--text-color);">Author</label>
+                <input 
+                    type="text" 
+                    name="author" 
+                    value="{escaped_author}" 
+                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); font-size: 1em;">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button 
+                    type="submit"
+                    style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    ✓ Save
+                </button>
+                <button 
+                    type="button"
+                    hx-get="/library/ui/book/{book_id}/cancel-edit"
+                    hx-target="#book-header"
+                    hx-swap="outerHTML"
+                    style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    ✕ Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+    """
+    
+    return HTMLResponse(content=form_html)
+
+
+@router.post("/ui/book/{book_id}/edit", response_class=HTMLResponse)
+async def ui_book_update(
+    request: Request,
+    book_id: int,
+    title: str = Form(...),
+    author: str = Form(""),
+    session: Session = Depends(get_session)
+):
+    """Update book metadata and return updated header."""
+    book = session.get(Book, book_id)
+    if not book:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    # Update book metadata
+    book.title = title.strip()
+    book.author = author.strip() if author.strip() else None
+    
+    session.add(book)
+    session.commit()
+    session.refresh(book)
+    
+    # Get highlight count for the book
+    highlights_stmt = select(Highlight).where(Highlight.book_id == book_id)
+    highlights = session.exec(highlights_stmt).all()
+    highlight_count = len(highlights)
+    
+    return _render_book_header(book, highlight_count)
+
+
+@router.get("/ui/book/{book_id}/cancel-edit", response_class=HTMLResponse)
+async def ui_book_cancel_edit(
+    request: Request,
+    book_id: int,
+    session: Session = Depends(get_session)
+):
+    """Cancel editing and return normal book header."""
+    book = session.get(Book, book_id)
+    if not book:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    # Get highlight count for the book
+    highlights_stmt = select(Highlight).where(Highlight.book_id == book_id)
+    highlights = session.exec(highlights_stmt).all()
+    highlight_count = len(highlights)
+    
+    return _render_book_header(book, highlight_count)
 
 
 @router.get("/ui/book/{book_id}/add-tag", response_class=HTMLResponse)
@@ -303,3 +417,92 @@ def _render_tags_section(book: Book) -> HTMLResponse:
     """
     
     return HTMLResponse(content=full_html)
+
+
+def _render_book_header(book: Book, highlight_count: int) -> HTMLResponse:
+    """Helper function to render the book header section."""
+    author_html = f"""
+    <div style="margin-bottom: 15px; font-size: 1.2em; color: var(--muted-text);">
+        by {book.author}
+    </div>
+    """ if book.author else ""
+    
+    header_html = f"""
+    <div id="book-header" style="position: relative; text-align: center; margin-bottom: 30px; padding: 30px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+        <!-- Edit Button in Top-Left -->
+        <button 
+            style="position: absolute; top: 15px; left: 15px; background: transparent; border: none; color: #007bff; cursor: pointer; font-size: 20px; line-height: 1; padding: 5px; transition: transform 0.2s;"
+            hx-get="/library/ui/book/{book.id}/edit"
+            hx-target="#book-header"
+            hx-swap="outerHTML"
+            title="Edit Book"
+            type="button"
+            onmouseover="this.style.transform='scale(1.2)'"
+            onmouseout="this.style.transform='scale(1)'">
+            ✏️
+        </button>
+        
+        <!-- Delete Button in Top-Right -->
+        <button 
+            style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #dc3545; cursor: pointer; font-size: 24px; line-height: 1; padding: 5px; transition: transform 0.2s;"
+            hx-delete="/library/ui/book/{book.id}"
+            hx-confirm="⚠️ Are you sure you want to remove '{book.title}' and all its {highlight_count} highlight(s) from your library? This action cannot be undone."
+            title="Remove from Library"
+            type="button"
+            onmouseover="this.style.transform='scale(1.2)'"
+            onmouseout="this.style.transform='scale(1)'">
+            ✕
+        </button>
+        
+        <h1 style="margin: 0 0 15px 0; font-size: 2em; color: var(--text-color);">
+            {book.title}
+        </h1>
+        
+        {author_html}
+        
+        <!-- Document Tags Section -->
+        <div id="document-tags-section" style="margin-top: 20px;">
+            <div id="tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px;">
+    """
+    
+    # Add tags
+    if book.document_tags:
+        tags = book.document_tags.split(',')
+        for tag in tags:
+            tag_stripped = tag.strip()
+            header_html += f"""
+                <div style="display: inline-flex; align-items: center; padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px;">
+                    <span style="margin-right: 8px;">🏷️ {tag_stripped}</span>
+                    <button 
+                        style="background: transparent; border: none; cursor: pointer; color: #dc3545; padding: 0; font-size: 1.2em; line-height: 1;"
+                        hx-post="/library/ui/book/{book.id}/remove-tag"
+                        hx-vals='{{"tag": "{tag_stripped}"}}'
+                        hx-target="#document-tags-section"
+                        hx-swap="innerHTML"
+                        title="Remove tag">
+                        ×
+                    </button>
+                </div>
+            """
+    
+    header_html += f"""
+            </div>
+            <div style="text-align: center;">
+                <button 
+                    style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
+                    hx-get="/library/ui/book/{book.id}/add-tag"
+                    hx-target="#add-tag-form"
+                    hx-swap="innerHTML">
+                    + Add document tags
+                </button>
+            </div>
+            <div id="add-tag-form" style="margin-top: 10px; text-align: center;"></div>
+        </div>
+        
+        <div style="margin-top: 20px; color: var(--muted-text); font-size: 0.9em;">
+            <strong>{highlight_count}</strong> highlight{'s' if highlight_count != 1 else ''}
+        </div>
+    </div>
+    """
+    
+    return HTMLResponse(content=header_html)

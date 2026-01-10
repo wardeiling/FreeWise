@@ -33,9 +33,9 @@ The application will be available at http://localhost:8000
 ## To-Do
 
 - [ ] if there is no date available for import (e.g., empty entry) set to null and also don't show them in the book UI
-- [ ] Remove date book added column from the library (and everywhere else in GUI)
+- [X] Remove date book added column from the library (and everywhere else in GUI)
     - [X] GUI library
-    - [ ] library.py
+    - [X] library.py
 - [ ] improve the UI: 
     - [ ] remove text of symbols (or make it show when hovering on it)
     - [X] remove book ID
@@ -54,3 +54,5 @@ The application will be available at http://localhost:8000
     - [ ] Define a separate function for readwise import and book import
     - [ ] For book import, allow for import with book section information and page numbers (annoyingly ReadWise does not provide this for export of csv)
     - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
+- [ ] Add progress bar for imports (of lage files)
+- [X] Allow users to edit book information (e.g., author name, title) after import.
