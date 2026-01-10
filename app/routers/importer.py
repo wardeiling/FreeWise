@@ -99,7 +99,6 @@ def get_or_create_book(session: Session, title: str, author: Optional[str] = Non
     elif document_tags and not book.document_tags:
         # Update document tags if they weren't set before
         book.document_tags = document_tags
-        book.updated_at = datetime.utcnow()
         session.add(book)
         session.commit()
         session.refresh(book)
@@ -236,7 +235,6 @@ async def process_import(
                 book_id=book.id if book else None,
                 note=note if note else None,
                 created_at=created_at,
-                updated_at=updated_at,
                 user_id=1,  # Default user for single-user mode
                 status="discarded" if is_discarded else "active",
                 is_favorited=is_favorited,

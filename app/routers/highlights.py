@@ -105,7 +105,6 @@ def update_highlight(
     if highlight_data.next_review is not None:
         highlight.next_review = highlight_data.next_review
     
-    highlight.updated_at = datetime.utcnow()
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -124,7 +123,6 @@ def toggle_favorite(
         raise HTTPException(status_code=404, detail="Highlight not found")
     
     highlight.favorite = favorite_data.favorite
-    highlight.updated_at = datetime.utcnow()
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -139,7 +137,6 @@ def discard_highlight(id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Highlight not found")
     
     highlight.status = "discarded"
-    highlight.updated_at = datetime.utcnow()
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -332,7 +329,6 @@ async def save_highlight_edit(
     
     highlight.text = text
     highlight.source = source if source else None
-    highlight.updated_at = datetime.utcnow()
     
     session.add(highlight)
     session.commit()
@@ -361,7 +357,6 @@ async def toggle_favorite_html(
         raise HTTPException(status_code=404, detail="Highlight not found")
     
     highlight.favorite = favorite
-    highlight.updated_at = datetime.utcnow()
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -389,7 +384,6 @@ async def discard_highlight_html(
     
     # Toggle the is_discarded field
     highlight.is_discarded = not highlight.is_discarded
-    highlight.updated_at = datetime.utcnow()
     session.add(highlight)
     session.commit()
     session.refresh(highlight)

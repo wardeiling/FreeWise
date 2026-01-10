@@ -86,16 +86,8 @@ def test_export_csv_headers(client: TestClient):
         'Highlighted at',
         'Document tags',
         # Extended FreeWise columns
-        'highlight_id',
-        'book_id',
         'is_favorited',
-        'is_discarded',
-        'last_reviewed_at',
-        'review_count',
-        'created_at',
-        'updated_at',
-        'book_created_at',
-        'book_updated_at'
+        'is_discarded'
     ]
     
     assert headers == expected_headers

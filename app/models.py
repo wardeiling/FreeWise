@@ -24,8 +24,6 @@ class Book(SQLModel, table=True):
     title: str = Field(index=True)
     author: Optional[str] = Field(default=None, index=True)
     document_tags: Optional[str] = None  # comma-separated tags
-    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     def __repr__(self) -> str:
         author_str = f" by {self.author}" if self.author else ""
@@ -40,8 +38,7 @@ class Highlight(SQLModel, table=True):
     note: Optional[str] = None  # Additional notes or annotations
     author: Optional[str] = None  # Deprecated: use book.author instead
     book_id: Optional[int] = Field(default=None, foreign_key="book.id", index=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)  # When the highlight was made
     status: str = Field(default="active")  # active | discarded
     favorite: bool = Field(default=False, index=True)
     is_favorited: bool = Field(default=False, index=True)  # Alias for favorite

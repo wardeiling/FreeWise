@@ -24,7 +24,7 @@ pip install -r requirements.txt
 
 Run the application using Uvicorn:
 
-```bash
+```powershell
 uvicorn app.main:app --reload
 ```
 

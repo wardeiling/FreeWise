@@ -47,8 +47,6 @@ async def ui_library(
             Book.title,
             Book.author,
             Book.document_tags,
-            Book.created_at,
-            Book.updated_at,
             highlight_count_col,
             last_highlight_col
         )
@@ -57,7 +55,7 @@ async def ui_library(
     )
     
     # Apply sorting
-    valid_sorts = ["title", "author", "highlight_count", "date_added", "last_highlight"]
+    valid_sorts = ["title", "author", "highlight_count", "last_highlight"]
     if sort not in valid_sorts:
         sort = "title"
     
@@ -70,8 +68,6 @@ async def ui_library(
         sort_col = Book.author
     elif sort == "highlight_count":
         sort_col = highlight_count_col
-    elif sort == "date_added":
-        sort_col = Book.created_at
     elif sort == "last_highlight":
         sort_col = last_highlight_col
     else:
@@ -93,8 +89,7 @@ async def ui_library(
             "author": result.author or "Unknown",
             "document_tags": result.document_tags,
             "highlight_count": result.highlight_count,
-            "last_highlight_date": result.last_highlight_date,
-            "date_added": result.created_at
+            "last_highlight_date": result.last_highlight_date
         })
     
     return templates.TemplateResponse("library.html", {
@@ -195,7 +190,6 @@ async def ui_book_add_tag(
         else:
             book.document_tags = new_tag
         
-        book.updated_at = datetime.utcnow()
         session.add(book)
         session.commit()
         session.refresh(book)
@@ -223,7 +217,6 @@ async def ui_book_remove_tag(
         existing_tags = [t for t in existing_tags if t != tag.strip()]
         book.document_tags = ', '.join(existing_tags) if existing_tags else None
         
-        book.updated_at = datetime.utcnow()
         session.add(book)
         session.commit()
         session.refresh(book)
