@@ -6,7 +6,42 @@
 
 {% block content %}
 <!-- Daily Review Call-to-Action -->
-{% if not reviewed_today %}
+{% if total_highlights == 0 %}
+<div style="margin-bottom: 30px;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 40px 30px; text-align: center; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);">
+        <div style="font-size: 2.5em; margin-bottom: 15px;">📚</div>
+        <h2 style="margin: 0 0 10px 0; font-size: 2em; font-weight: 600; color: white;">
+            No Highlights Available
+        </h2>
+        <p style="margin: 0 0 20px 0; font-size: 1.1em; opacity: 0.95;">
+            Please import some highlights to get started.
+        </p>
+        <a href="/import/ui" style="display: inline-block; background: white; color: #667eea; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;"
+           onmouseover="this.style.transform='scale(1.05)'"
+           onmouseout="this.style.transform='scale(1)'">📥 Import Highlights</a>
+    </div>
+</div>
+{% elif active_highlights < daily_review_count and not reviewed_today %}
+<div style="margin-bottom: 30px;">
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 16px; padding: 40px 30px; text-align: center; box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);">
+        <div style="font-size: 2.5em; margin-bottom: 15px;">⚡</div>
+        <h2 style="margin: 0 0 10px 0; font-size: 2em; font-weight: 600; color: white;">
+            Only {{ active_highlights }} Highlight{{ 's' if active_highlights != 1 else '' }} Available
+        </h2>
+        <p style="margin: 0 0 20px 0; font-size: 1.1em; opacity: 0.95;">
+            Please import more highlights to get the full experience.
+        </p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="/highlights/ui/review" style="display: inline-block; background: white; color: #f5576c; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;"
+               onmouseover="this.style.transform='scale(1.05)'"
+               onmouseout="this.style.transform='scale(1)'">📖 Start Review</a>
+            <a href="/import/ui" style="display: inline-block; background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid white; transition: all 0.3s;"
+               onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
+               onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">📥 Import More</a>
+        </div>
+    </div>
+</div>
+{% elif not reviewed_today %}
 <div style="margin-bottom: 30px;">
     <a href="/highlights/ui/review" style="text-decoration: none;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 40px 30px; text-align: center; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); transition: all 0.3s ease; cursor: pointer;"

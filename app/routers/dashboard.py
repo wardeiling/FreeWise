@@ -98,9 +98,9 @@ async def ui_dashboard(
         "highlights_reviewed_count": highlights_reviewed_count,
         "total_books": total_books,
         "total_highlights": total_highlights,
+        "active_highlights": active_highlights,
         "total_favorited": total_favorited,
         "total_discarded": total_discarded,
-        "active_highlights": active_highlights,
         "favorited_percentage": favorited_percentage,
         "discarded_percentage": discarded_percentage,
         "active_percentage": active_percentage
