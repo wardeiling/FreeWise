@@ -9,7 +9,8 @@
     
     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; gap: 10px; align-items: center;">
-            <!-- Favorite Star -->
+            <!-- Favorite Star (hidden if discarded) -->
+            {% if not highlight.is_discarded %}
             <button 
                 class="{% if highlight.favorite or highlight.is_favorited %}btn-favorite active{% else %}btn-favorite{% endif %}"
                 hx-post="/highlights/{{ highlight.id }}/favorite"
@@ -19,8 +20,10 @@
                 title="Toggle favorite">
                 {% if highlight.favorite or highlight.is_favorited %}★{% else %}☆{% endif %}
             </button>
+            {% endif %}
             
-            <!-- Edit Button -->
+            <!-- Edit Button (hidden if discarded) -->
+            {% if not highlight.is_discarded %}
             <button 
                 class="btn-edit"
                 hx-get="/highlights/{{ highlight.id }}/edit?context=book"
@@ -29,8 +32,10 @@
                 title="Edit highlight">
                 ✎
             </button>
+            {% endif %}
             
-            <!-- Discard Toggle -->
+            <!-- Discard Toggle (hidden if favorited) -->
+            {% if not (highlight.favorite or highlight.is_favorited) %}
             <button 
                 class="btn-discard"
                 hx-post="/highlights/{{ highlight.id }}/discard"
@@ -45,6 +50,7 @@
                 ✕ Discard
                 {% endif %}
             </button>
+            {% endif %}
         </div>
         
         <!-- Status Badges -->

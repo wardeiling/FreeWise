@@ -121,8 +121,13 @@ def toggle_favorite(
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
+
+    # Block favoriting discarded highlights
+    if favorite_data.favorite and highlight.is_discarded:
+        raise HTTPException(status_code=400, detail="Cannot favorite a discarded highlight. Restore it first.")
     
     highlight.favorite = favorite_data.favorite
+    highlight.is_favorited = favorite_data.favorite  # keep alias in sync
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -135,8 +140,13 @@ def discard_highlight(id: int, session: Session = Depends(get_session)):
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
+
+    # Prevent discarding favorites
+    if highlight.favorite or getattr(highlight, "is_favorited", False):
+        raise HTTPException(status_code=400, detail="Cannot discard a favorited highlight. Unfavorite it first.")
     
     highlight.status = "discarded"
+    highlight.is_discarded = True
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -355,8 +365,13 @@ async def toggle_favorite_html(
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
+
+    # Block favoriting discarded highlights
+    if favorite and highlight.is_discarded:
+        raise HTTPException(status_code=400, detail="Cannot favorite a discarded highlight. Restore it first.")
     
     highlight.favorite = favorite
+    highlight.is_favorited = favorite  # keep alias in sync
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
@@ -382,8 +397,13 @@ async def discard_highlight_html(
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
     
-    # Toggle the is_discarded field
-    highlight.is_discarded = not highlight.is_discarded
+    # Toggle the is_discarded field, blocking when favorited
+    new_state = not highlight.is_discarded
+    if new_state and (highlight.favorite or getattr(highlight, "is_favorited", False)):
+        raise HTTPException(status_code=400, detail="Cannot discard a favorited highlight. Unfavorite it first.")
+
+    highlight.is_discarded = new_state
+    highlight.status = "discarded" if new_state else "active"
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
