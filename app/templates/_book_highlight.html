@@ -55,7 +55,11 @@
             </span>
             {% endif %}
             <span style="color: var(--muted-text); font-size: 0.8em;">
-                {{ highlight.created_at.strftime('%b %d, %Y') }}
+                {% if highlight.created_at %}
+                    {{ highlight.created_at.strftime('%b %d, %Y') }}
+                {% else %}
+                    <em>Date unknown</em>
+                {% endif %}
             </span>
         </div>
     </div>

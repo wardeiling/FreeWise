@@ -22,10 +22,13 @@ def get_session():
     with Session(engine) as session:
         yield session
 
-def parse_readwise_datetime(dt_str: str) -> datetime:
-    """Parse various datetime formats from Readwise CSV."""
+def parse_readwise_datetime(dt_str: str) -> Optional[datetime]:
+    """Parse various datetime formats from Readwise CSV.
+    
+    Returns None if the date string is empty or cannot be parsed.
+    """
     if not dt_str or dt_str.strip() == "":
-        return ""
+        return None
     
     formats = [
         "%B %d, %Y %I:%M:%S %p",      # January 15, 2024 10:30:00 AM
@@ -48,7 +51,7 @@ def parse_readwise_datetime(dt_str: str) -> datetime:
             continue
     
     # If all formats fail, return None
-    return ""
+    return None
 
 
 def get_or_create_tag(session: Session, tag_name: str) -> Tag:
@@ -188,8 +191,7 @@ async def process_import(
             # Parse datetime
             datetime_str = highlighted_at_str
             created_at = parse_readwise_datetime(datetime_str)
-            if not created_at:
-                created_at = datetime.utcnow()
+            # If no date is provided, created_at remains None (don't use today's date as fallback)
             
             # Get or create book
             book = None

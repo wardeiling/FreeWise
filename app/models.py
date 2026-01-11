@@ -38,7 +38,7 @@ class Highlight(SQLModel, table=True):
     note: Optional[str] = None  # Additional notes or annotations
     author: Optional[str] = None  # Deprecated: use book.author instead
     book_id: Optional[int] = Field(default=None, foreign_key="book.id", index=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)  # When the highlight was made
+    created_at: Optional[datetime] = Field(default=None, index=True)  # When the highlight was made (None if unknown)
     status: str = Field(default="active")  # active | discarded
     favorite: bool = Field(default=False, index=True)
     is_favorited: bool = Field(default=False, index=True)  # Alias for favorite

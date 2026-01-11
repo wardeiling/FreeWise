@@ -32,7 +32,7 @@ The application will be available at http://localhost:8000
 
 ## To-Do
 
-- [ ] if there is no date available for import (e.g., empty entry) set to null and also don't show them in the book UI
+- [X] if there is no date available for import (e.g., empty entry) set to null and also don't show them in the book UI
 - [X] Remove date book added column from the library (and everywhere else in GUI)
     - [X] GUI library
     - [X] library.py
@@ -56,3 +56,4 @@ The application will be available at http://localhost:8000
     - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
 - [X] Add progress bar for imports (of large files)
 - [X] Allow users to edit book information (e.g., author name, title) after import.
+- [ ] If there are no higlights in the library, change dashboard header to "No highlights available. Please import some highlights to get started." And if there are less then the amount of set daily reviews, change to "Only X highlights available. Please import more highlights to get the full experience."
