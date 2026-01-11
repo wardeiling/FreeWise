@@ -15,8 +15,8 @@
                 class="{% if highlight.favorite or highlight.is_favorited %}btn-favorite active{% else %}btn-favorite{% endif %}"
                 hx-post="/highlights/{{ highlight.id }}/favorite"
                 hx-vals='{"favorite": "{{ "false" if (highlight.favorite or highlight.is_favorited) else "true" }}", "context": "book"}'
-                hx-target="#highlight-{{ highlight.id }}"
-                hx-swap="outerHTML"
+                hx-target="#highlights-sections-wrapper"
+                hx-swap="innerHTML"
                 title="Toggle favorite">
                 {% if highlight.favorite or highlight.is_favorited %}★{% else %}☆{% endif %}
             </button>
@@ -40,8 +40,8 @@
                 class="btn-discard"
                 hx-post="/highlights/{{ highlight.id }}/discard"
                 hx-vals='{"context": "book"}'
-                hx-target="#highlight-{{ highlight.id }}"
-                hx-swap="outerHTML"
+                hx-target="#highlights-sections-wrapper"
+                hx-swap="innerHTML"
                 hx-confirm="Are you sure you want to {{ 'restore' if highlight.is_discarded else 'discard' }} this highlight?"
                 title="{{ 'Restore' if highlight.is_discarded else 'Discard' }} highlight">
                 {% if highlight.is_discarded %}

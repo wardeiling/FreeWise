@@ -74,24 +74,47 @@
         <div id="add-tag-form" style="margin-top: 10px; text-align: center;"></div>
     </div>
     
+    {% set active_highlights = highlights | selectattr('is_discarded', 'equalto', false) | list %}
+    {% set discarded_highlights = highlights | selectattr('is_discarded', 'equalto', true) | list %}
+    
     <div style="margin-top: 20px; color: var(--muted-text); font-size: 0.9em;">
-        <strong>{{ highlights|length }}</strong> highlight{{ 's' if highlights|length != 1 else '' }}
+        <strong>{{ active_highlights|length }}</strong> active highlight{{ 's' if active_highlights|length != 1 else '' }}
+        {% if discarded_highlights %}
+            | <strong>{{ discarded_highlights|length }}</strong> discarded
+        {% endif %}
     </div>
 </div>
 
-<!-- Highlights List -->
-{% if highlights %}
-<div id="highlights-container">
-    {% for highlight in highlights %}
-        {% include "_book_highlight.html" %}
-    {% endfor %}
+<!-- Highlights Sections Wrapper -->
+<div id="highlights-sections-wrapper">
+    <!-- Active Highlights List -->
+    {% if active_highlights %}
+    <div id="highlights-container">
+        {% for highlight in active_highlights %}
+            {% include "_book_highlight.html" %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+        <p style="font-size: 1.2em; margin-bottom: 10px;">No active highlights</p>
+        <p style="color: var(--muted-text);">{% if discarded_highlights %}All highlights in this book have been discarded. See the discarded section below.{% else %}Import highlights to get started.{% endif %}</p>
+    </div>
+    {% endif %}
+
+    <!-- Discarded Highlights Section -->
+    {% if discarded_highlights %}
+    <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--border-color);">
+        <h2 style="margin-bottom: 20px; color: var(--muted-text); font-size: 1.3em;">
+            🗑️ Discarded Highlights ({{ discarded_highlights|length }})
+        </h2>
+        <div id="discarded-highlights-container" style="opacity: 0.75;">
+            {% for highlight in discarded_highlights %}
+                {% include "_book_highlight.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
-{% else %}
-<div style="text-align: center; padding: 40px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-    <p style="font-size: 1.2em; margin-bottom: 10px;">No highlights yet</p>
-    <p style="color: var(--muted-text);">Import highlights to get started.</p>
-</div>
-{% endif %}
 
 <div style="margin-top: 30px; text-align: center;">
     <a href="/library/ui">← Back to Library</a>

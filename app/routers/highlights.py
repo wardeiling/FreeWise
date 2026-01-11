@@ -21,6 +21,31 @@ def get_session():
         yield session
 
 
+def render_book_highlights_sections(request: Request, book_id: int, session: Session) -> HTMLResponse:
+    """
+    Helper function to render both active and discarded highlights sections.
+    Returns HTML for both containers.
+    """
+    # Get all highlights for this book
+    highlights_stmt = (
+        select(Highlight)
+        .where(Highlight.book_id == book_id)
+        .order_by(Highlight.created_at.desc())
+    )
+    highlights = session.exec(highlights_stmt).all()
+    
+    # Split into active and discarded
+    active_highlights = [h for h in highlights if not h.is_discarded]
+    discarded_highlights = [h for h in highlights if h.is_discarded]
+    
+    # Render the sections template
+    return templates.TemplateResponse("_book_highlights_sections.html", {
+        "request": request,
+        "active_highlights": active_highlights,
+        "discarded_highlights": discarded_highlights
+    })
+
+
 class HighlightCreate(BaseModel):
     """Request model for creating a highlight."""
     text: str
@@ -376,7 +401,11 @@ async def toggle_favorite_html(
     session.commit()
     session.refresh(highlight)
     
-    # Choose template based on context
+    # If context is book, render both highlight sections
+    if context == "book":
+        return render_book_highlights_sections(request, highlight.book_id, session)
+    
+    # Otherwise return just the single highlight
     template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
     
     return templates.TemplateResponse(template_name, {
@@ -408,7 +437,11 @@ async def discard_highlight_html(
     session.commit()
     session.refresh(highlight)
     
-    # Choose template based on context
+    # If context is book, render both highlight sections
+    if context == "book":
+        return render_book_highlights_sections(request, highlight.book_id, session)
+    
+    # Otherwise return just the single highlight
     template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
     
     # Return updated highlight with badge
