@@ -168,6 +168,7 @@ async def process_import(
         
         imported_count = 0
         skipped_count = 0
+        duplicate_count = 0
         
         for row in reader:
             # Skip empty rows
@@ -229,6 +230,17 @@ async def process_import(
                     else:
                         regular_tags.append(tag_name)
             
+            # Deduplicate: skip if an identical highlight (same text and note) already exists for this book
+            existing_stmt = select(Highlight).where(
+                Highlight.text == highlight_text,
+                Highlight.note == (note if note else None),
+                Highlight.book_id == (book.id if book else None)
+            )
+            existing_highlight = session.exec(existing_stmt).first()
+            if existing_highlight:
+                duplicate_count += 1
+                continue
+
             # Create highlight with appropriate boolean flags
             highlight = Highlight(
                 text=highlight_text,
@@ -272,9 +284,10 @@ async def process_import(
         return templates.TemplateResponse("import.html", {
             "request": request,
             "settings": settings,
-            "success_message": f"Successfully imported {imported_count} highlights. Skipped {skipped_count} empty rows.",
+            "success_message": f"Successfully imported {imported_count} highlights. Skipped {skipped_count} empty rows. Deduplicated {duplicate_count} duplicates.",
             "imported_count": imported_count,
-            "skipped_count": skipped_count
+            "skipped_count": skipped_count,
+            "duplicate_count": duplicate_count
         })
     
     except csv.Error as e:
