@@ -47,10 +47,10 @@ The application will be available at http://localhost:8000
     - [X] Remove columns from export and import: higlight_id, book_id, last_reviewed_at, created_at, updated_at, book_created_at, book_updated_at
         - [X] From import
         - [X] From export: also make higlighted_at date format consistent with readwise format
-- [ ] Improve location of import/export functionality.
 - [X] Added button to delete book from library.
 - [X] prevents discarded entries to be favorited and edited; and favorite entries to be discarded
 - [ ] Import
+    - [ ] Fix issue with skipped lines with readwise import.
     - [ ] Define a separate function for readwise import and book import
     - [ ] For book import, allow for import with book section information and page numbers.
     - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
@@ -60,5 +60,5 @@ The application will be available at http://localhost:8000
 - [X] If there are no higlights in the library, change dashboard header to "No highlights available. Please import some highlights to get started." And if there are less then the amount of set daily reviews, change to "Only X highlights available. Please import more highlights to get the full experience."
 - [X] Show discarded higlights for each book in a dedicated section at the bottom of the book page and make sure higlights are automatically moved from and to there.
 - [ ] Create automatic import of book metadata from external sources (e.g., Google Books API, Open Library API) based on book title and author.
-- [] What is Favicon?
-
+- [] Create Favicon (small icon shown in browser tab) and add to the application.
+- [X] Remove discarded text from entries (highlights) in discarded section (redundant).
