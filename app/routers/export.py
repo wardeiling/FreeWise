@@ -97,8 +97,8 @@ async def export_highlights_csv(
             highlight.note or '',                                           # Note
             '',                                                             # Color (not used)
             tags_str,                                                       # Tags (highlight-level)
-            '',                                                             # Location Type (not used)
-            '',                                                             # Location (not used)
+            highlight.location_type or '',                                  # Location Type (page or order)
+            str(highlight.location) if highlight.location else '',          # Location (page number or order)
             highlighted_at,                                                 # Highlighted at (ISO format)
             book.document_tags if book and book.document_tags else '',     # Document tags (book-level)
             # Extended FreeWise columns

@@ -1,9 +1,15 @@
 <div class="highlight" id="highlight-{{ highlight.id }}" style="position: relative;">
     <div class="highlight-text">{{ highlight.text }}</div>
     
+    {% if highlight.location_type == "page" and highlight.location %}
+    <div style="color: var(--muted-text); font-size: 0.8em; margin-top: 4px;">
+        (Page {{ highlight.location }})
+    </div>
+    {% endif %}
+    
     {% if highlight.note %}
     <div class="highlight-source" style="font-style: italic; margin-top: 8px;">
-        💭 {{ highlight.note }}
+        {{ highlight.note }}
     </div>
     {% endif %}
     

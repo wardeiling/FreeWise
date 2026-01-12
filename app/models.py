@@ -39,6 +39,8 @@ class Highlight(SQLModel, table=True):
     author: Optional[str] = None  # Deprecated: use book.author instead
     book_id: Optional[int] = Field(default=None, foreign_key="book.id", index=True)
     created_at: Optional[datetime] = Field(default=None, index=True)  # When the highlight was made (None if unknown)
+    location_type: Optional[str] = Field(default=None)  # "page" or "order" from Readwise
+    location: Optional[int] = Field(default=None, index=True)  # Page number or order in book
     status: str = Field(default="active")  # active | discarded
     favorite: bool = Field(default=False, index=True)
     is_favorited: bool = Field(default=False, index=True)  # Alias for favorite

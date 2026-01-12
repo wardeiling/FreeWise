@@ -119,11 +119,15 @@ async def ui_book_detail(
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Book not found")
     
-    # Get all highlights for this book
+    # Get all highlights for this book, ordered by location if available, then by date
+    # Order: location ASC (if available), created_at DESC (for fallback)
     highlights_stmt = (
         select(Highlight)
         .where(Highlight.book_id == book_id)
-        .order_by(Highlight.created_at.desc())
+        .order_by(
+            Highlight.location.asc().nullslast(),  # Location first (page/order), nulls last
+            Highlight.created_at.desc()             # Then by date
+        )
     )
     highlights = session.exec(highlights_stmt).all()
     

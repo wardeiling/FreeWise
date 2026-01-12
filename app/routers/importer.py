@@ -184,6 +184,8 @@ async def process_import(
             tags_str = row.get('Tags', '').strip()
             document_tags_str = row.get('Document tags', '').strip()
             highlighted_at_str = row.get('Highlighted at', '').strip()
+            location_type_str = row.get('Location Type', '').strip()
+            location_str = row.get('Location', '').strip()
             
             # Extended columns (optional - only in FreeWise exports)
             is_favorited_str = row.get('is_favorited', '').strip().lower()
@@ -241,6 +243,17 @@ async def process_import(
                 duplicate_count += 1
                 continue
 
+            # Parse location if provided
+            location = None
+            location_type = location_type_str if location_type_str else None
+            if location_str:
+                try:
+                    location = int(location_str)
+                except (ValueError, TypeError):
+                    # If location is not a valid integer, skip it
+                    location = None
+                    location_type = None
+
             # Create highlight with appropriate boolean flags
             highlight = Highlight(
                 text=highlight_text,
@@ -249,6 +262,8 @@ async def process_import(
                 book_id=book.id if book else None,
                 note=note if note else None,
                 created_at=created_at,
+                location_type=location_type,
+                location=location,
                 user_id=1,  # Default user for single-user mode
                 status="discarded" if is_discarded else "active",
                 is_favorited=is_favorited,

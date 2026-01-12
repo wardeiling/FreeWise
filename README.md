@@ -50,7 +50,7 @@ Core functionality:
 - [X] Added button to delete book from library.
 - [X] prevents discarded entries to be favorited and edited; and favorite entries to be discarded
 - [ ] Import
-    - [ ] Fix issue with skipped lines with readwise import.
+    - [ ] Identify issue with skipped lines with readwise import.
     - [ ] Define a separate function for readwise import and book import
     - [ ] For book import, allow for import with book section information and page numbers.
     - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
@@ -65,6 +65,7 @@ Nice to haves:
 - [ ] Create Favicon (small icon shown in browser tab) and add to the application.
 - [ ] Create automatic import of book metadata from external sources (e.g., Google Books API, Open Library API) based on book title and author.
 - [ ] Enhance aestethics (make more visually appealing) of the UI 
-    - [ ] utilize CSS framework e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
+    - [ ] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
     - [ ] Use back buttons at the top left to navigate back in full page views (daily review, book view) instead of only browser back button.
     - [ ] optional: navigation bar at the left
+    - [ ] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
