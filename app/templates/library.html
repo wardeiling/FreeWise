@@ -5,78 +5,88 @@
 {% block heading %}Library{% endblock %}
 
 {% block content %}
-<p style="color: var(--muted-text); margin-bottom: 20px;">
+<p class="text-gray-600 dark:text-gray-400 mb-6">
     Browse your collection of {{ books|length }} book{{ 's' if books|length != 1 else '' }}.
 </p>
 
 {% if books %}
-<div style="overflow-x: auto;">
-    <table style="width: 100%; border-collapse: collapse; background: var(--highlight-bg); border-radius: 8px; overflow: hidden;">
-        <thead>
-            <tr style="background: var(--bg-color); border-bottom: 2px solid var(--border-color);">
-                <th style="padding: 12px; text-align: left;">
+<div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+    <table class="w-full bg-white dark:bg-gray-800">
+        <thead class="bg-gray-50 dark:bg-gray-900 border-b-2 border-gray-200 dark:border-gray-700">
+            <tr>
+                <th class="px-4 py-3 text-left">
                     <a href="/library/ui?sort=title&order={{ 'desc' if current_sort == 'title' and current_order == 'asc' else 'asc' }}" 
-                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-                        Title 
+                       class="flex items-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <span>Title</span>
                         {% if current_sort == 'title' %}
-                            {{ '↓' if current_order == 'desc' else '↑' }}
+                            <i data-lucide="{{ 'chevron-down' if current_order == 'desc' else 'chevron-up' }}" class="w-4 h-4"></i>
                         {% endif %}
                     </a>
                 </th>
-                <th style="padding: 12px; text-align: left;">
+                <th class="px-4 py-3 text-left">
                     <a href="/library/ui?sort=author&order={{ 'desc' if current_sort == 'author' and current_order == 'asc' else 'asc' }}" 
-                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-                        Author
+                       class="flex items-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <span>Author</span>
                         {% if current_sort == 'author' %}
-                            {{ '↓' if current_order == 'desc' else '↑' }}
+                            <i data-lucide="{{ 'chevron-down' if current_order == 'desc' else 'chevron-up' }}" class="w-4 h-4"></i>
                         {% endif %}
                     </a>
                 </th>
-                <th style="padding: 12px; text-align: center;">
+                <th class="px-4 py-3 text-center">
                     <a href="/library/ui?sort=highlight_count&order={{ 'desc' if current_sort == 'highlight_count' and current_order == 'asc' else 'asc' }}" 
-                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-                        Highlights
+                       class="flex items-center justify-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <span>Highlights</span>
                         {% if current_sort == 'highlight_count' %}
-                            {{ '↓' if current_order == 'desc' else '↑' }}
+                            <i data-lucide="{{ 'chevron-down' if current_order == 'desc' else 'chevron-up' }}" class="w-4 h-4"></i>
                         {% endif %}
                     </a>
                 </th>
-                <th style="padding: 12px; text-align: left;">
+                <th class="px-4 py-3 text-center">
                     <a href="/library/ui?sort=last_highlight&order={{ 'desc' if current_sort == 'last_highlight' and current_order == 'asc' else 'asc' }}" 
-                       style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-                        Last Highlight
+                       class="flex items-center justify-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                       title="Last Highlighted At">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
                         {% if current_sort == 'last_highlight' %}
-                            {{ '↓' if current_order == 'desc' else '↑' }}
+                            <i data-lucide="{{ 'chevron-down' if current_order == 'desc' else 'chevron-up' }}" class="w-4 h-4"></i>
                         {% endif %}
                     </a>
                 </th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             {% for book in books %}
-            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;"
-                onmouseover="this.style.backgroundColor='var(--border-color)'"
-                onmouseout="this.style.backgroundColor='transparent'">
-                <td style="padding: 12px;">
-                    <a href="/library/ui/book/{{ book.id }}" style="color: var(--link-color); text-decoration: none; font-weight: 500;">
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                <td class="px-4 py-3">
+                    <a href="/library/ui/book/{{ book.id }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors">
                         {{ book.title }}
                     </a>
                     {% if book.document_tags %}
-                    <div style="margin-top: 4px; font-size: 0.85em; color: var(--muted-text);">
-                        🏷️ {{ book.document_tags }}
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        {% for tag in book.document_tags.split(',') %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400">
+                            <i data-lucide="tag" class="w-2.5 h-2.5"></i>
+                            {{ tag.strip() }}
+                        </span>
+                        {% endfor %}
                     </div>
                     {% endif %}
                 </td>
-                <td style="padding: 12px; color: var(--muted-text);">
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
                     {{ book.author }}
                 </td>
-                <td style="padding: 12px; text-align: center;">
-                    <span style="background: var(--bg-color); padding: 4px 12px; border-radius: 12px; font-weight: bold;">
+                <td class="px-4 py-3 text-center">
+                    <span class="inline-block bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1 rounded-full text-sm font-semibold">
                         {{ book.highlight_count }}
                     </span>
                 </td>
-                <td style="padding: 12px; color: var(--muted-text); font-size: 0.9em;">
-                    {{ book.last_highlight_date.strftime('%Y-%m-%d') if book.last_highlight_date else 'None' }}
+                <td class="px-4 py-3 text-center">
+                    {% if book.last_highlight_date %}
+                        <span class="text-gray-500 dark:text-gray-400 text-sm">
+                            {{ book.last_highlight_date.strftime('%Y-%m-%d') }}
+                        </span>
+                    {% else %}
+                        <span class="text-gray-400 dark:text-gray-600 italic">—</span>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -84,16 +94,23 @@
     </table>
 </div>
 {% else %}
-<div style="text-align: center; padding: 40px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-    <p style="font-size: 1.2em; margin-bottom: 20px;">📚 Your library is empty</p>
-    <p style="color: var(--muted-text); margin-bottom: 20px;">Import highlights from Readwise to get started!</p>
-    <a href="/import/ui" style="background: #007bff; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; display: inline-block;">
-        Import Highlights
+<div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+    <div class="mb-4">
+        <i data-lucide="library" class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600"></i>
+    </div>
+    <p class="text-xl font-medium text-gray-900 dark:text-white mb-2">Your library is empty</p>
+    <p class="text-gray-600 dark:text-gray-400 mb-6">Import highlights from Readwise to get started!</p>
+    <a href="/import/ui" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors">
+        <i data-lucide="upload" class="w-4 h-4"></i>
+        <span>Import Highlights</span>
     </a>
 </div>
 {% endif %}
 
-<div style="margin-top: 30px;">
-    <a href="/">← Back to Home</a>
+<div class="mt-8">
+    <a href="/" class="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Back to Home</span>
+    </a>
 </div>
 {% endblock %}

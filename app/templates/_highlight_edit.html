@@ -1,21 +1,34 @@
-<div class="highlight" id="highlight-{{ highlight.id }}">
-    <form class="edit-form" 
+<div class="relative p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm" id="highlight-{{ highlight.id }}">
+    <form class="space-y-4" 
           hx-post="/highlights/{{ highlight.id }}/edit"
           hx-target="#highlight-{{ highlight.id }}"
           hx-swap="outerHTML">
-        <textarea name="text" required>{{ highlight.text }}</textarea>
-        <input type="text" name="source" placeholder="Source (optional)" value="{{ highlight.source or '' }}">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Highlight Text</label>
+            <textarea name="text" required
+                class="w-full min-h-[150px] p-3 font-serif text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">{{ highlight.text }}</textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Note (optional)</label>
+            <input type="text" name="source" placeholder="Add a note..." value="{{ highlight.source or '' }}"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
         {% if context %}
         <input type="hidden" name="context" value="{{ context }}">
         {% endif %}
-        <div class="highlight-actions">
-            <button type="submit" class="btn-save">💾 Save</button>
+        <div class="flex gap-2 pt-2">
+            <button type="submit" 
+                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Save</span>
+            </button>
             <button type="button" 
-                    class="btn-cancel"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg transition-colors"
                     hx-get="/highlights/{{ highlight.id }}/view?context={{ context or '' }}"
                     hx-target="#highlight-{{ highlight.id }}"
                     hx-swap="outerHTML">
-                Cancel
+                <i data-lucide="x" class="w-4 h-4"></i>
+                <span>Cancel</span>
             </button>
         </div>
     </form>

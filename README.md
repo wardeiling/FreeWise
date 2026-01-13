@@ -65,7 +65,8 @@ Nice to haves:
 - [ ] Create Favicon (small icon shown in browser tab) and add to the application.
 - [ ] Create automatic import of book metadata from external sources (e.g., Google Books API, Open Library API) based on book title and author.
 - [ ] Enhance aestethics (make more visually appealing) of the UI 
-    - [ ] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
+    - [X] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
     - [ ] Use back buttons at the top left to navigate back in full page views (daily review, book view) instead of only browser back button.
     - [ ] optional: navigation bar at the left
-    - [ ] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
+    - [X] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
+    - [ ] Fix dark mode.

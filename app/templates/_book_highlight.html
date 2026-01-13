@@ -1,49 +1,56 @@
-<div class="highlight" id="highlight-{{ highlight.id }}" style="position: relative;">
-    <div class="highlight-text">{{ highlight.text }}</div>
+<div class="relative p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow" id="highlight-{{ highlight.id }}">
+    <!-- Highlight Text with Serif Font -->
+    <div class="highlight-text font-serif text-lg leading-relaxed text-gray-900 dark:text-gray-100">
+        {{ highlight.text }}
+    </div>
     
+    <!-- Page Number (if available) -->
     {% if highlight.location_type == "page" and highlight.location %}
-    <div style="color: var(--muted-text); font-size: 0.8em; margin-top: 4px;">
+    <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
         (Page {{ highlight.location }})
     </div>
     {% endif %}
     
+    <!-- Note Section -->
     {% if highlight.note %}
-    <div class="highlight-source" style="font-style: italic; margin-top: 8px;">
+    <div class="mt-3 text-sm italic text-gray-600 dark:text-gray-400 pl-3 border-l-2 border-gray-300 dark:border-gray-600">
         {{ highlight.note }}
     </div>
     {% endif %}
     
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <!-- Favorite Star (hidden if discarded) -->
+    <!-- Actions Bar -->
+    <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex-wrap gap-3">
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2">
+            <!-- Favorite Button (hidden if discarded) -->
             {% if not highlight.is_discarded %}
             <button 
-                class="{% if highlight.favorite or highlight.is_favorited %}btn-favorite active{% else %}btn-favorite{% endif %}"
+                class="p-2 rounded-lg transition-all {% if highlight.favorite or highlight.is_favorited %}text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30{% else %}text-gray-400 dark:text-gray-500 hover:text-yellow-500 dark:hover:text-yellow-400 hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}"
                 hx-post="/highlights/{{ highlight.id }}/favorite"
                 hx-vals='{"favorite": "{{ "false" if (highlight.favorite or highlight.is_favorited) else "true" }}", "context": "book"}'
                 hx-target="#highlights-sections-wrapper"
                 hx-swap="innerHTML"
                 title="Toggle favorite">
-                {% if highlight.favorite or highlight.is_favorited %}★{% else %}☆{% endif %}
+                <i data-lucide="star" class="w-4 h-4 {% if highlight.favorite or highlight.is_favorited %}fill-current{% endif %}"></i>
             </button>
             {% endif %}
             
             <!-- Edit Button (hidden if discarded) -->
             {% if not highlight.is_discarded %}
             <button 
-                class="btn-edit"
+                class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
                 hx-get="/highlights/{{ highlight.id }}/edit?context=book"
                 hx-target="#highlight-{{ highlight.id }}"
                 hx-swap="outerHTML"
                 title="Edit highlight">
-                ✎
+                <i data-lucide="pencil" class="w-4 h-4"></i>
             </button>
             {% endif %}
             
-            <!-- Discard Toggle (hidden if favorited) -->
+            <!-- Discard/Restore Button (hidden if favorited) -->
             {% if not (highlight.favorite or highlight.is_favorited) %}
             <button 
-                class="btn-discard"
+                class="p-2 rounded-lg {% if highlight.is_discarded %}text-green-600 dark:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20{% else %}text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20{% endif %} transition-all"
                 hx-post="/highlights/{{ highlight.id }}/discard"
                 hx-vals='{"context": "book"}'
                 hx-target="#highlights-sections-wrapper"
@@ -51,20 +58,19 @@
                 hx-confirm="Are you sure you want to {{ 'restore' if highlight.is_discarded else 'discard' }} this highlight?"
                 title="{{ 'Restore' if highlight.is_discarded else 'Discard' }} highlight">
                 {% if highlight.is_discarded %}
-                ↻ Restore
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                 {% else %}
-                ✕ Discard
+                <i data-lucide="x" class="w-4 h-4"></i>
                 {% endif %}
             </button>
             {% endif %}
         </div>
         
-        <!-- Status Badges -->
-        <div style="display: flex; gap: 8px; align-items: center;">
-            {% if highlight.is_discarded %}
-            {% endif %}
-            <span style="color: var(--muted-text); font-size: 0.8em;">
+        <!-- Date Badge -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 dark:text-gray-400">
                 {% if highlight.created_at %}
+                    <i data-lucide="calendar" class="w-3 h-3 inline-block"></i>
                     {{ highlight.created_at.strftime('%b %d, %Y') }}
                 {% else %}
                     <em>Date unknown</em>

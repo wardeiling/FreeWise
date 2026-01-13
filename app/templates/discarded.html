@@ -5,48 +5,53 @@
 {% block heading %}{% endblock %}
 
 {% block content %}
-<!-- Discarded Header (Centered) -->
-<div style="text-align: center; margin-bottom: 30px; padding: 30px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-    <h1 style="margin: 0 0 15px 0; font-size: 2em; color: var(--text-color);">
-        🗑️ Discarded Highlights
-    </h1>
+<!-- Discarded Header -->
+<div class="text-center mb-8 p-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="flex items-center justify-center gap-3 mb-4">
+        <i data-lucide="trash-2" class="w-8 h-8 text-gray-500 dark:text-gray-400"></i>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            Discarded Highlights
+        </h1>
+    </div>
     
-    <div style="margin-bottom: 15px; font-size: 1.1em; color: var(--muted-text);">
+    <div class="text-lg text-gray-600 dark:text-gray-400 mb-4">
         Highlights you've marked as discarded
     </div>
     
-    <div style="margin-top: 20px; color: var(--muted-text); font-size: 0.9em;">
-        <strong>{{ highlights|length }}</strong> discarded highlight{{ 's' if highlights|length != 1 else '' }}
+    <div class="text-sm text-gray-500 dark:text-gray-400">
+        <span class="font-semibold">{{ highlights|length }}</span> discarded highlight{{ 's' if highlights|length != 1 else '' }}
     </div>
 </div>
 
 <!-- Highlights List -->
 <div id="highlights-container">
     {% if highlights %}
-        {% for highlight in highlights %}
-            {% include "_highlight_row.html" %}
-        {% endfor %}
+        <div class="space-y-4 opacity-75">
+            {% for highlight in highlights %}
+                {% include "_highlight_row.html" %}
+            {% endfor %}
+        </div>
     {% else %}
         <!-- Empty State -->
-        <div style="text-align: center; padding: 60px 20px; background: var(--highlight-bg); border-radius: 12px; border: 2px dashed var(--border-color);">
-            <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">🗑️</div>
-            <h3 style="margin: 0 0 15px 0; color: var(--text-color); font-size: 1.5em;">No Discarded Highlights</h3>
-            <p style="margin: 0 0 25px 0; color: var(--muted-text); font-size: 1em;">
+        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <i data-lucide="trash-2" class="w-20 h-20 mx-auto mb-6 text-gray-300 dark:text-gray-600"></i>
+            <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">No Discarded Highlights</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
                 Highlights you discard will appear here.
             </p>
-            <div style="margin-top: 30px;">
-                <a href="/highlights/ui/review" 
-                   style="display: inline-block; background: var(--link-color); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: opacity 0.2s;"
-                   onmouseover="this.style.opacity='0.9'"
-                   onmouseout="this.style.opacity='1'">
-                    Start Reviewing Highlights
-                </a>
-            </div>
+            <a href="/highlights/ui/review" 
+               class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Start Reviewing Highlights</span>
+            </a>
         </div>
     {% endif %}
 </div>
 
-<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-    <a href="/">← Back to Dashboard</a>
+<div class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <a href="/" class="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Back to Dashboard</span>
+    </a>
 </div>
 {% endblock %}

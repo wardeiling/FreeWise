@@ -4,199 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}FreeWise{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        // Tailwind configuration
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        serif: ['Crimson Pro', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
+        /* Theme variables for compatibility with existing code */
         :root {
             --bg-color: #ffffff;
-            --text-color: #333333;
-            --border-color: #dddddd;
-            --highlight-bg: #f9f9f9;
-            --header-border: #dddddd;
-            --link-color: #007bff;
-            --muted-text: #666666;
-            --success-bg: #d4edda;
-            --success-border: #c3e6cb;
-            --success-text: #155724;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --highlight-bg: #f9fafb;
+            --header-border: #e5e7eb;
+            --link-color: #3b82f6;
+            --muted-text: #6b7280;
+            --success-bg: #d1fae5;
+            --success-border: #a7f3d0;
+            --success-text: #065f46;
         }
 
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #e0e0e0;
-            --border-color: #444444;
-            --highlight-bg: #2a2a2a;
-            --header-border: #444444;
-            --link-color: #4da3ff;
-            --muted-text: #aaaaaa;
-            --success-bg: #1e4620;
-            --success-border: #2d5a2e;
-            --success-text: #b8e6bb;
+        [data-theme="dark"], .dark {
+            --bg-color: #111827;
+            --text-color: #f3f4f6;
+            --border-color: #374151;
+            --highlight-bg: #1f2937;
+            --header-border: #374151;
+            --link-color: #60a5fa;
+            --muted-text: #9ca3af;
+            --success-bg: #064e3b;
+            --success-border: #065f46;
+            --success-text: #a7f3d0;
         }
 
         /* Auto theme uses system preference */
         @media (prefers-color-scheme: dark) {
             [data-theme="auto"] {
-                --bg-color: #1a1a1a;
-                --text-color: #e0e0e0;
-                --border-color: #444444;
-                --highlight-bg: #2a2a2a;
-                --header-border: #444444;
-                --link-color: #4da3ff;
-                --muted-text: #aaaaaa;
-                --success-bg: #1e4620;
-                --success-border: #2d5a2e;
-                --success-text: #b8e6bb;
+                --bg-color: #111827;
+                --text-color: #f3f4f6;
+                --border-color: #374151;
+                --highlight-bg: #1f2937;
+                --header-border: #374151;
+                --link-color: #60a5fa;
+                --muted-text: #9ca3af;
+                --success-bg: #064e3b;
+                --success-border: #065f46;
+                --success-text: #a7f3d0;
             }
         }
-
+        
+        /* Apply dark class when theme is dark */
+        [data-theme="dark"] {
+            color-scheme: dark;
+        }
+        
+        /* Font families */
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        .highlight {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            background: var(--highlight-bg);
-        }
+        
         .highlight-text {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-        .highlight-source {
-            color: var(--muted-text);
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-        .highlight-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        .btn-favorite {
-            background: #ffd700;
-            color: #333;
-        }
-        .btn-favorite.active {
-            background: #ff8c00;
-            color: white;
-        }
-        .btn-discard {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-edit {
-            background: #007bff;
-            color: white;
-        }
-        .btn-save {
-            background: #28a745;
-            color: white;
-        }
-        .btn-cancel {
-            background: #6c757d;
-            color: white;
-        }
-        .edit-form textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 1em;
-            margin-bottom: 10px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-        .edit-form input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: inherit;
-            margin-bottom: 10px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-        h1 {
-            color: var(--text-color);
-        }
-        .header {
-            border-bottom: 2px solid var(--header-border);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-        a {
-            color: var(--link-color);
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        input[type="text"],
-        input[type="number"],
-        select {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-        small {
-            color: var(--muted-text);
-        }
-        .success-message {
-            background-color: var(--success-bg);
-            border: 1px solid var(--success-border);
-            color: var(--success-text);
-        }
-        table a:hover {
-            text-decoration: underline;
+            font-family: 'Crimson Pro', Georgia, serif;
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1>{% block heading %}FreeWise{% endblock %}</h1>
-        <nav style="margin-top: 10px;">
-            <a href="/dashboard/ui" style="margin-right: 15px;">Dashboard</a>
-            <a href="/highlights/ui/review" style="margin-right: 15px;">Review</a>
-            <a href="/library/ui" style="margin-right: 15px;">Library</a>
-            <a href="/import/ui" style="margin-right: 15px;">Import</a>
-            <a href="/settings/ui">Settings</a>
-        </nav>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Header -->
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-6 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                {% block heading %}FreeWise{% endblock %}
+            </h1>
+            <nav class="flex flex-wrap gap-4 text-sm">
+                <a href="/dashboard/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/highlights/ui/review" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>Review</span>
+                </a>
+                <a href="/library/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="library" class="w-4 h-4"></i>
+                    <span>Library</span>
+                </a>
+                <a href="/import/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span>Import</span>
+                </a>
+                <a href="/settings/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </div>
+        
+        <!-- Content -->
+        {% block content %}
+        <div class="space-y-6">
+            <p class="text-lg text-gray-700 dark:text-gray-300">Welcome to FreeWise - your personal highlight manager.</p>
+            
+            <div class="space-y-4">
+                <a href="/highlights/ui/review" class="flex items-center gap-2 text-lg font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    <span>Start Daily Review</span>
+                    {% if settings %}
+                    <span class="text-sm text-gray-500 dark:text-gray-400">({{ settings.daily_review_count }} highlights)</span>
+                    {% endif %}
+                </a>
+                
+                <a href="/library/ui" class="flex items-center gap-2 text-base text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="library" class="w-5 h-5"></i>
+                    <span>Browse Library</span>
+                </a>
+                
+                <a href="/import/ui" class="flex items-center gap-2 text-base text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <i data-lucide="upload" class="w-5 h-5"></i>
+                    <span>Import from Readwise</span>
+                </a>
+            </div>
+        </div>
+        {% endblock %}
     </div>
-    {% block content %}
-<p>Welcome to FreeWise - your personal highlight manager.</p>
-<div style="margin-top: 20px;">
-    <a href="/highlights/ui/review" style="font-size: 1.1em;">
-        → Start Daily Review
-        {% if settings %}({{ settings.daily_review_count }} highlights){% endif %}
-    </a>
-</div>
-<div style="margin-top: 15px;">
-    <a href="/library/ui" style="font-size: 1em;">
-        📚 Browse Library
-    </a>
-</div>
-<div style="margin-top: 15px;">
-    <a href="/import/ui" style="font-size: 1em;">
-        📥 Import from Readwise
-    </a>
-</div>
-{% endblock %}
+    
+    <!-- Scripts at bottom for proper loading order -->
+    <script>
+        // Initialize Lucide icons - must come after library is loaded
+        function initLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLucideIcons);
+        } else {
+            initLucideIcons();
+        }
+        
+        // Re-initialize after HTMX swaps content
+        document.addEventListener('htmx:afterSwap', initLucideIcons);
+        document.addEventListener('htmx:afterSettle', initLucideIcons);
+    </script>
 </body>
 </html>
