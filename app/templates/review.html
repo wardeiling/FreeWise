@@ -1,40 +1,94 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ settings.theme if settings else 'light' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Review - FreeWise</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        serif: ['Crimson Pro', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+    <!-- Back Button (Top Left) -->
+    <div class="absolute top-6 left-6 z-10">
+        <a href="/dashboard/ui" class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            <span class="text-sm font-medium">Dashboard</span>
+        </a>
+    </div>
 
-{% block title %}Daily Review - FreeWise{% endblock %}
-
-{% block heading %}Daily Review ({{ highlights|length }} of {{ n }} highlights){% endblock %}
-
-{% block content %}
-<div id="highlights-container">
-    {% if highlights %}
-        {% for highlight in highlights %}
-            {% include "_highlight_row.html" %}
-        {% endfor %}
-        
-        <!-- Complete Review Button -->
-        <div style="margin-top: 40px; text-align: center; padding: 30px; background: var(--highlight-bg); border-radius: 12px; border: 2px dashed var(--border-color);">
-            <div style="font-size: 2em; margin-bottom: 15px;">🎉</div>
-            <h3 style="margin: 0 0 15px 0; color: var(--text-color);">Finished reviewing?</h3>
-            <p style="color: var(--muted-text); margin-bottom: 20px;">
-                Mark this session as complete to track your progress.
-            </p>
-            <a href="/dashboard/ui?reviewed=complete" 
-               style="display: inline-block; background: #28a745; color: white; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.2s;"
-               onmouseover="this.style.background='#218838'; this.style.transform='scale(1.05)'"
-               onmouseout="this.style.background='#28a745'; this.style.transform='scale(1)'">
-                ✓ Mark as Complete
-            </a>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col items-center justify-center px-4 py-20">
+        <div id="review-container" class="w-full max-w-3xl">
+            {% if total > 0 %}
+                {% include "_review_card.html" %}
+            {% else %}
+                <div class="text-center">
+                    <div class="mb-6">
+                        <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">All Done!</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">
+                        No highlights available for review today. Great job staying on top of things!
+                    </p>
+                    <a href="/dashboard/ui" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        <span>Back to Dashboard</span>
+                    </a>
+                </div>
+            {% endif %}
         </div>
-    {% else %}
-        <p>No highlights available for review today. Great job staying on top of things!</p>
-    {% endif %}
-</div>
+    </div>
 
-<div style="margin-top: 30px;">
-    <p style="color: var(--muted-text); font-size: 0.9em;">
-        Showing {{ highlights|length }} highlight(s) based on your daily review count setting ({{ n }}).
-        <a href="/settings/ui">Change in settings</a>
-    </p>
-    <a href="/dashboard/ui">← Back to Dashboard</a>
-</div>
-{% endblock %}
+    <script>
+        function initLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLucideIcons);
+        } else {
+            initLucideIcons();
+        }
+        
+        document.addEventListener('htmx:afterSwap', initLucideIcons);
+        document.addEventListener('htmx:afterSettle', initLucideIcons);
+    </script>
+</body>
+</html>

@@ -40,7 +40,9 @@ Core functionality:
 - [X] improve the UI: 
     - [X] remove text of symbols (or make it show when hovering on it)
     - [X] remove book ID
-- [ ] Improve daily review page: show at the top of the page that this is the "Daily Review" and then have the box of that particular note with at the bottom in the box a favorite and edit button. Then outside the highlight box have one X button saying under it in small font "Discard" and then right of it a checkmark button with in small font under it "Done". When pressing either Discard or done, it moves a new higlight into view after which the same process follows, until all X (default is 5) higlights are completed.
+- [X] Improve daily review page: show at the centered top of the page that this is the "Daily Review" (full screen, so no header; only at the left top a back icon to return to dashboard) and then have the box of that particular note with at the bottom in the box a favorite and edit button. Then outside the highlight box have one X button (with circle around it) saying under it in small font "Discard" and then right of it a green checkmark button (with circle around it) with in small font under it "Done". When pressing either Discard or done, it moves a new higlight into view after which the same process follows, until all X (default is 5) higlights are completed.
+    - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight.
+    - [ ] Add book title, author and cover image to higlights shown in daily review.
 - [X] Add deduplication for import
 - [ ] Create spaced repetition algorithm with option for different books to be shown more or less frequently.
 - [X] Evaluate whether there is any added benefit to changing export format (if not change back to readwise and simplify import)
@@ -63,11 +65,12 @@ Core functionality:
 
 Nice to haves:
 - [ ] Create Favicon (small icon shown in browser tab) and add to the application.
-- [ ] Create automatic import of book metadata from external sources (e.g., Google Books API, Open Library API) based on book title and author.
+- [ ] Create automatic import of book metadata and book cover image from external sources (e.g., Google Books API, Open Library API) based on book title and author.
 - [ ] Enhance aestethics (make more visually appealing) of the UI 
     - [X] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
-    - [ ] Use back buttons at the top left to navigate back in full page views (daily review, book view) instead of only browser back button.
+    - [ ] Remove navigation header from book page and create a back button to go back to the library.
     - [ ] optional: navigation bar at the left
     - [X] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
-    - [ ] Fix dark mode.
+    - [X] Fix dark mode.
     - [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
+    - [ ] Always have the navigation header at the top of the page and under it potentially a title (e.g., "Library"), except for daily review page and book view page.

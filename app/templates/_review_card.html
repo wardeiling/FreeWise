@@ -1,0 +1,92 @@
+<!-- Single Highlight Review Card -->
+<div class="space-y-8">
+    <!-- Progress Indicator -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">Daily Review</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-400">
+            <span class="font-semibold text-primary-600 dark:text-primary-400">{{ current }}</span> of <span class="font-semibold">{{ total }}</span>
+        </p>
+    </div>
+
+    <!-- Highlight Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700 p-8 md:p-12">
+        <!-- Book Information -->
+        {% if highlight.book %}
+        <div class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ highlight.book.title }}</h2>
+            {% if highlight.book.author %}
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">by {{ highlight.book.author }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Highlight Text -->
+        <div class="font-serif text-2xl leading-relaxed text-gray-900 dark:text-gray-100 mb-6">
+            {{ highlight.text }}
+        </div>
+
+        <!-- Note (if exists) -->
+        {% if highlight.note %}
+        <div class="mt-4 text-base italic text-gray-600 dark:text-gray-400 pl-4 border-l-4 border-gray-300 dark:border-gray-600">
+            {{ highlight.note }}
+        </div>
+        {% endif %}
+
+        <!-- Page Number (if exists) -->
+        {% if highlight.location_type == "page" and highlight.location %}
+        <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            Page {{ highlight.location }}
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons (Inside Card - Bottom) -->
+        <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <button 
+                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-all {% if highlight.is_favorited %}bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-2 border-yellow-400 dark:border-yellow-600{% else %}bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 hover:border-yellow-300 dark:hover:border-yellow-700{% endif %}"
+                hx-post="/highlights/{{ highlight.id }}/favorite"
+                hx-vals='{"favorite": "{{ "false" if highlight.is_favorited else "true" }}", "context": "review"}'
+                hx-target="#review-container"
+                hx-swap="innerHTML"
+                title="Toggle favorite">
+                <i data-lucide="star" class="w-5 h-5 {% if highlight.is_favorited %}fill-current{% endif %}"></i>
+                <span class="font-medium">Favorite</span>
+            </button>
+            <button 
+                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:border-blue-300 dark:hover:border-blue-700 rounded-lg transition-all"
+                hx-get="/highlights/{{ highlight.id }}/edit?context=review"
+                hx-target="#review-container"
+                hx-swap="innerHTML"
+                title="Edit highlight">
+                <i data-lucide="pencil" class="w-5 h-5"></i>
+                <span class="font-medium">Edit</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Action Buttons (Outside Card) -->
+    <div class="flex items-center justify-center gap-12 mt-12">
+        <!-- Discard Button -->
+        <button 
+            class="flex flex-col items-center group"
+            hx-post="/highlights/{{ highlight.id }}/discard?context=review"
+            hx-target="#review-container"
+            hx-swap="innerHTML">
+            <div class="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/30 group-hover:scale-110 transition-all border-2 border-red-300 dark:border-red-700 group-hover:border-red-400 dark:group-hover:border-red-600">
+                <i data-lucide="x" class="w-10 h-10 text-red-600 dark:text-red-500"></i>
+            </div>
+            <span class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-400">Discard</span>
+        </button>
+
+        <!-- Done Button -->
+        <button 
+            class="flex flex-col items-center group"
+            hx-post="/highlights/ui/review/next?current_id={{ highlight.id }}"
+            hx-target="#review-container"
+            hx-swap="innerHTML">
+            <div class="w-24 h-24 rounded-full bg-green-500 dark:bg-green-600 flex items-center justify-center group-hover:bg-green-600 dark:group-hover:bg-green-700 group-hover:scale-110 transition-all shadow-lg">
+                <i data-lucide="check" class="w-12 h-12 text-white"></i>
+            </div>
+            <span class="mt-3 text-base font-semibold text-gray-900 dark:text-white">Done</span>
+        </button>
+    </div>
+</div>

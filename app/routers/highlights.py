@@ -244,7 +244,7 @@ async def ui_review(
     request: Request,
     session: Session = Depends(get_session)
 ):
-    """Render HTML page with highlights for review."""
+    """Render HTML page with single highlight for review."""
     # Get settings for theme and daily review count
     settings_stmt = select(Settings)
     settings = session.exec(settings_stmt).first()
@@ -253,12 +253,71 @@ async def ui_review(
     n = settings.daily_review_count if settings else 5
     highlights = get_review_highlights(n=n, session=session)
     
+    # Get the first highlight and total count
+    highlight = highlights[0] if highlights else None
+    total = len(highlights)
+    current = 1 if highlight else 0
+    
     return templates.TemplateResponse("review.html", {
         "request": request,
-        "highlights": highlights,
-        "n": n,
+        "highlight": highlight,
+        "current": current,
+        "total": total,
         "settings": settings
     })
+
+
+@router.post("/ui/review/next", response_class=HTMLResponse)
+async def ui_review_next(
+    request: Request,
+    current_id: int = Form(...),
+    session: Session = Depends(get_session)
+):
+    """Get the next highlight for review after marking current as done."""
+    # Get settings for theme and daily review count
+    settings_stmt = select(Settings)
+    settings = session.exec(settings_stmt).first()
+    
+    # Use daily_review_count from settings
+    n = settings.daily_review_count if settings else 5
+    highlights = get_review_highlights(n=n, session=session)
+    
+    # Find the next highlight after the current one
+    current_index = None
+    for i, h in enumerate(highlights):
+        if h.id == current_id:
+            current_index = i
+            break
+    
+    # Get next highlight
+    if current_index is not None and current_index + 1 < len(highlights):
+        highlight = highlights[current_index + 1]
+        current = current_index + 2
+        total = len(highlights)
+        
+        return templates.TemplateResponse("_review_card.html", {
+            "request": request,
+            "highlight": highlight,
+            "current": current,
+            "total": total
+        })
+    else:
+        # No more highlights - show completion message
+        return HTMLResponse(content="""
+            <div class="text-center">
+                <div class="mb-6">
+                    <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Review Complete!</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                    Great job! You've reviewed all your highlights for today.
+                </p>
+                <a href="/dashboard/ui?reviewed=complete" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        """)
 
 
 @router.get("/ui/favorites", response_class=HTMLResponse)
@@ -344,6 +403,31 @@ async def get_highlight_edit_form(
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
     
+    # For review context, return special edit form with progress info
+    if context == "review":
+        # Get settings for daily review count
+        settings_stmt = select(Settings)
+        settings = session.exec(settings_stmt).first()
+        n = settings.daily_review_count if settings else 5
+        highlights = get_review_highlights(n=n, session=session)
+        
+        # Find current position
+        current_index = None
+        for i, h in enumerate(highlights):
+            if h.id == id:
+                current_index = i
+                break
+        
+        current = (current_index + 1) if current_index is not None else 1
+        total = len(highlights)
+        
+        return templates.TemplateResponse("_review_edit.html", {
+            "request": request,
+            "highlight": highlight,
+            "current": current,
+            "total": total
+        })
+    
     # Store context in the form for use after save
     return templates.TemplateResponse("_highlight_edit.html", {
         "request": request,
@@ -357,6 +441,7 @@ async def save_highlight_edit(
     request: Request,
     id: int,
     text: str = Form(...),
+    note: Optional[str] = Form(None),
     source: Optional[str] = Form(None),
     context: Optional[str] = Form(None),
     session: Session = Depends(get_session)
@@ -367,11 +452,37 @@ async def save_highlight_edit(
         raise HTTPException(status_code=404, detail="Highlight not found")
     
     highlight.text = text
+    highlight.note = note if note else None
     highlight.source = source if source else None
     
     session.add(highlight)
     session.commit()
     session.refresh(highlight)
+    
+    # For review context, return to review card
+    if context == "review":
+        # Get settings for daily review count
+        settings_stmt = select(Settings)
+        settings = session.exec(settings_stmt).first()
+        n = settings.daily_review_count if settings else 5
+        highlights = get_review_highlights(n=n, session=session)
+        
+        # Find current position
+        current_index = None
+        for i, h in enumerate(highlights):
+            if h.id == id:
+                current_index = i
+                break
+        
+        current = (current_index + 1) if current_index is not None else 1
+        total = len(highlights)
+        
+        return templates.TemplateResponse("_review_card.html", {
+            "request": request,
+            "highlight": highlight,
+            "current": current,
+            "total": total
+        })
     
     # Choose template based on context
     template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
@@ -380,6 +491,43 @@ async def save_highlight_edit(
         "request": request,
         "highlight": highlight
     })
+
+
+# Helper endpoint for cancel button in review edit
+@router.get("/ui/review/card/{id}", response_class=HTMLResponse)
+async def get_review_card(
+    request: Request,
+    id: int,
+    session: Session = Depends(get_session)
+):
+    """Return review card for a specific highlight."""
+    highlight = session.get(Highlight, id)
+    if not highlight:
+        raise HTTPException(status_code=404, detail="Highlight not found")
+    
+    # Get settings for daily review count
+    settings_stmt = select(Settings)
+    settings = session.exec(settings_stmt).first()
+    n = settings.daily_review_count if settings else 5
+    highlights = get_review_highlights(n=n, session=session)
+    
+    # Find current position
+    current_index = None
+    for i, h in enumerate(highlights):
+        if h.id == id:
+            current_index = i
+            break
+    
+    current = (current_index + 1) if current_index is not None else 1
+    total = len(highlights)
+    
+    return templates.TemplateResponse("_review_card.html", {
+        "request": request,
+        "highlight": highlight,
+        "current": current,
+        "total": total
+    })
+
 
 
 @router.post("/{id}/favorite", response_class=HTMLResponse)
@@ -409,6 +557,31 @@ async def toggle_favorite_html(
     if context == "book":
         return render_book_highlights_sections(request, highlight.book_id, session)
     
+    # If context is review, return the same highlight card (just updated)
+    if context == "review":
+        # Get settings for daily review count
+        settings_stmt = select(Settings)
+        settings = session.exec(settings_stmt).first()
+        n = settings.daily_review_count if settings else 5
+        highlights = get_review_highlights(n=n, session=session)
+        
+        # Find current position
+        current_index = None
+        for i, h in enumerate(highlights):
+            if h.id == id:
+                current_index = i
+                break
+        
+        current = (current_index + 1) if current_index is not None else 1
+        total = len(highlights)
+        
+        return templates.TemplateResponse("_review_card.html", {
+            "request": request,
+            "highlight": highlight,
+            "current": current,
+            "total": total
+        })
+    
     # Otherwise return just the single highlight
     template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
     
@@ -425,7 +598,7 @@ async def discard_highlight_html(
     context: Optional[str] = Form(None),
     session: Session = Depends(get_session)
 ):
-    """Toggle is_discarded status and return updated highlight partial."""
+    """Toggle is_discarded status and return updated highlight partial or next review item."""
     highlight = session.get(Highlight, id)
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
@@ -444,6 +617,51 @@ async def discard_highlight_html(
     # If context is book, render both highlight sections
     if context == "book":
         return render_book_highlights_sections(request, highlight.book_id, session)
+    
+    # If context is review, move to next highlight
+    if context == "review":
+        # Get settings for daily review count
+        settings_stmt = select(Settings)
+        settings = session.exec(settings_stmt).first()
+        n = settings.daily_review_count if settings else 5
+        highlights = get_review_highlights(n=n, session=session)
+        
+        # Find the next highlight after the current one
+        current_index = None
+        for i, h in enumerate(highlights):
+            if h.id == id:
+                current_index = i
+                break
+        
+        # Get next highlight
+        if current_index is not None and current_index + 1 < len(highlights):
+            next_highlight = highlights[current_index + 1]
+            current = current_index + 2
+            total = len(highlights)
+            
+            return templates.TemplateResponse("_review_card.html", {
+                "request": request,
+                "highlight": next_highlight,
+                "current": current,
+                "total": total
+            })
+        else:
+            # No more highlights - show completion message
+            return HTMLResponse(content="""
+                <div class="text-center">
+                    <div class="mb-6">
+                        <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Review Complete!</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                        Great job! You've reviewed all your highlights for today.
+                    </p>
+                    <a href="/dashboard/ui?reviewed=complete" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                        <span>Back to Dashboard</span>
+                    </a>
+                </div>
+            """)
     
     # Otherwise return just the single highlight
     template_name = "_book_highlight.html" if context == "book" else "_highlight_row.html"
