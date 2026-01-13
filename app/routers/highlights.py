@@ -26,11 +26,15 @@ def render_book_highlights_sections(request: Request, book_id: int, session: Ses
     Helper function to render both active and discarded highlights sections.
     Returns HTML for both containers.
     """
-    # Get all highlights for this book
+    # Get all highlights for this book, ordered by location if available, then by date
+    # Order: location ASC (if available), created_at DESC (for fallback)
     highlights_stmt = (
         select(Highlight)
         .where(Highlight.book_id == book_id)
-        .order_by(Highlight.created_at.desc())
+        .order_by(
+            Highlight.location.asc().nullslast(),  # Location first (page/order), nulls last
+            Highlight.created_at.desc()             # Then by date
+        )
     )
     highlights = session.exec(highlights_stmt).all()
     
