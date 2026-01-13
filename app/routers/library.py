@@ -390,34 +390,36 @@ def _render_tags_section(book: Book) -> HTMLResponse:
         for tag in tags:
             tag_stripped = tag.strip()
             tags_html += f"""
-            <div style="display: inline-flex; align-items: center; padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px;">
-                <span style="margin-right: 8px;">🏷️ {tag_stripped}</span>
+            <div class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
+                <i data-lucide="tag" class="w-3 h-3 mr-1.5"></i>
+                <span>{tag_stripped}</span>
                 <button 
-                    style="background: transparent; border: none; cursor: pointer; color: #dc3545; padding: 0; font-size: 1.2em; line-height: 1;"
+                    class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                     hx-post="/library/ui/book/{book.id}/remove-tag"
                     hx-vals='{{"tag": "{tag_stripped}"}}'
                     hx-target="#document-tags-section"
                     hx-swap="innerHTML"
                     title="Remove tag">
-                    ×
+                    <i data-lucide="x" class="w-3 h-3"></i>
                 </button>
             </div>
             """
     
     full_html = f"""
-    <div id="tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px;">
+    <div id="tags-list" class="flex flex-wrap gap-2 justify-center mb-3">
         {tags_html}
     </div>
-    <div style="text-align: center;">
+    <div class="text-center">
         <button 
-            style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
+            class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
             hx-get="/library/ui/book/{book.id}/add-tag"
             hx-target="#add-tag-form"
             hx-swap="innerHTML">
-            + Add document tags
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add document tags</span>
         </button>
     </div>
-    <div id="add-tag-form" style="margin-top: 10px; text-align: center;"></div>
+    <div id="add-tag-form" class="mt-3 text-center"></div>
     """
     
     return HTMLResponse(content=full_html)
