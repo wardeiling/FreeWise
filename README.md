@@ -70,3 +70,4 @@ Nice to haves:
     - [ ] optional: navigation bar at the left
     - [X] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
     - [ ] Fix dark mode.
+    - [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
