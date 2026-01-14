@@ -66,12 +66,14 @@ Core functionality:
 Nice to haves:
 - [ ] Create Favicon (small icon shown in browser tab) and add to the application.
 - [ ] Create automatic import of book metadata and book cover image from external sources (e.g., Google Books API, Open Library API) based on book title and author.
-- [ ] Enhance aestethics (make more visually appealing) of the UI 
+- [X] Enhance aestethics (make more visually appealing) of the UI 
     - [X] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
-    - [ ] Remove navigation header from book page (make it full screen) and create a back button to go back to the library (in a similar way as was done for daily higlight page).
+    - [X] Remove navigation header from book page (make it full screen) and create a back button to go back to the library (in a similar way as was done for daily higlight page).
     - [ ] optional: navigation bar at the left
     - [X] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
     - [X] Fix dark mode.
-    - [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
-    - [ ] Always have the navigation header at the top of the page and under it potentially a title (e.g., "Library"), except for daily review page and book view page.
+    - [X] Always have the navigation header at the top of the page and under it potentially a title (e.g., "Library"), except for daily review page and book view page.
+    - [ ] Use fonts more appropriate for reading/books (more pleasing and less "computer-like")
 - [ ] Investigate the logic and and scripts one by one to see whether there are any optimizations possible to reduce code redundancy and improve efficiency.
+- [X] Also show page numbers for favorite and discarded html views.
+- [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
