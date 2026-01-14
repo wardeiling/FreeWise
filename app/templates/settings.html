@@ -6,144 +6,143 @@
 
 {% block content %}
 {% if success_message %}
-<div class="success-message" style="padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-    {{ success_message }}
+<div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 mb-6 rounded">
+    <div class="flex items-center gap-3">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-600 dark:text-green-400"></i>
+        <p class="text-green-700 dark:text-green-300">{{ success_message }}</p>
+    </div>
 </div>
 {% endif %}
 
-<form method="post" action="/settings/ui" style="max-width: 500px;">
-    <div style="margin-bottom: 20px;">
-        <label for="daily_review_count" style="display: block; margin-bottom: 5px; font-weight: bold;">
-            Daily Review Count
-        </label>
-        <input 
-            type="number" 
-            id="daily_review_count" 
-            name="daily_review_count" 
-            value="{{ settings.daily_review_count }}"
-            min="1"
-            max="50"
-            required
-            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
-        <small style="display: block; margin-top: 5px;">
-            Number of highlights to show in daily review (1-50)
-        </small>
+<!-- Settings Form -->
+<form method="post" action="/settings/ui" class="max-w-2xl space-y-8">
+    <!-- Daily Review Count Setting -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-start gap-4">
+            <div class="pt-1">
+                <i data-lucide="zap" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
+            </div>
+            <div class="flex-1">
+                <label for="daily_review_count" class="block text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Daily Review Count
+                </label>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Number of highlights to show in your daily review session
+                </p>
+                <input 
+                    type="number" 
+                    id="daily_review_count" 
+                    name="daily_review_count" 
+                    value="{{ settings.daily_review_count }}"
+                    min="1"
+                    max="50"
+                    required
+                    class="w-full max-w-xs px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                <small class="text-xs text-gray-500 dark:text-gray-400 mt-2 block">
+                    Minimum: 1 | Maximum: 50
+                </small>
+            </div>
+        </div>
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <label for="default_sort" style="display: block; margin-bottom: 5px; font-weight: bold;">
-            Default Sort Order
-        </label>
-        <select 
-            id="default_sort" 
-            name="default_sort" 
-            required
-            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
-            <option value="next_review" {% if settings.default_sort == "next_review" %}selected{% endif %}>
-                Next Review Date
-            </option>
-            <option value="created_at" {% if settings.default_sort == "created_at" %}selected{% endif %}>
-                Creation Date
-            </option>
-            <option value="updated_at" {% if settings.default_sort == "updated_at" %}selected{% endif %}>
-                Last Updated
-            </option>
-            <option value="favorite" {% if settings.default_sort == "favorite" %}selected{% endif %}>
-                Favorites First
-            </option>
-        </select>
-        <small style="display: block; margin-top: 5px;">
-            How highlights are sorted in list views
-        </small>
+    <!-- Theme Setting -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-start gap-4">
+            <div class="pt-1">
+                <i data-lucide="palette" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
+            </div>
+            <div class="flex-1">
+                <label for="theme" class="block text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Theme
+                </label>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Choose your preferred visual theme
+                </p>
+                <select 
+                    id="theme" 
+                    name="theme" 
+                    required
+                    class="w-full max-w-xs px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                    <option value="light" {% if settings.theme == "light" %}selected{% endif %}>
+                        Light
+                    </option>
+                    <option value="dark" {% if settings.theme == "dark" %}selected{% endif %}>
+                        Dark
+                    </option>
+                    <option value="auto" {% if settings.theme == "auto" %}selected{% endif %}>
+                        Auto (System)
+                    </option>
+                </select>
+            </div>
+        </div>
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <label for="theme" style="display: block; margin-bottom: 5px; font-weight: bold;">
-            Theme
-        </label>
-        <select 
-            id="theme" 
-            name="theme" 
-            required
-            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
-            <option value="light" {% if settings.theme == "light" %}selected{% endif %}>
-                Light
-            </option>
-            <option value="dark" {% if settings.theme == "dark" %}selected{% endif %}>
-                Dark
-            </option>
-            <option value="auto" {% if settings.theme == "auto" %}selected{% endif %}>
-                Auto (System)
-            </option>
-        </select>
-        <small style="display: block; margin-top: 5px;">
-            Visual theme for the application
-        </small>
-    </div>
-
-    <div style="margin-top: 30px;">
-        <button type="submit" style="background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;">
-            💾 Save Settings
+    <!-- Save Button -->
+    <div class="flex gap-3 pt-4">
+        <button type="submit" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            <i data-lucide="save" class="w-5 h-5"></i>
+            <span>Save Settings</span>
         </button>
-        <a href="/" style="margin-left: 15px;">
-            Cancel
+        <a href="/dashboard/ui" class="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+            <span>Cancel</span>
         </a>
     </div>
 </form>
 
-<!-- Export Section -->
-<div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--border-color);">
-    <h2 style="margin-bottom: 20px; color: var(--text-color);">📥 Export Data</h2>
+<!-- Export Data Section -->
+<div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Export Data</h3>
     
-    <div style="max-width: 500px; background: var(--highlight-bg); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color);">
-        <p style="margin: 0 0 20px 0; color: var(--muted-text); line-height: 1.6;">
-            Download all your highlights and metadata as a CSV file. The export includes 
-            highlight text, notes, book information, tags, favorite/discard status, and timestamps.
-        </p>
-        
-        <!-- Progress Bar (hidden by default) -->
-        <div id="export-progress-container" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px;">
-            <div style="text-align: center; margin-bottom: 15px;">
-                <div style="font-size: 2em; margin-bottom: 10px;">📤</div>
-                <p style="margin: 0; font-weight: 600; color: var(--text-color);">Exporting your highlights...</p>
-                <p style="margin: 5px 0 0 0; color: var(--muted-text); font-size: 0.9em;">Please wait while we generate your CSV file</p>
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
+        <div class="flex items-start gap-4 mb-6">
+            <div class="pt-1">
+                <i data-lucide="download" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
             </div>
-            
-            <!-- Animated progress bar -->
-            <div style="width: 100%; height: 30px; background: var(--highlight-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); position: relative;">
-                <div id="export-progress-bar" style="height: 100%; background: linear-gradient(90deg, #28a745, #1e7e34); width: 0%; transition: width 0.3s ease; position: relative;">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 2s infinite;"></div>
+            <div class="flex-1">
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Download CSV Export
+                </h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    Download all your highlights and metadata as a CSV file. The export includes highlight text, notes, 
+                    book information, tags, favorite/discard status, and timestamps.
+                </p>
+
+                <!-- Progress Bar (hidden by default) -->
+                <div id="export-progress-container" style="display: none;" class="mb-6 p-5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div class="text-center mb-4">
+                        <i data-lucide="loader" class="w-8 h-8 mx-auto text-primary-600 dark:text-primary-400 animate-spin mb-3"></i>
+                        <p class="font-semibold text-gray-900 dark:text-white">Exporting your highlights...</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Please wait while we generate your CSV file</p>
+                    </div>
+                    
+                    <!-- Animated progress bar -->
+                    <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div id="export-progress-bar" class="h-full bg-gradient-to-r from-primary-500 to-primary-600 w-0 transition-all" style="transition: width 0.3s ease;"></div>
+                    </div>
+                    <p class="text-center mt-3 text-xs text-gray-500 dark:text-gray-400">
+                        <span id="export-progress-text">Preparing export...</span>
+                    </p>
+                </div>
+
+                <a href="/export/csv" 
+                   id="export-btn"
+                   onclick="showExportProgress(event)"
+                   class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-md">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    <span>Download CSV Export</span>
+                </a>
+                
+                <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <p class="text-xs text-blue-700 dark:text-blue-300 flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                        <span><strong>Note:</strong> The exported CSV can be imported back into FreeWise or used with other tools. File format is compatible with standard spreadsheet applications.</span>
+                    </p>
                 </div>
             </div>
-            <p style="text-align: center; margin-top: 10px; color: var(--muted-text); font-size: 0.85em;">
-                <span id="export-progress-text">Preparing export...</span>
-            </p>
-        </div>
-        
-        <a href="/export/csv" 
-           id="export-btn"
-           onclick="showExportProgress(event)"
-           style="display: inline-block; background: var(--link-color); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 1em; font-weight: 500; transition: all 0.2s;"
-           onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-2px)'"
-           onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)'">
-            📥 Download CSV Export
-        </a>
-        
-        <div style="margin-top: 20px; padding: 15px; background: var(--bg-color); border-radius: 4px; border-left: 4px solid var(--link-color);">
-            <small style="color: var(--muted-text); line-height: 1.5;">
-                <strong>Note:</strong> The exported CSV can be imported back into FreeWise or used with other tools. 
-                File format is compatible with standard spreadsheet applications.
-            </small>
         </div>
     </div>
 </div>
-
-<style>
-    @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
-</style>
 
 <script>
     function showExportProgress(event) {
@@ -198,9 +197,8 @@
             }
         }, 200);
     }
-</script>
 
-<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-    <a href="/">← Back to Home</a>
-</div>
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', lucide.createIcons);
+</script>
 {% endblock %}

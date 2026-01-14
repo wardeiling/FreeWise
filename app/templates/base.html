@@ -104,29 +104,33 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <!-- Header -->
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-6 mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {% block heading %}FreeWise{% endblock %}
-            </h1>
-            <nav class="flex flex-wrap gap-4 text-sm">
+        <!-- Navigation Header -->
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+            <nav class="flex flex-wrap gap-6 text-base">
                 <a href="/dashboard/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <span>Dashboard</span>
                 </a>
                 <a href="/library/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                    <i data-lucide="library" class="w-4 h-4"></i>
+                    <i data-lucide="library" class="w-5 h-5"></i>
                     <span>Library</span>
                 </a>
                 <a href="/import/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <i data-lucide="upload" class="w-5 h-5"></i>
                     <span>Import</span>
                 </a>
                 <a href="/settings/ui" class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <i data-lucide="settings" class="w-5 h-5"></i>
                     <span>Settings</span>
                 </a>
             </nav>
+        </div>
+        
+        <!-- Page Title -->
+        <div class="mb-8">
+            <h2 class="text-4xl font-bold text-gray-900 dark:text-white">
+                {% block heading %}FreeWise{% endblock %}
+            </h2>
         </div>
         
         <!-- Content -->

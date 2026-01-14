@@ -88,7 +88,6 @@ async def ui_settings(
 async def update_settings_ui(
     request: Request,
     daily_review_count: int = Form(...),
-    default_sort: str = Form(...),
     theme: str = Form(...),
     session: Session = Depends(get_session)
 ):
@@ -96,7 +95,6 @@ async def update_settings_ui(
     settings = get_settings(session)
     
     settings.daily_review_count = daily_review_count
-    settings.default_sort = default_sort
     settings.theme = theme
     
     session.add(settings)
