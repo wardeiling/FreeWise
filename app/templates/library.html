@@ -23,7 +23,7 @@
                         {% endif %}
                     </a>
                 </th>
-                <th class="px-4 py-3 text-left">
+                <th class="px-4 py-3 text-left w-48">
                     <a href="/library/ui?sort=author&order={{ 'desc' if current_sort == 'author' and current_order == 'asc' else 'asc' }}" 
                        class="flex items-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                         <span>Author</span>
@@ -32,7 +32,7 @@
                         {% endif %}
                     </a>
                 </th>
-                <th class="px-4 py-3 text-center">
+                <th class="px-4 py-3 text-center w-32">
                     <a href="/library/ui?sort=highlight_count&order={{ 'desc' if current_sort == 'highlight_count' and current_order == 'asc' else 'asc' }}" 
                        class="flex items-center justify-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                         <span>Highlights</span>
@@ -41,7 +41,7 @@
                         {% endif %}
                     </a>
                 </th>
-                <th class="px-4 py-3 text-center">
+                <th class="px-4 py-3 text-center w-40">
                     <a href="/library/ui?sort=last_highlight&order={{ 'desc' if current_sort == 'last_highlight' and current_order == 'asc' else 'asc' }}" 
                        class="flex items-center justify-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                        title="Last Highlighted At">
@@ -71,15 +71,15 @@
                     </div>
                     {% endif %}
                 </td>
-                <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-400 w-48">
                     {{ book.author }}
                 </td>
-                <td class="px-4 py-3 text-center">
+                <td class="px-4 py-3 text-center w-32">
                     <span class="inline-block bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1 rounded-full text-sm font-semibold">
                         {{ book.highlight_count }}
                     </span>
                 </td>
-                <td class="px-4 py-3 text-center">
+                <td class="px-4 py-3 text-center w-40">
                     {% if book.last_highlight_date %}
                         <span class="text-gray-500 dark:text-gray-400 text-sm">
                             {{ book.last_highlight_date.strftime('%Y-%m-%d') }}
