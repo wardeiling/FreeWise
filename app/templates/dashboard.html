@@ -7,134 +7,142 @@
 {% block content %}
 <!-- Daily Review Call-to-Action -->
 {% if total_highlights == 0 %}
-<div style="margin-bottom: 30px;">
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 40px 30px; text-align: center; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);">
-        <div style="font-size: 2.5em; margin-bottom: 15px;">📚</div>
-        <h2 style="margin: 0 0 10px 0; font-size: 2em; font-weight: 600; color: white;">
+<div class="mb-8">
+    <div class="bg-gradient-to-br from-primary-600 to-purple-700 text-white rounded-2xl p-10 text-center shadow-lg">
+        <div class="flex justify-center mb-4">
+            <i data-lucide="book-open" class="w-16 h-16"></i>
+        </div>
+        <h2 class="text-3xl font-semibold mb-3">
             No Highlights Available
         </h2>
-        <p style="margin: 0 0 20px 0; font-size: 1.1em; opacity: 0.95;">
+        <p class="text-lg mb-6 opacity-95">
             Please import some highlights to get started.
         </p>
-        <a href="/import/ui" style="display: inline-block; background: white; color: #667eea; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;"
-           onmouseover="this.style.transform='scale(1.05)'"
-           onmouseout="this.style.transform='scale(1)'">📥 Import Highlights</a>
+        <a href="/import/ui" class="inline-flex items-center gap-2 bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+            <i data-lucide="upload" class="w-5 h-5"></i>
+            Import Highlights
+        </a>
     </div>
 </div>
 {% elif active_highlights < daily_review_count and not reviewed_today %}
-<div style="margin-bottom: 30px;">
-    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 16px; padding: 40px 30px; text-align: center; box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);">
-        <div style="font-size: 2.5em; margin-bottom: 15px;">⚡</div>
-        <h2 style="margin: 0 0 10px 0; font-size: 2em; font-weight: 600; color: white;">
+<div class="mb-8">
+    <div class="bg-gradient-to-br from-pink-500 to-rose-600 text-white rounded-2xl p-10 text-center shadow-lg">
+        <div class="flex justify-center mb-4">
+            <i data-lucide="zap" class="w-16 h-16"></i>
+        </div>
+        <h2 class="text-3xl font-semibold mb-3">
             Only {{ active_highlights }} Highlight{{ 's' if active_highlights != 1 else '' }} Available
         </h2>
-        <p style="margin: 0 0 20px 0; font-size: 1.1em; opacity: 0.95;">
+        <p class="text-lg mb-6 opacity-95">
             Please import more highlights to get the full experience.
         </p>
-        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <a href="/highlights/ui/review" style="display: inline-block; background: white; color: #f5576c; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;"
-               onmouseover="this.style.transform='scale(1.05)'"
-               onmouseout="this.style.transform='scale(1)'">📖 Start Review</a>
-            <a href="/import/ui" style="display: inline-block; background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid white; transition: all 0.3s;"
-               onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
-               onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">📥 Import More</a>
+        <div class="flex gap-4 justify-center flex-wrap">
+            <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                Start Review
+            </a>
+            <a href="/import/ui" class="inline-flex items-center gap-2 bg-white bg-opacity-20 text-white px-6 py-3 rounded-lg font-semibold border-2 border-white hover:bg-opacity-30 transition-all">
+                <i data-lucide="upload" class="w-5 h-5"></i>
+                Import More
+            </a>
         </div>
     </div>
 </div>
 {% elif not reviewed_today %}
-<div style="margin-bottom: 30px;">
-    <a href="/highlights/ui/review" style="text-decoration: none;">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 40px 30px; text-align: center; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); transition: all 0.3s ease; cursor: pointer;"
-             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(102, 126, 234, 0.4)'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.3)'">
-            <div style="font-size: 2.5em; margin-bottom: 15px;">📖</div>
-            <h2 style="margin: 0 0 10px 0; font-size: 2em; font-weight: 600; color: white;">
+<div class="mb-8">
+    <a href="/highlights/ui/review" class="block no-underline">
+        <div class="bg-gradient-to-br from-primary-600 to-purple-700 text-white rounded-2xl p-10 text-center shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+            <div class="flex justify-center mb-4">
+                <i data-lucide="book-open" class="w-16 h-16"></i>
+            </div>
+            <h2 class="text-3xl font-semibold mb-3">
                 Start Your Daily Review
             </h2>
-            <p style="margin: 0; font-size: 1.3em; opacity: 0.95;">
+            <p class="text-xl opacity-95">
                 {{ daily_review_count }} highlights waiting for you
             </p>
         </div>
     </a>
 </div>
 {% else %}
-<div style="margin-bottom: 30px; background: var(--highlight-bg); border: 2px solid #28a745; border-radius: 16px; padding: 30px; text-align: center;">
-    <div style="font-size: 2.5em; margin-bottom: 15px;">✅</div>
-    <h2 style="margin: 0 0 10px 0; font-size: 1.8em; color: var(--text-color);">
+<div class="mb-8 bg-white dark:bg-gray-800 border-2 border-green-500 rounded-2xl p-8 text-center">
+    <div class="flex justify-center mb-4">
+        <i data-lucide="check-circle" class="w-16 h-16 text-green-500"></i>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
         Great Job!
     </h2>
-    <p style="margin: 0 0 20px 0; color: var(--muted-text); font-size: 1.1em;">
+    <p class="text-gray-600 dark:text-gray-400 text-lg mb-6">
         You already reviewed {{ highlights_reviewed_count }} highlights today
     </p>
-    <a href="/highlights/ui/review" style="display: inline-block; background: var(--link-color); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: opacity 0.2s;"
-       onmouseover="this.style.opacity='0.9'"
-       onmouseout="this.style.opacity='1'">
+    <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+        <i data-lucide="book-open" class="w-5 h-5"></i>
         Review More
     </a>
 </div>
 {% endif %}
 
-<p style="color: var(--muted-text); margin-bottom: 20px;">
+<p class="text-gray-600 dark:text-gray-400 mb-6">
     Overview of your reading highlights and collection.
 </p>
 
 <!-- Statistics Cards -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
     <!-- Total Books Card -->
-    <a href="/library/ui" style="text-decoration: none; color: inherit;">
-        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
-             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--link-color)'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
-            <div style="font-size: 3em; margin-bottom: 10px;">📚</div>
-            <div style="font-size: 2.5em; font-weight: bold; color: var(--text-color); margin-bottom: 5px;">
+    <a href="/library/ui" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-primary-600 group-hover:shadow-lg cursor-pointer">
+            <div class="flex justify-center mb-3">
+                <i data-lucide="book" class="w-12 h-12 text-primary-600"></i>
+            </div>
+            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_books }}
             </div>
-            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+            <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
                 Total Books
             </div>
         </div>
     </a>
     
     <!-- Total Highlights Card -->
-    <a href="/highlights/ui/review" style="text-decoration: none; color: inherit;">
-        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
-             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--link-color)'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
-            <div style="font-size: 3em; margin-bottom: 10px;">💡</div>
-            <div style="font-size: 2.5em; font-weight: bold; color: var(--text-color); margin-bottom: 5px;">
+    <a href="/library/ui" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-primary-600 group-hover:shadow-lg cursor-pointer">
+            <div class="flex justify-center mb-3">
+                <i data-lucide="lightbulb" class="w-12 h-12 text-amber-500"></i>
+            </div>
+            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_highlights }}
             </div>
-            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+            <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
                 Total Highlights
             </div>
         </div>
     </a>
     
     <!-- Favorites Card -->
-    <a href="/highlights/ui/favorites" style="text-decoration: none; color: inherit;">
-        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
-             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#ffd700'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
-            <div style="font-size: 3em; margin-bottom: 10px;">⭐</div>
-            <div style="font-size: 2.5em; font-weight: bold; color: #ffd700; margin-bottom: 5px;">
+    <a href="/highlights/ui/favorites" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-yellow-400 group-hover:shadow-lg cursor-pointer">
+            <div class="flex justify-center mb-3">
+                <i data-lucide="star" class="w-12 h-12 text-yellow-400"></i>
+            </div>
+            <div class="text-4xl font-bold text-yellow-500 mb-2">
                 {{ total_favorited }}
             </div>
-            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+            <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
                 Favorites
             </div>
         </div>
     </a>
     
     <!-- Discarded Card -->
-    <a href="/highlights/ui/discarded" style="text-decoration: none; color: inherit;">
-        <div style="background: var(--highlight-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s ease; cursor: pointer;"
-             onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#dc3545'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
-            <div style="font-size: 3em; margin-bottom: 10px;">🗑️</div>
-            <div style="font-size: 2.5em; font-weight: bold; color: #dc3545; margin-bottom: 5px;">
+    <a href="/highlights/ui/discarded" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-red-500 group-hover:shadow-lg cursor-pointer">
+            <div class="flex justify-center mb-3">
+                <i data-lucide="trash-2" class="w-12 h-12 text-red-500"></i>
+            </div>
+            <div class="text-4xl font-bold text-red-500 mb-2">
                 {{ total_discarded }}
             </div>
-            <div style="color: var(--muted-text); font-size: 0.9em; font-weight: 500;">
+            <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
                 Discarded
             </div>
         </div>
@@ -143,99 +151,115 @@
 
 <!-- Visualization Section -->
 {% if total_highlights > 0 %}
-<div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
-    <h2 style="margin-top: 0; margin-bottom: 25px; font-size: 1.3em;">Highlights Breakdown</h2>
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Highlights Breakdown</h2>
     
-    <div style="margin-bottom: 30px;">
+    <div class="space-y-6">
         <!-- Active Highlights Bar -->
-        <div style="margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="font-weight: 500; color: var(--text-color);">Active Highlights</span>
-                <span style="color: var(--muted-text);">{{ active_highlights }} ({{ "%.1f"|format(active_percentage) }}%)</span>
+        <div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    Active Highlights
+                </span>
+                <span class="text-gray-600 dark:text-gray-400">{{ active_highlights }} ({{ "%.1f"|format(active_percentage) }}%)</span>
             </div>
-            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color);">
-                <div style="width: {{ active_percentage }}%; height: 100%; background: linear-gradient(90deg, #007bff, #0056b3); transition: width 0.5s ease;"></div>
+            <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
+                <div class="h-full bg-gradient-to-r from-primary-600 to-primary-700 transition-all duration-500" style="width: {{ active_percentage }}%;"></div>
             </div>
         </div>
         
         <!-- Favorites Bar -->
-        <div style="margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="font-weight: 500; color: var(--text-color);">⭐ Favorites</span>
-                <span style="color: var(--muted-text);">{{ total_favorited }} ({{ "%.1f"|format(favorited_percentage) }}%)</span>
+        <div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="star" class="w-4 h-4 text-yellow-400"></i>
+                    Favorites
+                </span>
+                <span class="text-gray-600 dark:text-gray-400">{{ total_favorited }} ({{ "%.1f"|format(favorited_percentage) }}%)</span>
             </div>
-            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color);">
-                <div style="width: {{ favorited_percentage }}%; height: 100%; background: linear-gradient(90deg, #ffd700, #ffaa00); transition: width 0.5s ease;"></div>
+            <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
+                <div class="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-500" style="width: {{ favorited_percentage }}%;"></div>
             </div>
         </div>
         
         <!-- Discarded Bar -->
         <div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="font-weight: 500; color: var(--text-color);">🗑️ Discarded</span>
-                <span style="color: var(--muted-text);">{{ total_discarded }} ({{ "%.1f"|format(discarded_percentage) }}%)</span>
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
+                    Discarded
+                </span>
+                <span class="text-gray-600 dark:text-gray-400">{{ total_discarded }} ({{ "%.1f"|format(discarded_percentage) }}%)</span>
             </div>
-            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color);">
-                <div style="width: {{ discarded_percentage }}%; height: 100%; background: linear-gradient(90deg, #dc3545, #a02834); transition: width 0.5s ease;"></div>
+            <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
+                <div class="h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500" style="width: {{ discarded_percentage }}%;"></div>
             </div>
         </div>
     </div>
 </div>
 {% else %}
-<div style="text-align: center; padding: 60px 20px; background: var(--highlight-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-    <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">📖</div>
-    <h3 style="margin-bottom: 15px; color: var(--text-color);">No Highlights Yet</h3>
-    <p style="color: var(--muted-text); margin-bottom: 25px; max-width: 400px; margin-left: auto; margin-right: auto;">
+<div class="text-center py-16 px-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+    <div class="flex justify-center mb-5">
+        <i data-lucide="book-open" class="w-20 h-20 text-gray-400 dark:text-gray-600"></i>
+    </div>
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">No Highlights Yet</h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
         Start building your knowledge library by importing highlights from Readwise or other sources.
     </p>
-    <a href="/import/ui" style="background: var(--link-color); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 500; transition: opacity 0.2s;"
-       onmouseover="this.style.opacity='0.9'"
-       onmouseout="this.style.opacity='1'">
+    <a href="/import/ui" class="inline-flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+        <i data-lucide="upload" class="w-5 h-5"></i>
         Import Highlights
     </a>
 </div>
 {% endif %}
 
 <!-- Quick Actions -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 30px;">
-    <a href="/highlights/ui/review" style="text-decoration: none;">
-        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
-             onmouseover="this.style.background='var(--border-color)'"
-             onmouseout="this.style.background='var(--highlight-bg)'">
-            <div style="font-size: 1.5em; margin-bottom: 8px;">📝</div>
-            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Review Highlights</div>
-            <div style="font-size: 0.85em; color: var(--muted-text);">Review your daily highlights</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+    <a href="/highlights/ui/review" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
+            <div class="flex items-center gap-3 mb-2">
+                <i data-lucide="book-open" class="w-6 h-6 text-primary-600"></i>
+                <div class="font-semibold text-gray-900 dark:text-white">Review Highlights</div>
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Review your daily highlights</div>
         </div>
     </a>
     
-    <a href="/library/ui" style="text-decoration: none;">
-        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
-             onmouseover="this.style.background='var(--border-color)'"
-             onmouseout="this.style.background='var(--highlight-bg)'">
-            <div style="font-size: 1.5em; margin-bottom: 8px;">📚</div>
-            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Browse Library</div>
-            <div style="font-size: 0.85em; color: var(--muted-text);">Explore your book collection</div>
+    <a href="/library/ui" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
+            <div class="flex items-center gap-3 mb-2">
+                <i data-lucide="library" class="w-6 h-6 text-primary-600"></i>
+                <div class="font-semibold text-gray-900 dark:text-white">Browse Library</div>
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Explore your book collection</div>
         </div>
     </a>
     
-    <a href="/import/ui" style="text-decoration: none;">
-        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
-             onmouseover="this.style.background='var(--border-color)'"
-             onmouseout="this.style.background='var(--highlight-bg)'">
-            <div style="font-size: 1.5em; margin-bottom: 8px;">📥</div>
-            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Import Data</div>
-            <div style="font-size: 0.85em; color: var(--muted-text);">Add new highlights from CSV</div>
+    <a href="/import/ui" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
+            <div class="flex items-center gap-3 mb-2">
+                <i data-lucide="upload" class="w-6 h-6 text-primary-600"></i>
+                <div class="font-semibold text-gray-900 dark:text-white">Import Data</div>
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Add new highlights from CSV</div>
         </div>
     </a>
     
-    <a href="/settings/ui" style="text-decoration: none;">
-        <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.2s ease;"
-             onmouseover="this.style.background='var(--border-color)'"
-             onmouseout="this.style.background='var(--highlight-bg)'">
-            <div style="font-size: 1.5em; margin-bottom: 8px;">⚙️</div>
-            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 5px;">Settings</div>
-            <div style="font-size: 0.85em; color: var(--muted-text);">Configure your preferences</div>
+    <a href="/settings/ui" class="no-underline group">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
+            <div class="flex items-center gap-3 mb-2">
+                <i data-lucide="settings" class="w-6 h-6 text-primary-600"></i>
+                <div class="font-semibold text-gray-900 dark:text-white">Settings</div>
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Configure your preferences</div>
         </div>
     </a>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+</script>
 {% endblock %}
