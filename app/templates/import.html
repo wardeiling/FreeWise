@@ -6,152 +6,200 @@
 
 {% block content %}
 {% if success_message %}
-<div class="success-message" style="padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-    <strong>✓ Import Successful!</strong><br>
-    {{ success_message }}
-    <div style="margin-top: 15px;">
-        <a href="/highlights/ui/review" style="margin-right: 15px;">→ Review Highlights</a>
-        <a href="/import/ui">Import Another File</a>
+<div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 mb-6 rounded">
+    <div class="flex items-start gap-3">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"></i>
+        <div>
+            <p class="font-semibold text-green-700 dark:text-green-300 mb-2">Import Successful!</p>
+            <p class="text-sm text-green-700 dark:text-green-300 mb-3">{{ success_message }}</p>
+            <div class="flex gap-3">
+                <a href="/highlights/ui/review" class="inline-flex items-center gap-2 text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 font-medium transition-colors">
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    <span>Review Highlights</span>
+                </a>
+                <a href="/import/ui" class="inline-flex items-center gap-2 text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 font-medium transition-colors">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span>Import Another File</span>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 {% endif %}
 
-<div style="max-width: 600px;">
-    <p style="margin-bottom: 20px;">
+<div class="max-w-2xl">
+    <p class="text-gray-600 dark:text-gray-400 mb-6">
         Upload a Readwise CSV export file to import your highlights into FreeWise.
     </p>
     
-    <div style="background: var(--highlight-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-        <h3 style="margin-top: 0; font-size: 1em;">How to export from Readwise:</h3>
-        <ol style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
-            <li>Log in to <a href="https://readwise.io" target="_blank">readwise.io</a></li>
-            <li>Go to Settings → Export</li>
-            <li>Click "Export all data"</li>
-            <li>Download the CSV file</li>
-            <li>Upload it here</li>
+    <!-- How to Export Instructions -->
+    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8">
+        <div class="flex items-start gap-3 mb-4">
+            <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"></i>
+            <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100">How to export from Readwise:</h3>
+        </div>
+        <ol class="space-y-2 text-sm text-blue-800 dark:text-blue-200 ml-8">
+            <li class="flex items-start gap-2">
+                <span class="font-semibold">1.</span>
+                <span>Log in to <a href="https://readwise.io" target="_blank" class="underline hover:text-blue-600 dark:hover:text-blue-300">readwise.io</a></span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="font-semibold">2.</span>
+                <span>Go to Settings → Export</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="font-semibold">3.</span>
+                <span>Click "Export" in the CSV block (at the bottom of the page)</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="font-semibold">4.</span>
+                <span>Save file to device</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="font-semibold">5.</span>
+                <span>Upload it here</span>
+            </li>
         </ol>
     </div>
 
-    <form method="post" action="/import/ui" enctype="multipart/form-data" style="margin-top: 30px;" 
-          id="import-form"
-          onsubmit="showProgress()">
-        <div style="margin-bottom: 20px;">
-            <label for="file" style="display: block; margin-bottom: 10px; font-weight: bold;">
-                Select CSV File
-            </label>
-            <input 
-                type="file" 
-                id="file" 
-                name="file" 
-                accept=".csv"
-                required
-                style="width: 100%; padding: 10px; border: 2px dashed var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); cursor: pointer;">
+    <!-- Import Form -->
+    <form method="post" action="/import/ui" enctype="multipart/form-data" id="import-form" onsubmit="showProgress()">
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+            <div class="flex items-start gap-4 mb-4">
+                <div class="pt-1">
+                    <i data-lucide="file-text" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
+                </div>
+                <div class="flex-1">
+                    <label for="file" class="block text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        Select CSV File
+                    </label>
+                    <input 
+                        type="file" 
+                        id="file" 
+                        name="file" 
+                        accept=".csv"
+                        required
+                        class="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white cursor-pointer hover:border-primary-500 dark:hover:border-primary-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+            </div>
         </div>
 
-        <div style="padding: 15px; background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 20px;">
-            <p style="margin: 0; font-size: 0.9em;">
-                <strong>Note:</strong> The CSV should have these columns:
+        <!-- CSV Format Info -->
+        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+            <p class="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                Expected CSV columns:
             </p>
-            <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 0.85em; color: var(--muted-text);">
-                <li><strong>Highlight</strong> (required) - The highlighted text</li>
-                <li>Book Title - Stored as source</li>
-                <li>Book Author - Stored separately</li>
-                <li>Note - Additional annotations</li>
-                <li>Tags - Comma-separated tags</li>
-                <li>Highlighted at - When the highlight was created</li>
+            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                <li class="flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"></i>
+                    <span><strong class="text-gray-900 dark:text-white">Highlight</strong> (required) - The highlighted text</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5"></i>
+                    <span><strong class="text-gray-900 dark:text-white">Book Title</strong> - Stored as source</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5"></i>
+                    <span><strong class="text-gray-900 dark:text-white">Book Author</strong> - Stored separately</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5"></i>
+                    <span><strong class="text-gray-900 dark:text-white">Note</strong> - Additional annotations</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5"></i>
+                    <span><strong class="text-gray-900 dark:text-white">Tags</strong> - Comma-separated tags</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5"></i>
+                    <span><strong class="text-gray-900 dark:text-white">Highlighted at</strong> - When the highlight was created</span>
+                </li>
             </ul>
         </div>
 
         <!-- Progress Bar (hidden by default) -->
-        <div id="progress-container" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 8px;">
-            <div style="text-align: center; margin-bottom: 15px;">
-                <div style="font-size: 2em; margin-bottom: 10px;">📤</div>
-                <p style="margin: 0; font-weight: 600; color: var(--text-color);">Importing your highlights...</p>
-                <p style="margin: 5px 0 0 0; color: var(--muted-text); font-size: 0.9em;">Please wait while we process your CSV file</p>
+        <div id="progress-container" style="display: none;" class="mb-6 p-6 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
+            <div class="text-center mb-4">
+                <i data-lucide="loader" class="w-10 h-10 mx-auto text-primary-600 dark:text-primary-400 animate-spin mb-3"></i>
+                <p class="font-semibold text-primary-900 dark:text-primary-100 text-lg">Importing your highlights...</p>
+                <p class="text-sm text-primary-700 dark:text-primary-300 mt-1">Please wait while we process your CSV file</p>
             </div>
             
             <!-- Animated progress bar -->
-            <div style="width: 100%; height: 30px; background: var(--bg-color); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); position: relative;">
-                <div id="progress-bar" style="height: 100%; background: linear-gradient(90deg, #007bff, #0056b3); width: 0%; transition: width 0.3s ease; position: relative;">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 2s infinite;"></div>
-                </div>
+            <div class="w-full h-3 bg-primary-100 dark:bg-primary-900 rounded-full overflow-hidden border border-primary-200 dark:border-primary-800">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-primary-500 to-primary-600 w-0 transition-all" style="transition: width 0.3s ease;"></div>
             </div>
-            <p style="text-align: center; margin-top: 10px; color: var(--muted-text); font-size: 0.85em;">
+            <p class="text-center mt-3 text-sm text-primary-700 dark:text-primary-300">
                 <span id="progress-text">Starting upload...</span>
             </p>
         </div>
 
-        <div style="margin-top: 30px;">
-            <button type="submit" id="submit-btn" style="background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;">
-                📥 Import Highlights
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button type="submit" id="submit-btn" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-md">
+                <i data-lucide="upload" class="w-5 h-5"></i>
+                <span>Import Highlights</span>
             </button>
-            <a href="/dashboard/ui" style="margin-left: 15px;">
-                Cancel
+            <a href="/dashboard/ui" class="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+                <span>Cancel</span>
             </a>
         </div>
     </form>
-
-    <style>
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-    </style>
-
-    <script>
-        function showProgress() {
-            // Hide form elements
-            document.getElementById('submit-btn').disabled = true;
-            document.getElementById('submit-btn').style.opacity = '0.5';
-            
-            // Show progress container
-            document.getElementById('progress-container').style.display = 'block';
-            
-            // Simulate progress
-            let progress = 0;
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            
-            const messages = [
-                'Reading CSV file...',
-                'Processing rows...',
-                'Creating books...',
-                'Importing highlights...',
-                'Parsing tags...',
-                'Finalizing import...',
-                'Import complete!'
-            ];
-            
-            let messageIndex = 0;
-            progressText.textContent = messages[0];
-            
-            const interval = setInterval(() => {
-                progress += Math.random() * 12 + 5;
-                if (progress > 100) progress = 100;
-                
-                progressBar.style.width = progress + '%';
-                
-                // Update message periodically
-                const messageThreshold = (messageIndex + 1) * (100 / messages.length);
-                if (progress > messageThreshold && messageIndex < messages.length - 1) {
-                    messageIndex++;
-                    progressText.textContent = messages[messageIndex];
-                }
-                
-                // Complete - the form submission will navigate to success page
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    progressText.textContent = 'Import complete! Redirecting...';
-                }
-            }, 300);
-            
-            // Store interval ID to clear it if needed
-            window.progressInterval = interval;
-        }
-    </script>
 </div>
 
-<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-    <a href="/dashboard/ui">← Back to Dashboard</a>
-</div>
+<script>
+    function showProgress() {
+        // Hide form elements
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('submit-btn').style.opacity = '0.5';
+        
+        // Show progress container
+        document.getElementById('progress-container').style.display = 'block';
+        
+        // Simulate progress
+        let progress = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        const messages = [
+            'Reading CSV file...',
+            'Processing rows...',
+            'Creating books...',
+            'Importing highlights...',
+            'Parsing tags...',
+            'Finalizing import...',
+            'Import complete!'
+        ];
+        
+        let messageIndex = 0;
+        progressText.textContent = messages[0];
+        
+        const interval = setInterval(() => {
+            progress += Math.random() * 12 + 5;
+            if (progress > 100) progress = 100;
+            
+            progressBar.style.width = progress + '%';
+            
+            // Update message periodically
+            const messageThreshold = (messageIndex + 1) * (100 / messages.length);
+            if (progress > messageThreshold && messageIndex < messages.length - 1) {
+                messageIndex++;
+                progressText.textContent = messages[messageIndex];
+            }
+            
+            // Complete - the form submission will navigate to success page
+            if (progress >= 100) {
+                clearInterval(interval);
+                progressText.textContent = 'Import complete! Redirecting...';
+            }
+        }, 300);
+        
+        // Store interval ID to clear it if needed
+        window.progressInterval = interval;
+    }
+
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', lucide.createIcons);
+</script>
 {% endblock %}
