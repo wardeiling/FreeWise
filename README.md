@@ -74,3 +74,4 @@ Nice to haves:
     - [X] Fix dark mode.
     - [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
     - [ ] Always have the navigation header at the top of the page and under it potentially a title (e.g., "Library"), except for daily review page and book view page.
+- [ ] Investigate the logic and and scripts one by one to see whether there are any optimizations possible to reduce code redundancy and improve efficiency.

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
@@ -271,9 +271,41 @@ async def ui_review(
 async def ui_review_next(
     request: Request,
     current_id: int = Form(...),
+    reviews_completed: int = Form(0),
+    total_reviews: int = Form(0),
     session: Session = Depends(get_session)
 ):
     """Get the next highlight for review after marking current as done."""
+    # Mark the current highlight as reviewed by setting next_review to far future
+    current_highlight = session.get(Highlight, current_id)
+    if current_highlight:
+        # Set next_review to 30 days in the future (or use spaced repetition logic later)
+        current_highlight.next_review = datetime.utcnow() + timedelta(days=30)
+        session.add(current_highlight)
+        session.commit()
+    
+    # Calculate the next position
+    next_current = reviews_completed + 2  # +1 for the current we just completed, +1 for next
+    
+    # Check if we've reached the total
+    if next_current > total_reviews:
+        # Review complete - show completion message
+        return HTMLResponse(content="""
+            <div class="text-center">
+                <div class="mb-6">
+                    <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Review Complete!</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                    Great job! You've reviewed all your highlights for today.
+                </p>
+                <a href="/dashboard/ui?reviewed=complete" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        """)
+    
     # Get settings for theme and daily review count
     settings_stmt = select(Settings)
     settings = session.exec(settings_stmt).first()
@@ -282,24 +314,16 @@ async def ui_review_next(
     n = settings.daily_review_count if settings else 5
     highlights = get_review_highlights(n=n, session=session)
     
-    # Find the next highlight after the current one
-    current_index = None
-    for i, h in enumerate(highlights):
-        if h.id == current_id:
-            current_index = i
-            break
-    
     # Get next highlight
-    if current_index is not None and current_index + 1 < len(highlights):
-        highlight = highlights[current_index + 1]
-        current = current_index + 2
-        total = len(highlights)
+    if highlights:
+        next_highlight = highlights[0]
+        current = next_current
         
         return templates.TemplateResponse("_review_card.html", {
             "request": request,
-            "highlight": highlight,
+            "highlight": next_highlight,
             "current": current,
-            "total": total
+            "total": total_reviews
         })
     else:
         # No more highlights - show completion message
@@ -536,6 +560,8 @@ async def toggle_favorite_html(
     id: int,
     favorite: bool = Form(...),
     context: Optional[str] = Form(None),
+    reviews_completed: int = Form(0),
+    total_reviews: int = Form(0),
     session: Session = Depends(get_session)
 ):
     """Toggle favorite status and return updated highlight partial."""
@@ -559,21 +585,8 @@ async def toggle_favorite_html(
     
     # If context is review, return the same highlight card (just updated)
     if context == "review":
-        # Get settings for daily review count
-        settings_stmt = select(Settings)
-        settings = session.exec(settings_stmt).first()
-        n = settings.daily_review_count if settings else 5
-        highlights = get_review_highlights(n=n, session=session)
-        
-        # Find current position
-        current_index = None
-        for i, h in enumerate(highlights):
-            if h.id == id:
-                current_index = i
-                break
-        
-        current = (current_index + 1) if current_index is not None else 1
-        total = len(highlights)
+        current = reviews_completed + 1
+        total = total_reviews
         
         return templates.TemplateResponse("_review_card.html", {
             "request": request,
@@ -596,6 +609,8 @@ async def discard_highlight_html(
     request: Request,
     id: int,
     context: Optional[str] = Form(None),
+    reviews_completed: int = Form(0),
+    total_reviews: int = Form(0),
     session: Session = Depends(get_session)
 ):
     """Toggle is_discarded status and return updated highlight partial or next review item."""
@@ -620,24 +635,40 @@ async def discard_highlight_html(
     
     # If context is review, move to next highlight
     if context == "review":
+        # Calculate the next position
+        next_current = reviews_completed + 2  # +1 for the current we just discarded, +1 for next
+        
+        # Check if we've reached the total
+        if next_current > total_reviews:
+            # Review complete - show completion message
+            return HTMLResponse(content="""
+                <div class="text-center">
+                    <div class="mb-6">
+                        <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Review Complete!</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                        Great job! You've reviewed all your highlights for today.
+                    </p>
+                    <a href="/dashboard/ui?reviewed=complete" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                        <span>Back to Dashboard</span>
+                    </a>
+                </div>
+            """)
+        
         # Get settings for daily review count
         settings_stmt = select(Settings)
         settings = session.exec(settings_stmt).first()
         n = settings.daily_review_count if settings else 5
         highlights = get_review_highlights(n=n, session=session)
         
-        # Find the next highlight after the current one
-        current_index = None
-        for i, h in enumerate(highlights):
-            if h.id == id:
-                current_index = i
-                break
-        
-        # Get next highlight
-        if current_index is not None and current_index + 1 < len(highlights):
-            next_highlight = highlights[current_index + 1]
-            current = current_index + 2
-            total = len(highlights)
+        # Get the first highlight from the refreshed list (after discarding, the next highlight is now first in the filtered results)
+        if highlights:
+            next_highlight = highlights[0]
+            # Increment reviews_completed since we just processed one
+            current = next_current
+            total = total_reviews
             
             return templates.TemplateResponse("_review_card.html", {
                 "request": request,

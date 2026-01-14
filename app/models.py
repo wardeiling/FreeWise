@@ -24,6 +24,7 @@ class Book(SQLModel, table=True):
     title: str = Field(index=True)
     author: Optional[str] = Field(default=None, index=True)
     document_tags: Optional[str] = None  # comma-separated tags
+    highlights: list["Highlight"] = Relationship(back_populates="book")
     
     def __repr__(self) -> str:
         author_str = f" by {self.author}" if self.author else ""
@@ -47,6 +48,7 @@ class Highlight(SQLModel, table=True):
     is_discarded: bool = Field(default=False, index=True)  # Derived from status
     next_review: Optional[datetime] = Field(default=None, index=True)
     user_id: int = Field(foreign_key="user.id", index=True)
+    book: Optional["Book"] = Relationship(back_populates="highlights")
     
     def __repr__(self) -> str:
         preview = self.text[:50] + "..." if len(self.text) > 50 else self.text
