@@ -68,7 +68,7 @@ Nice to haves:
 - [ ] Create automatic import of book metadata and book cover image from external sources (e.g., Google Books API, Open Library API) based on book title and author.
 - [ ] Enhance aestethics (make more visually appealing) of the UI 
     - [X] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
-    - [ ] Remove navigation header from book page and create a back button to go back to the library.
+    - [ ] Remove navigation header from book page (make it full screen) and create a back button to go back to the library (in a similar way as was done for daily higlight page).
     - [ ] optional: navigation bar at the left
     - [X] Remove "Discard" and "Restore" buttons and replace with icons only and remove trashcan before "Discarded Highlights" section.
     - [X] Fix dark mode.

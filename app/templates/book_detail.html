@@ -1,134 +1,191 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ settings.theme if settings else 'light' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - FreeWise</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        serif: ['Crimson Pro', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Back Button (Top Left) -->
+    <div class="absolute top-6 left-6 z-10">
+        <a href="/library/ui" class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            <span class="text-sm font-medium">Library</span>
+        </a>
+    </div>
 
-{% block title %}{{ book.title }} - FreeWise{% endblock %}
-
-{% block heading %}{% endblock %}
-
-{% block content %}
-<!-- Content Wrapper for max-width and mobile compatibility -->
-<div class="max-w-2xl mx-auto px-4">
-    <!-- Book Header (Centered) -->
-    <div id="book-header" class="relative text-center mb-8 p-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-        <!-- Edit Button in Top-Left -->
-        <button 
-            class="absolute top-4 left-4 p-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:scale-110 transition-all"
-            hx-get="/library/ui/book/{{ book.id }}/edit"
-            hx-target="#book-header"
-            hx-swap="outerHTML"
-            title="Edit Book"
-            type="button">
-            <i data-lucide="pencil" class="w-5 h-5"></i>
-        </button>
-        
-        <!-- Delete Button in Top-Right -->
-        <button 
-            class="absolute top-4 right-4 p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:scale-110 transition-all"
-            hx-delete="/library/ui/book/{{ book.id }}"
-            hx-confirm="⚠️ Are you sure you want to remove '{{ book.title }}' and all its {{ highlights|length }} highlight(s) from your library? This action cannot be undone."
-            title="Remove from Library"
-            type="button">
-            <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-        
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3 px-12">
-            {{ book.title }}
-        </h1>
-        
-        {% if book.author %}
-        <div class="text-lg text-gray-600 dark:text-gray-400 mb-5">
-            by {{ book.author }}
-        </div>
-        {% endif %}
-        
-        <!-- Document Tags Section -->
-        <div id="document-tags-section" class="mt-6">
-            <div id="tags-list" class="flex flex-wrap gap-2 justify-center mb-3">
-                {% if book.document_tags %}
-                    {% for tag in book.document_tags.split(',') %}
-                    <div class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
-                        <i data-lucide="tag" class="w-3 h-3 mr-1.5"></i>
-                        <span>{{ tag.strip() }}</span>
-                        <button 
-                            class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-                            hx-post="/library/ui/book/{{ book.id }}/remove-tag"
-                            hx-vals='{"tag": "{{ tag.strip() }}"}'
-                            hx-target="#document-tags-section"
-                            hx-swap="innerHTML"
-                            title="Remove tag">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    </div>
-                    {% endfor %}
+    <!-- Content Wrapper for max-width and mobile compatibility -->
+    <div class="max-w-2xl mx-auto px-4 py-20">
+        <!-- Book Header (Centered) -->
+        <div id="book-header" class="relative text-center mb-8 p-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+            <!-- Edit Button in Top-Left -->
+            <button 
+                class="absolute top-4 left-4 p-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:scale-110 transition-all"
+                hx-get="/library/ui/book/{{ book.id }}/edit"
+                hx-target="#book-header"
+                hx-swap="outerHTML"
+                title="Edit Book"
+                type="button">
+                <i data-lucide="pencil" class="w-5 h-5"></i>
+            </button>
+            
+            <!-- Delete Button in Top-Right -->
+            <button 
+                class="absolute top-4 right-4 p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:scale-110 transition-all"
+                hx-delete="/library/ui/book/{{ book.id }}"
+                hx-confirm="⚠️ Are you sure you want to remove '{{ book.title }}' and all its {{ highlights|length }} highlight(s) from your library? This action cannot be undone."
+                title="Remove from Library"
+                type="button">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3 px-12">
+                {{ book.title }}
+            </h1>
+            
+            {% if book.author %}
+            <div class="text-lg text-gray-600 dark:text-gray-400 mb-5">
+                by {{ book.author }}
+            </div>
+            {% endif %}
+            
+            <!-- Document Tags Section -->
+            <div id="document-tags-section" class="mt-6">
+                <div id="tags-list" class="flex flex-wrap gap-2 justify-center mb-3">
+                    {% if book.document_tags %}
+                        {% for tag in book.document_tags.split(',') %}
+                        <div class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
+                            <i data-lucide="tag" class="w-3 h-3 mr-1.5"></i>
+                            <span>{{ tag.strip() }}</span>
+                            <button 
+                                class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                                hx-post="/library/ui/book/{{ book.id }}/remove-tag"
+                                hx-vals='{"tag": "{{ tag.strip() }}"}'
+                                hx-target="#document-tags-section"
+                                hx-swap="innerHTML"
+                                title="Remove tag">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="text-center">
+                    <button 
+                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                        hx-get="/library/ui/book/{{ book.id }}/add-tag"
+                        hx-target="#add-tag-form"
+                        hx-swap="innerHTML">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Add document tags</span>
+                    </button>
+                </div>
+                <div id="add-tag-form" class="mt-3 text-center"></div>
+            </div>
+            
+            {% set active_highlights = highlights | selectattr('is_discarded', 'equalto', false) | list %}
+            {% set discarded_highlights = highlights | selectattr('is_discarded', 'equalto', true) | list %}
+            
+            <div class="mt-6 text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-semibold">{{ active_highlights|length }}</span> active highlight{{ 's' if active_highlights|length != 1 else '' }}
+                {% if discarded_highlights %}
+                    <span class="mx-2">|</span>
+                    <span class="font-semibold">{{ discarded_highlights|length }}</span> discarded
                 {% endif %}
             </div>
-            <div class="text-center">
-                <button 
-                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-                    hx-get="/library/ui/book/{{ book.id }}/add-tag"
-                    hx-target="#add-tag-form"
-                    hx-swap="innerHTML">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    <span>Add document tags</span>
-                </button>
-            </div>
-            <div id="add-tag-form" class="mt-3 text-center"></div>
         </div>
-        
-        {% set active_highlights = highlights | selectattr('is_discarded', 'equalto', false) | list %}
-        {% set discarded_highlights = highlights | selectattr('is_discarded', 'equalto', true) | list %}
-        
-        <div class="mt-6 text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-semibold">{{ active_highlights|length }}</span> active highlight{{ 's' if active_highlights|length != 1 else '' }}
+
+        <!-- Highlights Sections Wrapper -->
+        <div id="highlights-sections-wrapper">
+            <!-- Active Highlights List -->
+            {% if active_highlights %}
+            <div id="highlights-container" class="space-y-4">
+                {% for highlight in active_highlights %}
+                    {% include "_book_highlight.html" %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                <p class="text-xl font-medium text-gray-900 dark:text-white mb-2">No active highlights</p>
+                <p class="text-gray-600 dark:text-gray-400">
+                    {% if discarded_highlights %}
+                        All highlights in this book have been discarded. See the discarded section below.
+                    {% else %}
+                        Import highlights to get started.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Discarded Highlights Section -->
             {% if discarded_highlights %}
-                <span class="mx-2">|</span>
-                <span class="font-semibold">{{ discarded_highlights|length }}</span> discarded
+            <div class="mt-12 pt-8 border-t-2 border-gray-200 dark:border-gray-700">
+                <h2 class="flex items-center gap-2 mb-6 text-xl font-semibold text-gray-600 dark:text-gray-400">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    <span>Discarded Highlights ({{ discarded_highlights|length }})</span>
+                </h2>
+                <div id="discarded-highlights-container" class="space-y-4 opacity-75">
+                    {% for highlight in discarded_highlights %}
+                        {% include "_book_highlight.html" %}
+                    {% endfor %}
+                </div>
+            </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Highlights Sections Wrapper -->
-    <div id="highlights-sections-wrapper">
-        <!-- Active Highlights List -->
-        {% if active_highlights %}
-        <div id="highlights-container" class="space-y-4">
-            {% for highlight in active_highlights %}
-                {% include "_book_highlight.html" %}
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <p class="text-xl font-medium text-gray-900 dark:text-white mb-2">No active highlights</p>
-            <p class="text-gray-600 dark:text-gray-400">
-                {% if discarded_highlights %}
-                    All highlights in this book have been discarded. See the discarded section below.
-                {% else %}
-                    Import highlights to get started.
-                {% endif %}
-            </p>
-        </div>
-        {% endif %}
-
-        <!-- Discarded Highlights Section -->
-        {% if discarded_highlights %}
-        <div class="mt-12 pt-8 border-t-2 border-gray-200 dark:border-gray-700">
-            <h2 class="flex items-center gap-2 mb-6 text-xl font-semibold text-gray-600 dark:text-gray-400">
-                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                <span>Discarded Highlights ({{ discarded_highlights|length }})</span>
-            </h2>
-            <div id="discarded-highlights-container" class="space-y-4 opacity-75">
-                {% for highlight in discarded_highlights %}
-                    {% include "_book_highlight.html" %}
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-    <div class="mt-8 text-center">
-        <a href="/library/ui" class="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            <span>Back to Library</span>
-        </a>
-    </div>
-</div>
-{% endblock %}
+    <script>
+        function initLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLucideIcons);
+        } else {
+            initLucideIcons();
+        }
+        
+        document.addEventListener('htmx:afterSwap', initLucideIcons);
+        document.addEventListener('htmx:afterSettle', initLucideIcons);
+    </script>
+</body>
+</html>
