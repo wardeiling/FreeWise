@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
@@ -26,7 +26,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
                         serif: ['Crimson Pro', 'Georgia', 'serif'],
                     },
                     colors: {
@@ -94,11 +94,15 @@
         
         /* Font families */
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Manrope', system-ui, -apple-system, sans-serif;
         }
         
         .highlight-text {
             font-family: 'Crimson Pro', Georgia, serif;
+        }
+
+        .title-font {
+            font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
         }
     </style>
 </head>
@@ -128,7 +132,7 @@
         
         <!-- Page Title -->
         <div class="mb-8">
-            <h2 class="text-4xl font-bold text-gray-900 dark:text-white">
+            <h2 class="text-5xl font-bold text-gray-900 dark:text-white title-font">
                 {% block heading %}FreeWise{% endblock %}
             </h2>
         </div>
