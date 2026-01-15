@@ -2,67 +2,91 @@
 <div class="space-y-8">
     <!-- Progress Indicator -->
     <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">Edit Highlight</h1>
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">Daily Review</h1>
         <p class="text-lg text-gray-600 dark:text-gray-400">
             <span class="font-semibold text-primary-600 dark:text-primary-400">{{ current }}</span> of <span class="font-semibold">{{ total }}</span>
         </p>
     </div>
 
-    <!-- Edit Form -->
-    <form class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700 p-8 md:p-12"
-          hx-post="/highlights/{{ highlight.id }}/edit"
-          hx-target="#review-container"
-          hx-swap="innerHTML">
-        <input type="hidden" name="context" value="review">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700">
+        <!-- Button Bar at Top -->
+        <div class="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-8 py-4 rounded-t-2xl flex items-center justify-between">
+            <span class="text-base font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-2">
+                <i data-lucide="pencil" class="w-5 h-5"></i>
+                Editing Highlight
+            </span>
+            <div class="flex gap-3">
+                <button type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors"
+                        hx-get="/highlights/ui/review/card/{{ highlight.id }}"
+                        hx-target="#review-container"
+                        hx-swap="innerHTML">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                    Cancel
+                </button>
+                <button type="submit"
+                        form="review-edit-form-{{ highlight.id }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
         
-        <!-- Book Information -->
-        {% if highlight.book %}
-        <div class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ highlight.book.title }}</h2>
-            {% if highlight.book.author %}
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">by {{ highlight.book.author }}</p>
+        <!-- Edit Form -->
+        <form id="review-edit-form-{{ highlight.id }}" class="p-8 md:p-12"
+              hx-post="/highlights/{{ highlight.id }}/edit"
+              hx-target="#review-container"
+              hx-swap="innerHTML">
+            <input type="hidden" name="context" value="review">
+            
+            <!-- Book Information -->
+            {% if highlight.book %}
+            <div class="mb-6">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ highlight.book.title }}</h2>
+                {% if highlight.book.author %}
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ highlight.book.author }}</p>
+                {% endif %}
+            </div>
             {% endif %}
-        </div>
-        {% endif %}
 
-        <!-- Highlight Text -->
-        <div class="mb-6">
-            <label for="text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Highlight Text</label>
-            <textarea 
-                id="text"
-                name="text"
-                rows="6"
-                class="w-full px-4 py-3 font-serif text-lg border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                required>{{ highlight.text }}</textarea>
-        </div>
+            <!-- Highlight Text -->
+            <div class="mb-6">
+                <textarea 
+                    name="text"
+                    rows="1"
+                    class="w-full px-4 py-3 font-serif text-2xl leading-relaxed border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors resize-none overflow-hidden"
+                    oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
+                    required>{{ highlight.text }}</textarea>
+            </div>
+            
+            <!-- Page Number -->
+            <div class="mb-4 flex items-center gap-2">
+                <span class="text-sm text-gray-600 dark:text-gray-400">(Page</span>
+                <input type="number" name="location" min="1" placeholder="#"
+                    value="{{ highlight.location if highlight.location_type == 'page' and highlight.location else '' }}"
+                    class="w-24 px-3 py-2 text-sm text-center border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors">
+                <span class="text-sm text-gray-600 dark:text-gray-400">)</span>
+            </div>
 
-        <!-- Note -->
-        <div class="mb-6">
-            <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Note (Optional)</label>
-            <textarea 
-                id="note"
-                name="note"
-                rows="3"
-                class="w-full px-4 py-3 text-base border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">{{ highlight.note if highlight.note else '' }}</textarea>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex gap-3">
-            <button 
-                type="submit"
-                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                <i data-lucide="save" class="w-5 h-5"></i>
-                <span>Save Changes</span>
-            </button>
-            <button 
-                type="button"
-                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-semibold transition-colors"
-                hx-get="/highlights/ui/review/card/{{ highlight.id }}"
-                hx-target="#review-container"
-                hx-swap="innerHTML">
-                <i data-lucide="x" class="w-5 h-5"></i>
-                <span>Cancel</span>
-            </button>
-        </div>
-    </form>
+            <!-- Note -->
+            <div>
+                <textarea 
+                    name="note"
+                    rows="1"
+                    placeholder="Add a note..."
+                    class="w-full px-4 py-3 text-base italic border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors resize-none overflow-hidden"
+                    oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'">{{ highlight.note if highlight.note else '' }}</textarea>
+            </div>
+        </form>
+    </div>
 </div>
+
+<script>
+    // Auto-resize textareas on page load
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    });
+    lucide.createIcons();
+</script>
