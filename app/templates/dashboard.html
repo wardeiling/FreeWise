@@ -8,17 +8,17 @@
 <!-- Daily Review Call-to-Action -->
 {% if total_highlights == 0 %}
 <div class="mb-8">
-    <div class="bg-gradient-to-br from-primary-600 to-purple-700 text-white rounded-2xl p-10 text-center shadow-lg">
+    <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-10 text-center shadow-xl border border-amber-700/30">
         <div class="flex justify-center mb-4">
-            <i data-lucide="book-open" class="w-16 h-16"></i>
+            <i data-lucide="book-open" class="w-16 h-16 text-amber-200"></i>
         </div>
-        <h2 class="text-3xl font-semibold mb-3">
+        <h2 class="text-3xl font-semibold mb-3 text-amber-50">
             No Highlights Available
         </h2>
-        <p class="text-lg mb-6 opacity-95">
+        <p class="text-lg mb-6 text-amber-100/90">
             Please import some highlights to get started.
         </p>
-        <a href="/import/ui" class="inline-flex items-center gap-2 bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+        <a href="/import/ui" class="inline-flex items-center gap-2 bg-amber-100 text-amber-900 px-6 py-3 rounded-lg font-semibold hover:bg-amber-50 transition-all shadow-md">
             <i data-lucide="upload" class="w-5 h-5"></i>
             Import Highlights
         </a>
@@ -26,22 +26,22 @@
 </div>
 {% elif active_highlights < daily_review_count and not reviewed_today %}
 <div class="mb-8">
-    <div class="bg-gradient-to-br from-pink-500 to-rose-600 text-white rounded-2xl p-10 text-center shadow-lg">
+    <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-10 text-center shadow-xl border border-amber-700/30">
         <div class="flex justify-center mb-4">
-            <i data-lucide="zap" class="w-16 h-16"></i>
+            <i data-lucide="zap" class="w-16 h-16 text-amber-200"></i>
         </div>
-        <h2 class="text-3xl font-semibold mb-3">
+        <h2 class="text-3xl font-semibold mb-3 text-amber-50">
             Only {{ active_highlights }} Highlight{{ 's' if active_highlights != 1 else '' }} Available
         </h2>
-        <p class="text-lg mb-6 opacity-95">
+        <p class="text-lg mb-6 text-amber-100/90">
             Please import more highlights to get the full experience.
         </p>
         <div class="flex gap-4 justify-center flex-wrap">
-            <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+            <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-amber-100 text-red-900 px-6 py-3 rounded-lg font-semibold hover:bg-amber-50 transition-all shadow-md">
                 <i data-lucide="book-open" class="w-5 h-5"></i>
                 Start Review
             </a>
-            <a href="/import/ui" class="inline-flex items-center gap-2 bg-white bg-opacity-20 text-white px-6 py-3 rounded-lg font-semibold border-2 border-white hover:bg-opacity-30 transition-all">
+            <a href="/import/ui" class="inline-flex items-center gap-2 bg-amber-100/20 text-amber-50 px-6 py-3 rounded-lg font-semibold border-2 border-amber-200/50 hover:bg-amber-100/30 transition-all">
                 <i data-lucide="upload" class="w-5 h-5"></i>
                 Import More
             </a>
@@ -51,31 +51,31 @@
 {% elif not reviewed_today %}
 <div class="mb-8">
     <a href="/highlights/ui/review" class="block no-underline">
-        <div class="bg-gradient-to-br from-primary-600 to-purple-700 text-white rounded-2xl p-10 text-center shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+        <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-10 text-center shadow-xl border border-amber-700/30 hover:-translate-y-1 hover:shadow-2xl transition-all cursor-pointer">
             <div class="flex justify-center mb-4">
-                <i data-lucide="book-open" class="w-16 h-16"></i>
+                <i data-lucide="book-open" class="w-16 h-16 text-amber-200"></i>
             </div>
-            <h2 class="text-3xl font-semibold mb-3">
+            <h2 class="text-3xl font-semibold mb-3 text-amber-50">
                 Start Your Daily Review
             </h2>
-            <p class="text-xl opacity-95">
+            <p class="text-xl text-amber-100/90">
                 {{ daily_review_count }} highlights waiting for you
             </p>
         </div>
     </a>
 </div>
 {% else %}
-<div class="mb-8 bg-white dark:bg-gray-800 border-2 border-green-500 rounded-2xl p-8 text-center">
+<div class="mb-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 border-emerald-700 dark:border-emerald-800 rounded-2xl p-8 text-center shadow-lg">
     <div class="flex justify-center mb-4">
-        <i data-lucide="check-circle" class="w-16 h-16 text-green-500"></i>
+        <i data-lucide="check-circle" class="w-16 h-16 text-emerald-700 dark:text-emerald-600"></i>
     </div>
-    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+    <h2 class="text-3xl font-bold text-emerald-900 dark:text-emerald-100 mb-2">
         Great Job!
     </h2>
-    <p class="text-gray-600 dark:text-gray-400 text-lg mb-6">
+    <p class="text-emerald-800 dark:text-emerald-300 text-lg mb-6">
         You already reviewed {{ highlights_reviewed_count }} highlights today
     </p>
-    <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+    <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-emerald-800 dark:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-900 dark:hover:bg-emerald-800 transition-colors shadow-md">
         <i data-lucide="book-open" class="w-5 h-5"></i>
         Review More
     </a>
@@ -90,9 +90,9 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
     <!-- Total Books Card -->
     <a href="/library/ui" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-primary-600 group-hover:shadow-lg cursor-pointer">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-amber-700 group-hover:shadow-lg cursor-pointer">
             <div class="flex justify-center mb-3">
-                <i data-lucide="book" class="w-12 h-12 text-primary-600"></i>
+                <i data-lucide="book" class="w-12 h-12 text-amber-800 dark:text-amber-600"></i>
             </div>
             <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_books }}
@@ -105,7 +105,7 @@
     
     <!-- Total Highlights Card -->
     <a href="/library/ui" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-primary-600 group-hover:shadow-lg cursor-pointer">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-amber-500 group-hover:shadow-lg cursor-pointer">
             <div class="flex justify-center mb-3">
                 <i data-lucide="lightbulb" class="w-12 h-12 text-amber-500"></i>
             </div>
@@ -120,11 +120,11 @@
     
     <!-- Favorites Card -->
     <a href="/highlights/ui/favorites" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-yellow-400 group-hover:shadow-lg cursor-pointer">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-yellow-500 group-hover:shadow-lg cursor-pointer">
             <div class="flex justify-center mb-3">
-                <i data-lucide="star" class="w-12 h-12 text-yellow-400"></i>
+                <i data-lucide="star" class="w-12 h-12 text-yellow-500 dark:text-yellow-400"></i>
             </div>
-            <div class="text-4xl font-bold text-yellow-500 mb-2">
+            <div class="text-4xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">
                 {{ total_favorited }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -135,11 +135,11 @@
     
     <!-- Discarded Card -->
     <a href="/highlights/ui/discarded" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-red-500 group-hover:shadow-lg cursor-pointer">
+        <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center transition-all group-hover:-translate-y-1 group-hover:border-rose-400 group-hover:shadow-lg cursor-pointer">
             <div class="flex justify-center mb-3">
-                <i data-lucide="trash-2" class="w-12 h-12 text-red-500"></i>
+                <i data-lucide="trash-2" class="w-12 h-12 text-rose-500 dark:text-rose-400"></i>
             </div>
-            <div class="text-4xl font-bold text-red-500 mb-2">
+            <div class="text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2">
                 {{ total_discarded }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -165,7 +165,7 @@
                 <span class="text-gray-600 dark:text-gray-400">{{ active_highlights }} ({{ "%.1f"|format(active_percentage) }}%)</span>
             </div>
             <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
-                <div class="h-full bg-gradient-to-r from-primary-600 to-primary-700 transition-all duration-500" style="width: {{ active_percentage }}%;"></div>
+                <div class="h-full bg-gradient-to-r from-amber-700 to-amber-800 transition-all duration-500" style="width: {{ active_percentage }}%;"></div>
             </div>
         </div>
         
@@ -173,7 +173,7 @@
         <div>
             <div class="flex justify-between items-center mb-2">
                 <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="star" class="w-4 h-4 text-yellow-400"></i>
+                    <i data-lucide="star" class="w-4 h-4 text-yellow-500"></i>
                     Favorites
                 </span>
                 <span class="text-gray-600 dark:text-gray-400">{{ total_favorited }} ({{ "%.1f"|format(favorited_percentage) }}%)</span>
@@ -187,13 +187,13 @@
         <div>
             <div class="flex justify-between items-center mb-2">
                 <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
+                    <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
                     Discarded
                 </span>
                 <span class="text-gray-600 dark:text-gray-400">{{ total_discarded }} ({{ "%.1f"|format(discarded_percentage) }}%)</span>
             </div>
             <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
-                <div class="h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500" style="width: {{ discarded_percentage }}%;"></div>
+                <div class="h-full bg-gradient-to-r from-rose-400 to-rose-500 transition-all duration-500" style="width: {{ discarded_percentage }}%;"></div>
             </div>
         </div>
     </div>
@@ -207,55 +207,12 @@
     <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
         Start building your knowledge library by importing highlights from Readwise or other sources.
     </p>
-    <a href="/import/ui" class="inline-flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+    <a href="/import/ui" class="inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-6 py-3 rounded-lg font-medium hover:bg-amber-900 transition-colors shadow-md">
         <i data-lucide="upload" class="w-5 h-5"></i>
         Import Highlights
     </a>
 </div>
 {% endif %}
-
-<!-- Quick Actions -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-    <a href="/highlights/ui/review" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
-            <div class="flex items-center gap-3 mb-2">
-                <i data-lucide="book-open" class="w-6 h-6 text-primary-600"></i>
-                <div class="font-semibold text-gray-900 dark:text-white">Review Highlights</div>
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Review your daily highlights</div>
-        </div>
-    </a>
-    
-    <a href="/library/ui" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
-            <div class="flex items-center gap-3 mb-2">
-                <i data-lucide="library" class="w-6 h-6 text-primary-600"></i>
-                <div class="font-semibold text-gray-900 dark:text-white">Browse Library</div>
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Explore your book collection</div>
-        </div>
-    </a>
-    
-    <a href="/import/ui" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
-            <div class="flex items-center gap-3 mb-2">
-                <i data-lucide="upload" class="w-6 h-6 text-primary-600"></i>
-                <div class="font-semibold text-gray-900 dark:text-white">Import Data</div>
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Add new highlights from CSV</div>
-        </div>
-    </a>
-    
-    <a href="/settings/ui" class="no-underline group">
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all group-hover:bg-gray-50 dark:group-hover:bg-gray-750 group-hover:shadow-md">
-            <div class="flex items-center gap-3 mb-2">
-                <i data-lucide="settings" class="w-6 h-6 text-primary-600"></i>
-                <div class="font-semibold text-gray-900 dark:text-white">Settings</div>
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Configure your preferences</div>
-        </div>
-    </a>
-</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
