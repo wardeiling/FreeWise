@@ -50,11 +50,10 @@ Core functionality:
 - [X] Added button to delete book from library.
 - [X] prevents discarded entries to be favorited and edited; and favorite entries to be discarded
 - [X] Import
-    - [ ] Identify issue with skipped lines with readwise import.
+    - [X] Identify issue with skipped lines with readwise import.
     - [ ] Define a separate function for readwise import and book import
     - [X] For book import, allow for import with book section information and page numbers.
-    - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
-    - [ ] Correctly import book sections from readwise (readwise exports it to the higlight column with the comment .h1 for heading 1, .h2 for heading 2, etc.)
+    - [X] Correctly import book sections from readwise (readwise exports it to the higlight column with the comment .h1 for heading 1, .h2 for heading 2, etc.)
 - [X] Add progress bar for imports (of large files)
 - [X] Allow users to edit book information (e.g., author name, title) after import.
 - [X] If there are no higlights in the library, change dashboard header to "No highlights available. Please import some highlights to get started." And if there are less then the amount of set daily reviews, change to "Only X highlights available. Please import more highlights to get the full experience."
