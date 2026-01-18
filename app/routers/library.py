@@ -164,19 +164,15 @@ async def ui_book_edit_form(
     <div id="book-header" class="text-center mb-8">
         <form hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" class="max-w-md mx-auto">
             <!-- Form Header with Edit Indicator -->
-                <form 
-                    hx-post=\"/library/ui/book/{book.id}/remove-tag\"
-                    hx-target=\"#document-tags-section\"
-                    hx-swap=\"innerHTML\"
-                    class=\"inline-flex items-center\">
-                    <input type=\"hidden\" name=\"tag\" value=\"{tag_stripped}\">
+            <div class="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
+                <span class="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                    <svg data-lucide="pencil" class="w-4 h-4"></svg>
+                    <span>Editing Book Metadata</span>
+                </span>
+                <div class="flex items-center gap-2">
                     <button 
-                        type=\"submit\"
-                        class=\"ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors\"
-                        title=\"Remove tag\">
-                        <i data-lucide=\"x\" class=\"w-3 h-3\"></i>
-                    </button>
-                </form>
+                        type="button"
+                        hx-get="/library/ui/book/{book_id}/cancel-edit"
                         hx-target="#book-header"
                         hx-swap="outerHTML"
                         class="flex items-center gap-1 px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-md transition-colors text-xs font-medium"

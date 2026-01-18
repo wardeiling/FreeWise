@@ -78,3 +78,4 @@ Nice to haves:
 - [ ] Investigate the logic and and scripts one by one to see whether there are any optimizations possible to reduce code redundancy and improve efficiency.
 - [X] Also show page numbers for favorite and discarded html views.
 - [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
+- [ ] Sort higlights in favorite and discarded by the date they were favorited/discarded (more recent up top)
