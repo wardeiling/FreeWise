@@ -164,15 +164,19 @@ async def ui_book_edit_form(
     <div id="book-header" class="text-center mb-8">
         <form hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" class="max-w-md mx-auto">
             <!-- Form Header with Edit Indicator -->
-            <div class="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
-                <span class="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-2">
-                    <svg data-lucide="pencil" class="w-4 h-4"></svg>
-                    <span>Editing Book Metadata</span>
-                </span>
-                <div class="flex items-center gap-2">
+                <form 
+                    hx-post=\"/library/ui/book/{book.id}/remove-tag\"
+                    hx-target=\"#document-tags-section\"
+                    hx-swap=\"innerHTML\"
+                    class=\"inline-flex items-center\">
+                    <input type=\"hidden\" name=\"tag\" value=\"{tag_stripped}\">
                     <button 
-                        type="button"
-                        hx-get="/library/ui/book/{book_id}/cancel-edit"
+                        type=\"submit\"
+                        class=\"ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors\"
+                        title=\"Remove tag\">
+                        <i data-lucide=\"x\" class=\"w-3 h-3\"></i>
+                    </button>
+                </form>
                         hx-target="#book-header"
                         hx-swap="outerHTML"
                         class="flex items-center gap-1 px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-md transition-colors text-xs font-medium"
@@ -427,39 +431,55 @@ def _render_tags_section(book: Book) -> HTMLResponse:
         tags = book.document_tags.split(',')
         for tag in tags:
             tag_stripped = tag.strip()
+            tag_display = html.escape(tag_stripped)
+            tag_attr = html.escape(tag_stripped, quote=True)
             tags_html += f"""
-            <div class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
-                <i data-lucide="tag" class="w-3 h-3 mr-1.5"></i>
-                <span>{tag_stripped}</span>
-                <button 
-                    class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-                    hx-post="/library/ui/book/{book.id}/remove-tag"
-                    hx-vals='{{"tag": "{tag_stripped}"}}'
-                    hx-target="#document-tags-section"
-                    hx-swap="innerHTML"
-                    title="Remove tag">
-                    <i data-lucide="x" class="w-3 h-3"></i>
-                </button>
+            <div class=\"inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm\">
+                <i data-lucide=\"tag\" class=\"w-3 h-3 mr-1.5\"></i>
+                <span>{tag_display}</span>
+                <form 
+                    hx-post=\"/library/ui/book/{book.id}/remove-tag\"
+                    hx-target=\"#document-tags-section\"
+                    hx-swap=\"innerHTML\"
+                    class=\"inline-flex items-center\">
+                    <input type=\"hidden\" name=\"tag\" value=\"{tag_attr}\">
+                    <button 
+                        type=\"submit\"
+                        class=\"ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors\"
+                        title=\"Remove tag\">
+                        <i data-lucide=\"x\" class=\"w-3 h-3\"></i>
+                    </button>
+                </form>
             </div>
             """
-    
+
     full_html = f"""
-    <div id="tags-list" class="flex flex-wrap gap-2 justify-center mb-3">
+    <div id=\"tags-list\" class=\"flex flex-wrap gap-2 justify-center mb-3\">
         {tags_html}
     </div>
-    <div class="text-center">
-        <button 
-            class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-            hx-get="/library/ui/book/{book.id}/add-tag"
-            hx-target="#add-tag-form"
-            hx-swap="innerHTML">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>Add document tags</span>
-        </button>
+    <div class=\"text-center\">
+        <form 
+            hx-post=\"/library/ui/book/{book.id}/add-tag\"
+            hx-target=\"#document-tags-section\"
+            hx-swap=\"innerHTML\"
+            class=\"inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 transition-colors\">
+            <i data-lucide=\"plus\" class=\"w-4 h-4\"></i>
+            <input 
+                type=\"text\"
+                name=\"new_tag\"
+                placeholder=\"Add document tags\"
+                class=\"bg-transparent focus:outline-none text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500\"
+                autocomplete=\"off\">
+            <button type=\"submit\" class=\"text-xs font-medium text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 transition-colors\">Add</button>
+        </form>
     </div>
-    <div id="add-tag-form" class="mt-3 text-center"></div>
+    <script>
+        if (typeof lucide !== 'undefined') {{
+            lucide.createIcons();
+        }}
+    </script>
     """
-    
+
     return HTMLResponse(content=full_html)
 
 
@@ -525,35 +545,46 @@ def _render_book_header(book: Book, highlight_count: int) -> HTMLResponse:
         tags = book.document_tags.split(',')
         for tag in tags:
             tag_stripped = tag.strip()
+            tag_display = html.escape(tag_stripped)
+            tag_attr = html.escape(tag_stripped, quote=True)
             header_html += f"""
                 <div class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
                     <svg data-lucide="tag" class="w-3 h-3 mr-1.5"></svg>
-                    <span>{tag_stripped}</span>
-                    <button 
-                        class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                    <span>{tag_display}</span>
+                    <form 
                         hx-post="/library/ui/book/{book.id}/remove-tag"
-                        hx-vals='{{"tag": "{tag_stripped}"}}'
                         hx-target="#document-tags-section"
                         hx-swap="innerHTML"
-                        title="Remove tag">
-                        <svg data-lucide="x" class="w-3 h-3"></svg>
-                    </button>
+                        class="inline-flex items-center">
+                        <input type="hidden" name="tag" value="{tag_attr}">
+                        <button 
+                            type="submit"
+                            class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                            title="Remove tag">
+                            <svg data-lucide="x" class="w-3 h-3"></svg>
+                        </button>
+                    </form>
                 </div>
             """
     
     header_html += f"""
             </div>
             <div class="text-center">
-                <button 
-                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-                    hx-get="/library/ui/book/{book.id}/add-tag"
-                    hx-target="#add-tag-form"
-                    hx-swap="innerHTML">
+                <form 
+                    hx-post="/library/ui/book/{book.id}/add-tag"
+                    hx-target="#document-tags-section"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
                     <svg data-lucide="plus" class="w-4 h-4"></svg>
-                    <span>Add document tags</span>
-                </button>
+                    <input 
+                        type="text"
+                        name="new_tag"
+                        placeholder="Add document tags"
+                        class="bg-transparent focus:outline-none text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
+                        autocomplete="off">
+                    <button type="submit" class="text-xs font-medium text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 transition-colors">Add</button>
+                </form>
             </div>
-            <div id="add-tag-form" class="mt-3 text-center"></div>
         </div>
     </div>
     <script>
