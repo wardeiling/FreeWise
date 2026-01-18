@@ -82,3 +82,8 @@ Nice to haves:
     - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight.
     - [ ] Add book title, author and cover image to higlights shown in daily review.
 - [ ] Book import - The Book title should also be required column and the required boxes should not be red anymore if there is a selection made.
+
+vertical line yellow
+fix disc. favs.
+testore high.
+Black tiles dashboard

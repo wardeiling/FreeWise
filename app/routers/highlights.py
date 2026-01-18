@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional, List, Dict
+from collections import defaultdict
+import math
+import random
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -191,10 +194,6 @@ def get_review_highlights(
     Return up to n highlights for review.
     
     If n is not provided, uses Settings.daily_review_count.
-    
-    Priority order:
-    1. Active highlights with next_review <= now or next_review is NULL
-    2. Fill remaining slots with random active highlights
     """
     # Load n from settings if not provided
     if n is None:
@@ -203,38 +202,89 @@ def get_review_highlights(
         n = settings.daily_review_count if settings else 5
     
     now = datetime.utcnow()
-    
-    # Get highlights due for review
-    due_statement = (
+
+    # Fetch all active highlights (exclude discarded)
+    statement = (
         select(Highlight)
         .where(Highlight.status == "active")
-        .where(
-            (Highlight.next_review <= now) | (Highlight.next_review == None)
-        )
-        .order_by(Highlight.next_review.asc())
-        .limit(n)
+        .where(Highlight.is_discarded == False)
     )
-    due_highlights = list(session.exec(due_statement).all())
-    
-    # If we have fewer than n, fill with random active highlights
-    if len(due_highlights) < n:
-        remaining = n - len(due_highlights)
-        due_ids = [h.id for h in due_highlights]
-        
-        random_statement = (
-            select(Highlight)
-            .where(Highlight.status == "active")
-            .where(Highlight.next_review > now)
-        )
-        
-        if due_ids:
-            random_statement = random_statement.where(Highlight.id.not_in(due_ids))
-        
-        random_statement = random_statement.order_by(func.random()).limit(remaining)
-        random_highlights = list(session.exec(random_statement).all())
-        due_highlights.extend(random_highlights)
-    
-    return due_highlights
+    highlights = list(session.exec(statement).all())
+
+    if not highlights:
+        return []
+
+    # Scoring parameters
+    tau_days = 14.0
+
+    def get_book_weight(h: Highlight) -> float:
+        if h.book and h.book.review_weight is not None:
+            return max(0.0, float(h.book.review_weight))
+        return 1.0
+
+    def get_days_since(h: Highlight) -> float:
+        anchor = h.last_reviewed_at or h.created_at
+        if anchor is None:
+            return 30.0
+        delta = now - anchor
+        return max(0.0, delta.total_seconds() / 86400.0)
+
+    def time_score(days: float) -> float:
+        # Smooth time-decayed resurfacing
+        return 1.0 - math.exp(-days / tau_days)
+
+    # Build candidate list with scores
+    candidates = []
+    for h in highlights:
+        weight = get_book_weight(h)
+        if weight <= 0.0:
+            continue
+        days = get_days_since(h)
+        score = time_score(days) * weight
+        if score <= 0.0:
+            continue
+        book_id = h.book_id
+        candidates.append((h, score, book_id))
+
+    if not candidates:
+        return []
+
+    # Diversity constraint (Option B): weighted sampling with per-book cap
+    max_per_book = 2 if n >= 4 else 1
+    selected = []
+    book_counts: Dict[Optional[int], int] = defaultdict(int)
+
+    def weighted_pick(items: list[tuple[Highlight, float, Optional[int]]]) -> tuple[Highlight, float, Optional[int]]:
+        total = sum(item[1] for item in items)
+        if total <= 0:
+            return random.choice(items)
+        r = random.random() * total
+        upto = 0.0
+        for item in items:
+            upto += item[1]
+            if upto >= r:
+                return item
+        return items[-1]
+
+    remaining = candidates[:]
+
+    while len(selected) < n and remaining:
+        eligible = [c for c in remaining if book_counts[c[2]] < max_per_book]
+        if not eligible:
+            break
+        pick = weighted_pick(eligible)
+        selected.append(pick[0])
+        book_counts[pick[2]] += 1
+        remaining.remove(pick)
+
+    # Fill remaining slots ignoring per-book cap if needed
+    if len(selected) < n and remaining:
+        while len(selected) < n and remaining:
+            pick = weighted_pick(remaining)
+            selected.append(pick[0])
+            remaining.remove(pick)
+
+    return selected
 
 
 # ============ HTML/HTMX Endpoints ============
@@ -276,11 +326,11 @@ async def ui_review_next(
     session: Session = Depends(get_session)
 ):
     """Get the next highlight for review after marking current as done."""
-    # Mark the current highlight as reviewed by setting next_review to far future
+    # Mark the current highlight as reviewed
     current_highlight = session.get(Highlight, current_id)
     if current_highlight:
-        # Set next_review to 30 days in the future (or use spaced repetition logic later)
-        current_highlight.next_review = datetime.utcnow() + timedelta(days=30)
+        current_highlight.last_reviewed_at = datetime.utcnow()
+        current_highlight.review_count = (current_highlight.review_count or 0) + 1
         session.add(current_highlight)
         session.commit()
     

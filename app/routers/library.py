@@ -209,6 +209,24 @@ async def ui_book_edit_form(
                         value="{escaped_author}" 
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Review Frequency</label>
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Never</span>
+                            <input 
+                                type="range"
+                                name="review_weight"
+                                min="0"
+                                max="2"
+                                step="0.1"
+                                value="{book.review_weight if book.review_weight is not None else 1.0}"
+                                class="flex-1 accent-amber-600">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">More</span>
+                        </div>
+                        <div class="text-center text-xs text-gray-500 dark:text-gray-400 mt-1">Normally</div>
+                    </div>
+                </div>
 
                 <!-- Action Buttons moved to header for consistency -->
             </div>
@@ -223,6 +241,7 @@ async def ui_book_edit_form(
                     t.style.height = t.scrollHeight + 'px';
                 }}
             }}
+
 
             resizeTitle(document);
 
@@ -246,6 +265,7 @@ async def ui_book_update(
     book_id: int,
     title: str = Form(...),
     author: str = Form(""),
+    review_weight: float = Form(1.0),
     session: Session = Depends(get_session)
 ):
     """Update book metadata and return updated header."""
@@ -257,6 +277,7 @@ async def ui_book_update(
     # Update book metadata
     book.title = title.strip()
     book.author = author.strip() if author.strip() else None
+    book.review_weight = min(2.0, max(0.0, float(review_weight)))
     
     session.add(book)
     session.commit()

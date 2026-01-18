@@ -124,7 +124,7 @@
             <div class="flex justify-center mb-3">
                 <i data-lucide="star" class="w-12 h-12 text-yellow-500 dark:text-yellow-400"></i>
             </div>
-            <div class="text-4xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">
+            <div class="text-4xl font-bold text-gray-900 dark:text-yellow-500 mb-2">
                 {{ total_favorited }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -139,7 +139,7 @@
             <div class="flex justify-center mb-3">
                 <i data-lucide="trash-2" class="w-12 h-12 text-rose-500 dark:text-rose-400"></i>
             </div>
-            <div class="text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2">
+            <div class="text-4xl font-bold text-gray-900 dark:text-rose-400 mb-2">
                 {{ total_discarded }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -197,20 +197,6 @@
             </div>
         </div>
     </div>
-</div>
-{% else %}
-<div class="text-center py-16 px-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-    <div class="flex justify-center mb-5">
-        <i data-lucide="book-open" class="w-20 h-20 text-gray-400 dark:text-gray-600"></i>
-    </div>
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">No Highlights Yet</h3>
-    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-        Start building your knowledge library by importing highlights from Readwise or other sources.
-    </p>
-    <a href="/import/ui" class="inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-6 py-3 rounded-lg font-medium hover:bg-amber-900 transition-colors shadow-md">
-        <i data-lucide="upload" class="w-5 h-5"></i>
-        Import Highlights
-    </a>
 </div>
 {% endif %}
 

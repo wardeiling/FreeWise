@@ -24,6 +24,7 @@ class Book(SQLModel, table=True):
     title: str = Field(index=True)
     author: Optional[str] = Field(default=None, index=True)
     document_tags: Optional[str] = None  # comma-separated tags
+    review_weight: float = Field(default=1.0, index=True)  # 0.0 (Never) to 2.0 (More)
     highlights: list["Highlight"] = Relationship(back_populates="book")
     
     def __repr__(self) -> str:
@@ -47,6 +48,8 @@ class Highlight(SQLModel, table=True):
     is_favorited: bool = Field(default=False, index=True)  # Alias for favorite
     is_discarded: bool = Field(default=False, index=True)  # Derived from status
     next_review: Optional[datetime] = Field(default=None, index=True)
+    last_reviewed_at: Optional[datetime] = Field(default=None, index=True)
+    review_count: int = Field(default=0)
     user_id: int = Field(foreign_key="user.id", index=True)
     book: Optional["Book"] = Relationship(back_populates="highlights")
     
