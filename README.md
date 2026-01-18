@@ -85,5 +85,4 @@ Nice to haves:
 
 vertical line yellow
 fix disc. favs.
-testore high.
-Black tiles dashboard
+restore highlights

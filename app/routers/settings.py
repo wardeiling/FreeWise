@@ -2,11 +2,11 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from pydantic import BaseModel
 
 from app.db import get_engine
-from app.models import Settings
+from app.models import Settings, Highlight
 
 
 router = APIRouter(prefix="/settings", tags=["settings"])
@@ -78,9 +78,12 @@ async def ui_settings(
 ):
     """Render settings page with form."""
     settings = get_settings(session)
+    highlights_count_stmt = select(func.count(Highlight.id))
+    highlights_count = session.exec(highlights_count_stmt).one()
     return templates.TemplateResponse("settings.html", {
         "request": request,
-        "settings": settings
+        "settings": settings,
+        "highlights_count": highlights_count
     })
 
 
@@ -101,9 +104,13 @@ async def update_settings_ui(
     session.commit()
     session.refresh(settings)
     
+    highlights_count_stmt = select(func.count(Highlight.id))
+    highlights_count = session.exec(highlights_count_stmt).one()
+    
     # Return updated form with success message
     return templates.TemplateResponse("settings.html", {
         "request": request,
         "settings": settings,
+        "highlights_count": highlights_count,
         "success_message": "Settings saved successfully!"
     })

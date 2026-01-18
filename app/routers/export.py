@@ -2,7 +2,7 @@ import csv
 import io
 from datetime import datetime
 from typing import List
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, HTTPException
 from sqlmodel import Session, select
 
 from app.db import get_engine
@@ -45,6 +45,9 @@ async def export_highlights_csv(
     )
     results = session.exec(statement).all()
     
+    if not results:
+        raise HTTPException(status_code=400, detail="No highlights available to export.")
+
     # Create CSV in memory
     output = io.StringIO()
     writer = csv.writer(output, quoting=csv.QUOTE_ALL)

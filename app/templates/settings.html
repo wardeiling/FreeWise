@@ -125,6 +125,7 @@
                     </p>
                 </div>
 
+                {% if highlights_count and highlights_count > 0 %}
                 <a href="/export/csv" 
                    id="export-btn"
                    onclick="showExportProgress(event)"
@@ -132,6 +133,16 @@
                     <i data-lucide="download" class="w-5 h-5"></i>
                     <span>Download CSV Export</span>
                 </a>
+                {% else %}
+                <button type="button"
+                        class="inline-flex items-center gap-2 bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-6 py-3 rounded-lg font-semibold cursor-not-allowed">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    <span>Download CSV Export</span>
+                </button>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    Add highlights before exporting data.
+                </p>
+                {% endif %}
                 
                 <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <p class="text-xs text-blue-700 dark:text-blue-300 flex items-start gap-2">
