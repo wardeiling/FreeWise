@@ -161,42 +161,80 @@ async def ui_book_edit_form(
     escaped_author = html.escape(book.author or '', quote=True)
     
     form_html = f"""
-    <div id="book-header" style="position: relative; text-align: center; margin-bottom: 30px; padding: 30px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-        <form hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" style="max-width: 500px; margin: 0 auto;">
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; text-align: left; margin-bottom: 5px; font-weight: bold; color: var(--text-color);">Book Title</label>
-                <input 
-                    type="text" 
-                    name="title" 
-                    value="{escaped_title}" 
-                    required
-                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); font-size: 1em;">
+    <div id="book-header" class="text-center mb-8">
+        <form hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" class="max-w-md mx-auto">
+            <!-- Form Header with Edit Indicator -->
+            <div class="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
+                <span class="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                    <svg data-lucide="pencil" class="w-4 h-4"></svg>
+                    <span>Editing Book Metadata</span>
+                </span>
+                <div class="flex items-center gap-2">
+                    <button 
+                        type="button"
+                        hx-get="/library/ui/book/{book_id}/cancel-edit"
+                        hx-target="#book-header"
+                        hx-swap="outerHTML"
+                        class="flex items-center gap-1 px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-md transition-colors text-xs font-medium"
+                        title="Cancel">
+                        <svg data-lucide="x" class="w-4 h-4"></svg>
+                        <span>Cancel</span>
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex items-center gap-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white rounded-md font-medium text-xs transition-colors"
+                        title="Save">
+                        <svg data-lucide="save" class="w-4 h-4"></svg>
+                        <span>Save</span>
+                    </button>
+                </div>
             </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; text-align: left; margin-bottom: 5px; font-weight: bold; color: var(--text-color);">Author</label>
-                <input 
-                    type="text" 
-                    name="author" 
-                    value="{escaped_author}" 
-                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); font-size: 1em;">
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button 
-                    type="submit"
-                    style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
-                    ✓ Save
-                </button>
-                <button 
-                    type="button"
-                    hx-get="/library/ui/book/{book_id}/cancel-edit"
-                    hx-target="#book-header"
-                    hx-swap="outerHTML"
-                    style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
-                    ✕ Cancel
-                </button>
+
+            <!-- Form Fields -->
+            <div class="bg-white dark:bg-gray-800 rounded-b-lg p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Book Title</label>
+                    <textarea 
+                        name="title" 
+                        required
+                        rows="1"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none overflow-hidden"
+                        oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'">{escaped_title}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Author</label>
+                    <input 
+                        type="text" 
+                        name="author" 
+                        value="{escaped_author}" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                </div>
+
+                <!-- Action Buttons moved to header for consistency -->
             </div>
         </form>
     </div>
+    <script>
+        (function() {{
+            function resizeTitle(root) {{
+                const t = (root && root.querySelector) ? root.querySelector('textarea[name="title"]') : document.querySelector('textarea[name="title"]');
+                if (t) {{
+                    t.style.height = 'auto';
+                    t.style.height = t.scrollHeight + 'px';
+                }}
+            }}
+
+            resizeTitle(document);
+
+            if (window.htmx && window.htmx.onLoad) {{
+                window.htmx.onLoad(resizeTitle);
+            }}
+
+            if (typeof lucide !== 'undefined') {{
+                lucide.createIcons();
+            }}
+        }})();
+    </script>
     """
     
     return HTMLResponse(content=form_html)
@@ -427,48 +465,59 @@ def _render_tags_section(book: Book) -> HTMLResponse:
 
 def _render_book_header(book: Book, highlight_count: int) -> HTMLResponse:
     """Helper function to render the book header section."""
+    active_highlights = [h for h in book.highlights if not h.is_discarded] if book.highlights else []
+    discarded_highlights = [h for h in book.highlights if h.is_discarded] if book.highlights else []
+    
     author_html = f"""
-    <div style="margin-bottom: 15px; font-size: 1.2em; color: var(--muted-text);">
-        by {book.author}
-    </div>
+        <div class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+            by {book.author}
+        </div>
     """ if book.author else ""
     
+    discarded_html = f"""
+                <span class="mx-2">|</span>
+                <span class="font-semibold">{len(discarded_highlights)}</span> discarded
+            """ if len(discarded_highlights) > 0 else ""
+    
     header_html = f"""
-    <div id="book-header" style="position: relative; text-align: center; margin-bottom: 30px; padding: 30px; background: var(--highlight-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-        <!-- Edit Button in Top-Left -->
-        <button 
-            style="position: absolute; top: 15px; left: 15px; background: transparent; border: none; color: #007bff; cursor: pointer; font-size: 20px; line-height: 1; padding: 5px; transition: transform 0.2s;"
-            hx-get="/library/ui/book/{book.id}/edit"
-            hx-target="#book-header"
-            hx-swap="outerHTML"
-            title="Edit Book"
-            type="button"
-            onmouseover="this.style.transform='scale(1.2)'"
-            onmouseout="this.style.transform='scale(1)'">
-            ✏️
-        </button>
-        
-        <!-- Delete Button in Top-Right -->
-        <button 
-            style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #dc3545; cursor: pointer; font-size: 24px; line-height: 1; padding: 5px; transition: transform 0.2s;"
-            hx-delete="/library/ui/book/{book.id}"
-            hx-confirm="⚠️ Are you sure you want to remove '{book.title}' and all its {highlight_count} highlight(s) from your library? This action cannot be undone."
-            title="Remove from Library"
-            type="button"
-            onmouseover="this.style.transform='scale(1.2)'"
-            onmouseout="this.style.transform='scale(1)'">
-            ✕
-        </button>
-        
-        <h1 style="margin: 0 0 15px 0; font-size: 2em; color: var(--text-color);">
+    <div id="book-header" class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 title-font">
             {book.title}
         </h1>
         
         {author_html}
         
+        <div class="mb-6 text-sm text-gray-600 dark:text-gray-400">
+            <span class="font-semibold">{len(active_highlights)}</span> active highlight{'s' if len(active_highlights) != 1 else ''}
+            {discarded_html}
+        </div>
+        
+        <!-- Action Buttons (Edit/Delete) -->
+        <div class="flex items-center justify-center gap-4 mb-6">
+            <button 
+                class="flex items-center gap-2 px-3 py-2 text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 transition-colors"
+                hx-get="/library/ui/book/{book.id}/edit"
+                hx-target="#book-header"
+                hx-swap="outerHTML"
+                title="Edit Book"
+                type="button">
+                <svg data-lucide="pencil" class="w-4 h-4"></svg>
+                <span class="text-xs font-medium">Edit</span>
+            </button>
+            <button 
+                class="flex items-center gap-2 px-3 py-2 text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors"
+                hx-delete="/library/ui/book/{book.id}"
+                hx-confirm="⚠️ Are you sure you want to remove '{book.title}' and all its {highlight_count} highlight(s) from your library? This action cannot be undone."
+                title="Remove from Library"
+                type="button">
+                <svg data-lucide="trash-2" class="w-4 h-4"></svg>
+                <span class="text-xs font-medium">Remove</span>
+            </button>
+        </div>
+        
         <!-- Document Tags Section -->
-        <div id="document-tags-section" style="margin-top: 20px;">
-            <div id="tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px;">
+        <div id="document-tags-section" class="mt-6">
+            <div id="tags-list" class="flex flex-wrap gap-2 justify-center mb-3">
     """
     
     # Add tags
@@ -477,38 +526,41 @@ def _render_book_header(book: Book, highlight_count: int) -> HTMLResponse:
         for tag in tags:
             tag_stripped = tag.strip()
             header_html += f"""
-                <div style="display: inline-flex; align-items: center; padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 20px;">
-                    <span style="margin-right: 8px;">🏷️ {tag_stripped}</span>
+                <div class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
+                    <svg data-lucide="tag" class="w-3 h-3 mr-1.5"></svg>
+                    <span>{tag_stripped}</span>
                     <button 
-                        style="background: transparent; border: none; cursor: pointer; color: #dc3545; padding: 0; font-size: 1.2em; line-height: 1;"
+                        class="ml-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                         hx-post="/library/ui/book/{book.id}/remove-tag"
                         hx-vals='{{"tag": "{tag_stripped}"}}'
                         hx-target="#document-tags-section"
                         hx-swap="innerHTML"
                         title="Remove tag">
-                        ×
+                        <svg data-lucide="x" class="w-3 h-3"></svg>
                     </button>
                 </div>
             """
     
     header_html += f"""
             </div>
-            <div style="text-align: center;">
+            <div class="text-center">
                 <button 
-                    style="background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; color: var(--muted-text);"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
                     hx-get="/library/ui/book/{book.id}/add-tag"
                     hx-target="#add-tag-form"
                     hx-swap="innerHTML">
-                    + Add document tags
+                    <svg data-lucide="plus" class="w-4 h-4"></svg>
+                    <span>Add document tags</span>
                 </button>
             </div>
-            <div id="add-tag-form" style="margin-top: 10px; text-align: center;"></div>
-        </div>
-        
-        <div style="margin-top: 20px; color: var(--muted-text); font-size: 0.9em;">
-            <strong>{highlight_count}</strong> highlight{'s' if highlight_count != 1 else ''}
+            <div id="add-tag-form" class="mt-3 text-center"></div>
         </div>
     </div>
+    <script>
+        if (typeof lucide !== 'undefined') {{
+            lucide.createIcons();
+        }}
+    </script>
     """
     
     return HTMLResponse(content=header_html)

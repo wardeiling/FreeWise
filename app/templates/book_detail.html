@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
@@ -25,7 +25,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
                         serif: ['Crimson Pro', 'Georgia', 'serif'],
                     },
                     colors: {
@@ -41,6 +41,12 @@
             }
         }
     </script>
+
+    <style>
+        .title-font {
+            font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
     <!-- Back Button (Top Left) -->
@@ -53,38 +59,51 @@
 
     <!-- Content Wrapper for max-width and mobile compatibility -->
     <div class="max-w-2xl mx-auto px-4 py-20">
-        <!-- Book Header (Centered) -->
-        <div id="book-header" class="relative text-center mb-8 p-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-            <!-- Edit Button in Top-Left -->
-            <button 
-                class="absolute top-4 left-4 p-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:scale-110 transition-all"
-                hx-get="/library/ui/book/{{ book.id }}/edit"
-                hx-target="#book-header"
-                hx-swap="outerHTML"
-                title="Edit Book"
-                type="button">
-                <i data-lucide="pencil" class="w-5 h-5"></i>
-            </button>
-            
-            <!-- Delete Button in Top-Right -->
-            <button 
-                class="absolute top-4 right-4 p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:scale-110 transition-all"
-                hx-delete="/library/ui/book/{{ book.id }}"
-                hx-confirm="⚠️ Are you sure you want to remove '{{ book.title }}' and all its {{ highlights|length }} highlight(s) from your library? This action cannot be undone."
-                title="Remove from Library"
-                type="button">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 px-12">
+        <!-- Book Header (Centered, No Background) -->
+        <div id="book-header" class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 title-font">
                 {{ book.title }}
             </h1>
             
             {% if book.author %}
-            <div class="text-xl text-gray-600 dark:text-gray-400 mb-5">
+            <div class="text-lg text-gray-600 dark:text-gray-400 mb-6">
                 by {{ book.author }}
             </div>
             {% endif %}
+            
+            {% set active_highlights = highlights | selectattr('is_discarded', 'equalto', false) | list %}
+            {% set discarded_highlights = highlights | selectattr('is_discarded', 'equalto', true) | list %}
+            
+            <div class="mb-6 text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-semibold">{{ active_highlights|length }}</span> active highlight{{ 's' if active_highlights|length != 1 else '' }}
+                {% if discarded_highlights %}
+                    <span class="mx-2">|</span>
+                    <span class="font-semibold">{{ discarded_highlights|length }}</span> discarded
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons (Edit/Delete) -->
+            <div class="flex items-center justify-center gap-4 mb-6 pb-0">
+                <button 
+                    class="flex items-center gap-2 px-3 py-2 text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 transition-colors"
+                    hx-get="/library/ui/book/{{ book.id }}/edit"
+                    hx-target="#book-header"
+                    hx-swap="outerHTML"
+                    title="Edit Book"
+                    type="button">
+                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                    <span class="text-xs font-medium">Edit</span>
+                </button>
+                <button 
+                    class="flex items-center gap-2 px-3 py-2 text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors"
+                    hx-delete="/library/ui/book/{{ book.id }}"
+                    hx-confirm="⚠️ Are you sure you want to remove '{{ book.title }}' and all its {{ highlights|length }} highlight(s) from your library? This action cannot be undone."
+                    title="Remove from Library"
+                    type="button">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span class="text-xs font-medium">Remove</span>
+                </button>
+            </div>
             
             <!-- Document Tags Section -->
             <div id="document-tags-section" class="mt-6">
@@ -118,17 +137,6 @@
                     </button>
                 </div>
                 <div id="add-tag-form" class="mt-3 text-center"></div>
-            </div>
-            
-            {% set active_highlights = highlights | selectattr('is_discarded', 'equalto', false) | list %}
-            {% set discarded_highlights = highlights | selectattr('is_discarded', 'equalto', true) | list %}
-            
-            <div class="mt-6 text-sm text-gray-600 dark:text-gray-400">
-                <span class="font-semibold">{{ active_highlights|length }}</span> active highlight{{ 's' if active_highlights|length != 1 else '' }}
-                {% if discarded_highlights %}
-                    <span class="mx-2">|</span>
-                    <span class="font-semibold">{{ discarded_highlights|length }}</span> discarded
-                {% endif %}
             </div>
         </div>
 
