@@ -83,8 +83,96 @@
 {% endif %}
 
 <p class="text-gray-600 dark:text-gray-400 mb-6">
+    Overview of your review activity.
+</p>
+
+
+<!-- Review Activity Heatmap -->
+{% if review_heatmap_data %}
+<div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <i data-lucide="target" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+        Review Activity
+    </h3>
+    <div id="review-heatmap-container" class="overflow-x-auto">
+        <div id="review-heatmap" style="display: flex; gap: 4px;"></div>
+    </div>
+    <div class="mt-4 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex gap-2 items-center">
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #f0f0f0;"></div>
+            <span>No Review</span>
+        </div>
+        <div class="flex gap-2 items-center">
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #10b981;"></div>
+            <span>Reviewed</span>
+        </div>
+    </div>
+</div>
+
+<!-- Streak Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+    <!-- Current Streak Card -->
+    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 border-emerald-500 dark:border-emerald-700 rounded-xl p-8 text-center shadow-lg">
+        <div class="flex justify-center mb-4">
+            <i data-lucide="zap" class="w-12 h-12 text-emerald-600 dark:text-emerald-400"></i>
+        </div>
+        <div class="text-5xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">
+            {{ current_streak }}
+        </div>
+        <div class="text-emerald-800 dark:text-emerald-300 text-lg font-semibold">
+            Current Streak
+        </div>
+        <div class="text-emerald-600 dark:text-emerald-500 text-sm mt-2">
+            {{ 'day' if current_streak == 1 else 'days' }} in a row
+        </div>
+    </div>
+    
+    <!-- Longest Streak Card -->
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-2 border-amber-500 dark:border-amber-700 rounded-xl p-8 text-center shadow-lg">
+        <div class="flex justify-center mb-4">
+            <i data-lucide="trophy" class="w-12 h-12 text-amber-600 dark:text-amber-400"></i>
+        </div>
+        <div class="text-5xl font-bold text-amber-700 dark:text-amber-400 mb-2">
+            {{ longest_streak }}
+        </div>
+        <div class="text-amber-800 dark:text-amber-300 text-lg font-semibold">
+            Longest Streak
+        </div>
+        <div class="text-amber-600 dark:text-amber-500 text-sm mt-2">
+            Personal best
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<p class="text-gray-600 dark:text-gray-400 mb-6">
     Overview of your reading highlights and collection.
 </p>
+
+
+<!-- Highlights Activity Heatmap -->
+{% if heatmap_data and heatmap_data|length > 0 %}
+<div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <i data-lucide="calendar" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
+        Highlighting Activity
+    </h3>
+    <div id="heatmap-container" class="overflow-x-auto">
+        <div id="heatmap" style="display: flex; gap: 4px;"></div>
+    </div>
+    <div class="mt-4 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+        <span>Less</span>
+        <div class="flex gap-1">
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #f0f0f0;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #c7e9c0;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #7bcf6e;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #2e9f3f;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #0d5f1d;"></div>
+        </div>
+        <span>More</span>
+    </div>
+</div>
+{% endif %}
 
 <!-- Statistics Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
@@ -148,139 +236,6 @@
         </div>
     </a>
 </div>
-
-<!-- Visualization Section -->
-{% if total_highlights > 0 %}
-<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 mb-8">
-    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Highlights Breakdown</h2>
-    
-    <div class="space-y-6">
-        <!-- Active Highlights Bar -->
-        <div>
-            <div class="flex justify-between items-center mb-2">
-                <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4"></i>
-                    Active Highlights
-                </span>
-                <span class="text-gray-600 dark:text-gray-400">{{ active_highlights }} ({{ "%.1f"|format(active_percentage) }}%)</span>
-            </div>
-            <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
-                <div class="h-full bg-gradient-to-r from-amber-700 to-amber-800 transition-all duration-500" style="width: {{ active_percentage }}%;"></div>
-            </div>
-        </div>
-        
-        <!-- Favorites Bar -->
-        <div>
-            <div class="flex justify-between items-center mb-2">
-                <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="star" class="w-4 h-4 text-yellow-500"></i>
-                    Favorites
-                </span>
-                <span class="text-gray-600 dark:text-gray-400">{{ total_favorited }} ({{ "%.1f"|format(favorited_percentage) }}%)</span>
-            </div>
-            <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
-                <div class="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-500" style="width: {{ favorited_percentage }}%;"></div>
-            </div>
-        </div>
-        
-        <!-- Discarded Bar -->
-        <div>
-            <div class="flex justify-between items-center mb-2">
-                <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
-                    Discarded
-                </span>
-                <span class="text-gray-600 dark:text-gray-400">{{ total_discarded }} ({{ "%.1f"|format(discarded_percentage) }}%)</span>
-            </div>
-            <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
-                <div class="h-full bg-gradient-to-r from-rose-400 to-rose-500 transition-all duration-500" style="width: {{ discarded_percentage }}%;"></div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- Highlights Activity Heatmap -->
-{% if heatmap_data and heatmap_data|length > 0 %}
-<div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
-    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-        <i data-lucide="calendar" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
-        Highlighting Activity
-    </h3>
-    <div id="heatmap-container" class="overflow-x-auto">
-        <div id="heatmap" style="display: flex; gap: 4px;"></div>
-    </div>
-    <div class="mt-4 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-        <span>Less</span>
-        <div class="flex gap-1">
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #f0f0f0;"></div>
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #c7e9c0;"></div>
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #7bcf6e;"></div>
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #2e9f3f;"></div>
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #0d5f1d;"></div>
-        </div>
-        <span>More</span>
-    </div>
-</div>
-{% endif %}
-
-<!-- Review Activity Heatmap -->
-{% if review_heatmap_data %}
-<div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
-    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-        <i data-lucide="target" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
-        Review Activity
-    </h3>
-    <div id="review-heatmap-container" class="overflow-x-auto">
-        <div id="review-heatmap" style="display: flex; gap: 4px;"></div>
-    </div>
-    <div class="mt-4 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-        <div class="flex gap-2 items-center">
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #f0f0f0;"></div>
-            <span>No Review</span>
-        </div>
-        <div class="flex gap-2 items-center">
-            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #10b981;"></div>
-            <span>Reviewed</span>
-        </div>
-    </div>
-</div>
-
-<!-- Streak Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
-    <!-- Current Streak Card -->
-    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 border-emerald-500 dark:border-emerald-700 rounded-xl p-8 text-center shadow-lg">
-        <div class="flex justify-center mb-4">
-            <i data-lucide="zap" class="w-12 h-12 text-emerald-600 dark:text-emerald-400"></i>
-        </div>
-        <div class="text-5xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">
-            {{ current_streak }}
-        </div>
-        <div class="text-emerald-800 dark:text-emerald-300 text-lg font-semibold">
-            Current Streak
-        </div>
-        <div class="text-emerald-600 dark:text-emerald-500 text-sm mt-2">
-            {{ 'day' if current_streak == 1 else 'days' }} in a row
-        </div>
-    </div>
-    
-    <!-- Longest Streak Card -->
-    <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-2 border-amber-500 dark:border-amber-700 rounded-xl p-8 text-center shadow-lg">
-        <div class="flex justify-center mb-4">
-            <i data-lucide="trophy" class="w-12 h-12 text-amber-600 dark:text-amber-400"></i>
-        </div>
-        <div class="text-5xl font-bold text-amber-700 dark:text-amber-400 mb-2">
-            {{ longest_streak }}
-        </div>
-        <div class="text-amber-800 dark:text-amber-300 text-lg font-semibold">
-            Longest Streak
-        </div>
-        <div class="text-amber-600 dark:text-amber-500 text-sm mt-2">
-            Personal best
-        </div>
-    </div>
-</div>
-{% endif %}
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
