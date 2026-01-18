@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Import Custom CSV - FreeWise{% endblock %}
+
+{% block heading %}
+<div class="flex items-center gap-3">
+    <a href="/import/ui" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+    </a>
+    <span>Import Custom CSV</span>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    {% if success_message %}
+    <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 mb-6 rounded">
+        <div class="flex items-start gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"></i>
+            <div class="flex-1">
+                <p class="font-semibold text-green-700 dark:text-green-300 mb-2">Import Successful!</p>
+                <p class="text-sm text-green-700 dark:text-green-300 mb-3">{{ success_message }}</p>
+                <div class="flex gap-3">
+                    <a href="/highlights/ui/review" class="inline-flex items-center gap-2 text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 font-medium transition-colors">
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        <span>Review Highlights</span>
+                    </a>
+                    <a href="/import/ui" class="inline-flex items-center gap-2 text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 font-medium transition-colors">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                        <span>Import Another File</span>
+                    </a>
+                </div>
+                {% if skipped_rows %}
+                <div class="mt-4 bg-white dark:bg-gray-900/40 border border-green-200 dark:border-green-800 rounded p-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Skipped rows ({{ skipped_rows|length }})</span>
+                    </div>
+                    <div class="max-h-64 overflow-auto border border-gray-200 dark:border-gray-800 rounded">
+                        <table class="min-w-full text-left text-xs text-gray-700 dark:text-gray-200">
+                            <thead class="bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-gray-100 sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2">Row</th>
+                                    <th class="px-3 py-2">Reason</th>
+                                    <th class="px-3 py-2">Highlight</th>
+                                    <th class="px-3 py-2">Note</th>
+                                    <th class="px-3 py-2">Book</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in skipped_rows %}
+                                <tr class="border-t border-gray-200 dark:border-gray-800">
+                                    <td class="px-3 py-2 align-top">{{ r.row }}</td>
+                                    <td class="px-3 py-2 align-top text-amber-700 dark:text-amber-300">{{ r.reason }}</td>
+                                    <td class="px-3 py-2 align-top max-w-xs truncate">{{ r.highlight }}</td>
+                                    <td class="px-3 py-2 align-top">{{ r.note }}</td>
+                                    <td class="px-3 py-2 align-top">{{ r.book_title }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not preview_data %}
+    <!-- Step 1: Upload File -->
+    <div class="max-w-2xl mx-auto">
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Upload any CSV file with your highlights. You'll be able to map your columns to FreeWise fields in the next step.
+        </p>
+        
+        <form method="post" action="/import/ui/custom/preview" enctype="multipart/form-data" id="upload-form">
+            <div class="bg-white dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 p-12 mb-6 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
+                <i data-lucide="upload-cloud" class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Upload CSV File</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Drop your file here or click to browse</p>
+                <input 
+                    type="file" 
+                    id="file" 
+                    name="file" 
+                    accept=".csv"
+                    required
+                    onchange="this.form.submit()"
+                    class="hidden">
+                <label for="file" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold cursor-pointer transition-colors">
+                    <i data-lucide="file-plus" class="w-5 h-5"></i>
+                    <span>Select File</span>
+                </label>
+            </div>
+        </form>
+        
+        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6">
+            <div class="flex items-start gap-3">
+                <i data-lucide="lightbulb" class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"></i>
+                <div>
+                    <h4 class="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">Tips for best results:</h4>
+                    <ul class="text-sm text-amber-800 dark:text-amber-200 space-y-1">
+                        <li>• Your CSV should have column headers in the first row</li>
+                        <li>• At minimum, include a column with highlighted text</li>
+                        <li>• UTF-8 encoding recommended for special characters</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- Step 2: Column Mapping -->
+    <div class="mb-6">
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div class="flex items-center gap-2">
+                <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                <p class="text-sm text-blue-900 dark:text-blue-100">
+                    Preview of first {{ preview_data|length }} rows. Map your CSV columns to FreeWise fields below.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Table -->
+    <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="overflow-x-auto max-h-64">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-100 dark:bg-gray-900/50 sticky top-0">
+                    <tr>
+                        {% for col in csv_columns %}
+                        <th class="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                            {{ col }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 dark:text-gray-300">
+                    {% for row in preview_data %}
+                    <tr class="border-b border-gray-100 dark:border-gray-800">
+                        {% for col in csv_columns %}
+                        <td class="px-4 py-3 max-w-xs truncate">{{ row[col] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Column Mapping Form -->
+    <form method="post" action="/import/ui/custom/process" id="mapping-form">
+        <input type="hidden" name="csv_data" value="{{ csv_data_b64 }}">
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <i data-lucide="git-compare" class="w-5 h-5"></i>
+                <span>Map Your Columns</span>
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Highlight (Required) -->
+                <div class="space-y-4">
+                    <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-red-900 dark:text-red-100 mb-2 flex items-center gap-2">
+                            <i data-lucide="asterisk" class="w-3 h-3"></i>
+                            Highlight Text (Required)
+                        </label>
+                        <select name="highlight" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500">
+                            <option value="">-- Select Column --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['highlight', 'text', 'quote', 'content'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Book Title</label>
+                        <select name="book_title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['book title', 'title', 'book', 'source'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Book Author</label>
+                        <select name="book_author" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['book author', 'author', 'writer'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Note</label>
+                        <select name="note" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['note', 'notes', 'annotation', 'comment'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Tags</label>
+                        <select name="tags" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['tags', 'tag', 'labels', 'categories'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Document Tags</label>
+                        <select name="document_tags" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['document tags', 'book tags'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Highlighted Date</label>
+                        <select name="highlighted_at" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['highlighted at', 'date', 'created', 'timestamp'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Location</label>
+                        <select name="location" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">-- Skip --</option>
+                            {% for col in csv_columns %}
+                            <option value="{{ col }}" {% if col|lower in ['location', 'page', 'position'] %}selected{% endif %}>{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button type="submit" id="process-btn" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-md">
+                <i data-lucide="check" class="w-5 h-5"></i>
+                <span>Import Highlights</span>
+            </button>
+            <a href="/import/ui/custom" class="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+                <span>Cancel</span>
+            </a>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        
+        // Auto-submit upload form when file selected
+        const fileInput = document.getElementById('file');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    document.getElementById('upload-form').submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
