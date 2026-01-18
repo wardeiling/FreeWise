@@ -169,11 +169,19 @@ async def process_import(
         imported_count = 0
         skipped_count = 0
         duplicate_count = 0
+        skipped_rows = []
         
-        for row in reader:
+        for idx, row in enumerate(reader, start=1):
             # Skip empty rows
             if not row.get('Highlight', '').strip():
                 skipped_count += 1
+                skipped_rows.append({
+                    "row": idx,
+                    "reason": "Empty highlight",
+                    "highlight": row.get('Highlight', '').strip(),
+                    "note": row.get('Note', '').strip(),
+                    "book_title": row.get('Book Title', '').strip()
+                })
                 continue
             
             # Extract data from CSV - support both Readwise and extended format
@@ -181,6 +189,16 @@ async def process_import(
             book_title = row.get('Book Title', '').strip()
             book_author = row.get('Book Author', '').strip()
             note = row.get('Note', '').strip()
+            if note.lower() in {'.h1', '.h2', '.h3', '.h4', '.h5', '.h6'}:
+                skipped_count += 1
+                skipped_rows.append({
+                    "row": idx,
+                    "reason": "Header marker note (.h1-.h6)",
+                    "highlight": highlight_text,
+                    "note": note,
+                    "book_title": book_title
+                })
+                continue
             tags_str = row.get('Tags', '').strip()
             document_tags_str = row.get('Document tags', '').strip()
             highlighted_at_str = row.get('Highlighted at', '').strip()
@@ -241,6 +259,13 @@ async def process_import(
             existing_highlight = session.exec(existing_stmt).first()
             if existing_highlight:
                 duplicate_count += 1
+                skipped_rows.append({
+                    "row": idx,
+                    "reason": "Duplicate highlight",
+                    "highlight": highlight_text,
+                    "note": note,
+                    "book_title": book_title
+                })
                 continue
 
             # Parse location if provided
@@ -299,10 +324,11 @@ async def process_import(
         return templates.TemplateResponse("import.html", {
             "request": request,
             "settings": settings,
-            "success_message": f"Successfully imported {imported_count} highlights. Skipped {skipped_count} empty rows. Deduplicated {duplicate_count} duplicates.",
+            "success_message": f"Successfully imported {imported_count} highlights. Skipped {skipped_count} rows. Deduplicated {duplicate_count} duplicates.",
             "imported_count": imported_count,
             "skipped_count": skipped_count,
-            "duplicate_count": duplicate_count
+            "duplicate_count": duplicate_count,
+            "skipped_rows": skipped_rows
         })
     
     except csv.Error as e:

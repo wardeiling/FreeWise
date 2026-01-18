@@ -41,8 +41,6 @@ Core functionality:
     - [X] remove text of symbols (or make it show when hovering on it)
     - [X] remove book ID
 - [X] Improve daily review page: show at the centered top of the page that this is the "Daily Review" (full screen, so no header; only at the left top a back icon to return to dashboard) and then have the box of that particular note with at the bottom in the box a favorite and edit button. Then outside the highlight box have one X button (with circle around it) saying under it in small font "Discard" and then right of it a green checkmark button (with circle around it) with in small font under it "Done". When pressing either Discard or done, it moves a new higlight into view after which the same process follows, until all X (default is 5) higlights are completed.
-    - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight.
-    - [ ] Add book title, author and cover image to higlights shown in daily review.
 - [X] Add deduplication for import
 - [ ] Create spaced repetition algorithm with option for different books to be shown more or less frequently.
 - [X] Evaluate whether there is any added benefit to changing export format (if not change back to readwise and simplify import)
@@ -51,10 +49,10 @@ Core functionality:
         - [X] From export: also make higlighted_at date format consistent with readwise format
 - [X] Added button to delete book from library.
 - [X] prevents discarded entries to be favorited and edited; and favorite entries to be discarded
-- [ ] Import
+- [X] Import
     - [ ] Identify issue with skipped lines with readwise import.
     - [ ] Define a separate function for readwise import and book import
-    - [ ] For book import, allow for import with book section information and page numbers.
+    - [X] For book import, allow for import with book section information and page numbers.
     - [ ] Make sure that variables not used are still saved at import (e.g., color, location (order of note in book), location type) and also appropriately exported.
     - [ ] Correctly import book sections from readwise (readwise exports it to the higlight column with the comment .h1 for heading 1, .h2 for heading 2, etc.)
 - [X] Add progress bar for imports (of large files)
@@ -79,3 +77,6 @@ Nice to haves:
 - [X] Also show page numbers for favorite and discarded html views.
 - [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
 - [ ] Sort higlights in favorite and discarded by the date they were favorited/discarded (more recent up top)
+- [ ] Daily Review page
+    - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight.
+    - [ ] Add book title, author and cover image to higlights shown in daily review.

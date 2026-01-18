@@ -22,6 +22,38 @@
                     <span>Import Another File</span>
                 </a>
             </div>
+            {% if skipped_rows %}
+            <div class="mt-4 bg-white dark:bg-gray-900/40 border border-green-200 dark:border-green-800 rounded p-3">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                    <span class="text-sm font-semibold text-green-800 dark:text-green-200">Skipped rows ({{ skipped_rows|length }})</span>
+                </div>
+                <div class="max-h-64 overflow-auto border border-gray-200 dark:border-gray-800 rounded">
+                    <table class="min-w-full text-left text-xs text-gray-700 dark:text-gray-200">
+                        <thead class="bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-gray-100">
+                            <tr>
+                                <th class="px-3 py-2">Row</th>
+                                <th class="px-3 py-2">Reason</th>
+                                <th class="px-3 py-2">Highlight</th>
+                                <th class="px-3 py-2">Note</th>
+                                <th class="px-3 py-2">Book</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in skipped_rows %}
+                            <tr class="border-t border-gray-200 dark:border-gray-800">
+                                <td class="px-3 py-2 align-top">{{ r.row }}</td>
+                                <td class="px-3 py-2 align-top text-amber-700 dark:text-amber-300">{{ r.reason }}</td>
+                                <td class="px-3 py-2 align-top">{{ r.highlight }}</td>
+                                <td class="px-3 py-2 align-top">{{ r.note }}</td>
+                                <td class="px-3 py-2 align-top">{{ r.book_title }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
