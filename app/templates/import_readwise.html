@@ -128,15 +128,26 @@
             <p class="text-sm font-semibold text-gray-900 dark:text-white mb-3">
                 Expected CSV columns:
             </p>
-            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
+                {% set cols = [
+                    'Highlight',
+                    'Book Title',
+                    'Book Author',
+                    'Amazon Book ID',
+                    'Note',
+                    'Color',
+                    'Tags',
+                    'Location Type',
+                    'Location',
+                    'Highlighted at',
+                    'Document tags'
+                ] %}
+                {% for col in cols %}
                 <li class="flex items-start gap-2">
                     <i data-lucide="check" class="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"></i>
-                    <span><strong class="text-gray-900 dark:text-white">Highlight</strong> (required)</span>
+                    <span class="text-gray-900 dark:text-white font-semibold">{{ col }}</span>
                 </li>
-                <li class="flex items-start gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5"></i>
-                    <span><strong class="text-gray-900 dark:text-white">Book Title, Book Author, Note, Tags, Highlighted at</strong></span>
-                </li>
+                {% endfor %}
             </ul>
         </div>
 
