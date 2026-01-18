@@ -200,9 +200,214 @@
 </div>
 {% endif %}
 
+<!-- Highlights Activity Heatmap -->
+{% if heatmap_data and heatmap_data|length > 0 %}
+<div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <i data-lucide="calendar" class="w-6 h-6 text-primary-600 dark:text-primary-400"></i>
+        Highlighting Activity
+    </h3>
+    <div id="heatmap-container" class="overflow-x-auto">
+        <div id="heatmap" style="display: flex; gap: 4px;"></div>
+    </div>
+    <div class="mt-4 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+        <span>Less</span>
+        <div class="flex gap-1">
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #f0f0f0;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #c7e9c0;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #7bcf6e;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #2e9f3f;"></div>
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #0d5f1d;"></div>
+        </div>
+        <span>More</span>
+    </div>
+</div>
+{% endif %}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         lucide.createIcons();
+        
+        // Initialize heatmap
+        const heatmapData = {{ heatmap_data | tojson }};
+        if (Object.keys(heatmapData).length > 0) {
+            renderHeatmap(heatmapData);
+        }
     });
+
+    function renderHeatmap(data) {
+        const container = document.getElementById('heatmap');
+        if (!container) return;
+
+        // Get year range from data
+        const dates = Object.keys(data).map(d => new Date(d));
+        if (dates.length === 0) return;
+
+        const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+        const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+
+        // Start from Sunday of the first week containing data
+        const startDate = new Date(minDate);
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+
+        // End on Saturday of the last week containing data
+        const endDate = new Date(maxDate);
+        endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
+
+        // Find max value for color scaling
+        const maxValue = Math.max(...Object.values(data));
+        const colorScale = getColorScale(maxValue);
+
+        // Create grid: weeks (columns) × 7 days (rows)
+        const weeks = [];
+        let currentWeek = [];
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const count = data[dateStr] || 0;
+            const dayOfWeek = currentDate.getDay();
+
+            currentWeek.push({
+                date: new Date(currentDate),
+                dateStr: dateStr,
+                count: count,
+                day: dayOfWeek
+            });
+
+            if (dayOfWeek === 6) {
+                weeks.push(currentWeek);
+                currentWeek = [];
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (currentWeek.length > 0) {
+            weeks.push(currentWeek);
+        }
+
+        // Render grid
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const cellSize = 14;
+        const cellGap = 2;
+        const dayLabelWidth = 30;
+        const monthLabelHeight = 20;
+
+        // Create wrapper div with flexbox layout
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.gap = '4px';
+        wrapper.style.alignItems = 'flex-start';
+
+        // Create SVG for sticky day labels
+        const dayLabelsSvg = document.createElementNS(svgNS, 'svg');
+        dayLabelsSvg.setAttribute('width', dayLabelWidth);
+        dayLabelsSvg.setAttribute('height', monthLabelHeight + 7 * (cellSize + cellGap) + 10);
+        dayLabelsSvg.setAttribute('class', 'dark:text-gray-300');
+        dayLabelsSvg.style.position = 'sticky';
+        dayLabelsSvg.style.left = '0';
+        dayLabelsSvg.style.zIndex = '20';
+        dayLabelsSvg.style.backgroundColor = 'white';
+        dayLabelsSvg.classList.add('dark:bg-gray-800');
+        dayLabelsSvg.style.flexShrink = '0';
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let i = 0; i < 7; i++) {
+            const text = document.createElementNS(svgNS, 'text');
+            text.setAttribute('x', 2);
+            text.setAttribute('y', monthLabelHeight + i * (cellSize + cellGap) + cellSize - 2);
+            text.setAttribute('font-size', '11');
+            text.setAttribute('fill', 'currentColor');
+            text.setAttribute('class', 'dark:text-gray-400');
+            text.textContent = days[i];
+            dayLabelsSvg.appendChild(text);
+        }
+
+        // Create main heatmap SVG
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('width', weeks.length * (cellSize + cellGap) + 10);
+        svg.setAttribute('height', monthLabelHeight + 7 * (cellSize + cellGap) + 10);
+        svg.setAttribute('class', 'dark:text-gray-300');
+
+        // Month labels
+        let lastMonth = -1;
+        for (let w = 0; w < weeks.length; w++) {
+            const week = weeks[w];
+            const firstDay = week[0].date;
+            const month = firstDay.getMonth();
+
+            if (month !== lastMonth) {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', w * (cellSize + cellGap));
+                text.setAttribute('y', 14);
+                text.setAttribute('font-size', '11');
+                text.setAttribute('fill', 'currentColor');
+                text.setAttribute('class', 'dark:text-gray-400');
+                text.textContent = monthNames[month];
+                svg.appendChild(text);
+
+                lastMonth = month;
+            }
+        }
+
+        // Cells
+        for (let w = 0; w < weeks.length; w++) {
+            const week = weeks[w];
+            for (let d = 0; d < week.length; d++) {
+                const cell = week[d];
+                const x = w * (cellSize + cellGap);
+                const y = monthLabelHeight + d * (cellSize + cellGap);
+                const color = colorScale(cell.count);
+
+                const rect = document.createElementNS(svgNS, 'rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', cellSize);
+                rect.setAttribute('height', cellSize);
+                rect.setAttribute('fill', color);
+                rect.setAttribute('stroke', '#e5e7eb');
+                rect.setAttribute('stroke-width', '0.5');
+                rect.setAttribute('rx', '2');
+                rect.setAttribute('class', 'cursor-pointer hover:stroke-gray-400 dark:stroke-gray-600');
+
+                // Tooltip on hover (now with year)
+                const title = document.createElementNS(svgNS, 'title');
+                const dayName = days[cell.date.getDay()];
+                const monthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][cell.date.getMonth()];
+                const year = cell.date.getFullYear();
+                title.textContent = `${dayName}, ${monthName} ${cell.date.getDate()}, ${year}: ${cell.count} highlight${cell.count !== 1 ? 's' : ''}`;
+                rect.appendChild(title);
+
+                svg.appendChild(rect);
+            }
+        }
+
+        wrapper.appendChild(dayLabelsSvg);
+        wrapper.appendChild(svg);
+        container.appendChild(wrapper);
+
+        // Auto-scroll to the right to show most recent activity
+        const scrollContainer = document.getElementById('heatmap-container');
+        if (scrollContainer) {
+            setTimeout(() => {
+                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+            }, 0);
+        }
+    }
+
+    function getColorScale(maxValue) {
+        const colors = ['#f0f0f0', '#c7e9c0', '#7bcf6e', '#2e9f3f', '#0d5f1d'];
+        
+        return function(value) {
+            if (value === 0) return colors[0];
+            if (maxValue === 0) return colors[0];
+            
+            const ratio = value / maxValue;
+            const index = Math.ceil(ratio * (colors.length - 1));
+            return colors[Math.min(index, colors.length - 1)];
+        };
+    }
 </script>
 {% endblock %}

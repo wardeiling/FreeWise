@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, Dict
 from fastapi import APIRouter, Depends, Request, Cookie
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select, func
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from app.db import get_engine
 from app.models import Book, Highlight, Settings
@@ -90,6 +90,22 @@ async def ui_dashboard(
     discarded_percentage = (total_discarded / total_highlights * 100) if total_highlights > 0 else 0
     active_percentage = (active_highlights / total_highlights * 100) if total_highlights > 0 else 0
     
+    # Generate heatmap data: group highlights by date (created_at)
+    # Query all highlights with created_at dates
+    highlights_stmt = select(Highlight).where(Highlight.created_at != None)
+    highlights_with_dates = session.exec(highlights_stmt).all()
+    
+    # Group by date and count
+    heatmap_data: Dict[str, int] = {}
+    for highlight in highlights_with_dates:
+        if highlight.created_at:
+            date_key = highlight.created_at.date().isoformat()
+            heatmap_data[date_key] = heatmap_data.get(date_key, 0) + 1
+    
+    # If no data, create empty dict for template compatibility
+    if not heatmap_data:
+        heatmap_data = {}
+    
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "settings": settings,
@@ -103,5 +119,6 @@ async def ui_dashboard(
         "total_discarded": total_discarded,
         "favorited_percentage": favorited_percentage,
         "discarded_percentage": discarded_percentage,
-        "active_percentage": active_percentage
+        "active_percentage": active_percentage,
+        "heatmap_data": heatmap_data
     })
