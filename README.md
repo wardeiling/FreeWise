@@ -42,7 +42,7 @@ Core functionality:
     - [X] remove book ID
 - [X] Improve daily review page: show at the centered top of the page that this is the "Daily Review" (full screen, so no header; only at the left top a back icon to return to dashboard) and then have the box of that particular note with at the bottom in the box a favorite and edit button. Then outside the highlight box have one X button (with circle around it) saying under it in small font "Discard" and then right of it a green checkmark button (with circle around it) with in small font under it "Done". When pressing either Discard or done, it moves a new higlight into view after which the same process follows, until all X (default is 5) higlights are completed.
 - [X] Add deduplication for import
-- [ ] Create spaced repetition algorithm with option for different books to be shown more or less frequently.
+- [X] Create spaced repetition algorithm with option for different books to be shown more or less frequently.
 - [X] Evaluate whether there is any added benefit to changing export format (if not change back to readwise and simplify import)
     - [X] Remove columns from export and import: higlight_id, book_id, last_reviewed_at, created_at, updated_at, book_created_at, book_updated_at
         - [X] From import
@@ -76,10 +76,10 @@ Nice to haves:
         - [X] Use title font for "Daily Review" 
 - [ ] Investigate the logic and and scripts one by one to see whether there are any optimizations possible to reduce code redundancy and improve efficiency.
 - [X] Also show page numbers for favorite and discarded html views.
-- [ ] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
+- [X] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
 - [ ] Sort higlights in favorite and discarded by the date they were favorited/discarded (more recent up top)
 - [ ] Daily Review page
     - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight.
-    - [ ] Add book title, author and cover image to higlights shown in daily review.
-- [ ] Book import - The Book title should also be required column and the required boxes should not be red anymore if there is a selection made.
+    - [ ] Add cover image to higlights shown in daily review.
+- [X] Book import - The Book title should also be required column and the required boxes should not be red anymore if there is a selection made.
 restore highlights

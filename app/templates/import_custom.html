@@ -121,6 +121,13 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .required-missing {
+            border-color: #fca5a5 !important;
+            background-color: #fef2f2 !important;
+        }
+    </style>
     
     <!-- Preview Table -->
     <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -161,12 +168,12 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Highlight (Required) -->
                 <div class="space-y-4">
-                    <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
-                        <label class="block text-sm font-semibold text-red-900 dark:text-red-100 mb-2 flex items-center gap-2">
-                            <i data-lucide="asterisk" class="w-3 h-3"></i>
+                    <div id="highlight-required" class="required-box bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                            <i data-lucide="asterisk" class="w-3 h-3 text-red-600"></i>
                             Highlight Text (Required)
                         </label>
-                        <select name="highlight" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500">
+                        <select name="highlight" id="highlight-select" required class="required-select w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500">
                             <option value="">-- Select Column --</option>
                             {% for col in csv_columns %}
                             <option value="{{ col }}" {% if col|lower in ['highlight', 'text', 'quote', 'content'] %}selected{% endif %}>{{ col }}</option>
@@ -174,10 +181,13 @@
                         </select>
                     </div>
                     
-                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Book Title</label>
-                        <select name="book_title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                            <option value="">-- Skip --</option>
+                    <div id="book-title-required" class="required-box bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                            <i data-lucide="asterisk" class="w-3 h-3 text-red-600"></i>
+                            Book Title (Required)
+                        </label>
+                        <select name="book_title" id="book-title-select" required class="required-select w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500">
+                            <option value="">-- Select Column --</option>
                             {% for col in csv_columns %}
                             <option value="{{ col }}" {% if col|lower in ['book title', 'title', 'book', 'source'] %}selected{% endif %}>{{ col }}</option>
                             {% endfor %}
@@ -265,6 +275,14 @@
 </div>
 
 <script>
+    function updateRequiredStyles(selectId, boxId) {
+        const selectEl = document.getElementById(selectId);
+        const boxEl = document.getElementById(boxId);
+        if (!selectEl || !boxEl) return;
+        const isEmpty = !selectEl.value;
+        boxEl.classList.toggle('required-missing', isEmpty);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         
@@ -277,6 +295,19 @@
                 }
             });
         }
+
+        // Toggle required styling once a selection is made
+        updateRequiredStyles('highlight-select', 'highlight-required');
+        updateRequiredStyles('book-title-select', 'book-title-required');
+        ['highlight-select', 'book-title-select'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', () => {
+                    const boxId = id === 'highlight-select' ? 'highlight-required' : 'book-title-required';
+                    updateRequiredStyles(id, boxId);
+                });
+            }
+        });
     });
 </script>
 {% endblock %}

@@ -216,7 +216,7 @@ async def process_custom_import(
     request: Request,
     csv_data: str = Form(...),
     highlight: str = Form(...),
-    book_title: Optional[str] = Form(None),
+    book_title: str = Form(...),
     book_author: Optional[str] = Form(None),
     note: Optional[str] = Form(None),
     tags: Optional[str] = Form(None),
@@ -271,6 +271,18 @@ async def process_custom_import(
             book_title_val = row.get(column_mapping['book_title'], '').strip() if column_mapping['book_title'] else ''
             book_author_val = row.get(column_mapping['book_author'], '').strip() if column_mapping['book_author'] else ''
             note_val = row.get(column_mapping['note'], '').strip() if column_mapping['note'] else ''
+
+            # Require book title
+            if not book_title_val:
+                skipped_count += 1
+                skipped_rows.append({
+                    "row": idx,
+                    "reason": "Missing book title",
+                    "highlight": highlight_text,
+                    "note": note_val,
+                    "book_title": book_title_val
+                })
+                continue
             
             # Skip header marker notes
             if note_val.lower() in {'.h1', '.h2', '.h3', '.h4', '.h5', '.h6'}:
@@ -293,14 +305,12 @@ async def process_custom_import(
             created_at = parse_readwise_datetime(highlighted_at_val) if highlighted_at_val else None
             
             # Get or create book
-            book = None
-            if book_title_val:
-                book = get_or_create_book(
-                    session=session,
-                    title=book_title_val,
-                    author=book_author_val if book_author_val else None,
-                    document_tags=document_tags_val if document_tags_val else None
-                )
+            book = get_or_create_book(
+                session=session,
+                title=book_title_val,
+                author=book_author_val if book_author_val else None,
+                document_tags=document_tags_val if document_tags_val else None
+            )
             
             # Parse tags
             is_favorited = False
