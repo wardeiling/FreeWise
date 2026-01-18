@@ -224,14 +224,78 @@
 </div>
 {% endif %}
 
+<!-- Review Activity Heatmap -->
+{% if review_heatmap_data %}
+<div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <i data-lucide="target" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+        Review Activity
+    </h3>
+    <div id="review-heatmap-container" class="overflow-x-auto">
+        <div id="review-heatmap" style="display: flex; gap: 4px;"></div>
+    </div>
+    <div class="mt-4 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex gap-2 items-center">
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #f0f0f0;"></div>
+            <span>No Review</span>
+        </div>
+        <div class="flex gap-2 items-center">
+            <div class="w-4 h-4 rounded border border-gray-300" style="background-color: #10b981;"></div>
+            <span>Reviewed</span>
+        </div>
+    </div>
+</div>
+
+<!-- Streak Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+    <!-- Current Streak Card -->
+    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 border-emerald-500 dark:border-emerald-700 rounded-xl p-8 text-center shadow-lg">
+        <div class="flex justify-center mb-4">
+            <i data-lucide="zap" class="w-12 h-12 text-emerald-600 dark:text-emerald-400"></i>
+        </div>
+        <div class="text-5xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">
+            {{ current_streak }}
+        </div>
+        <div class="text-emerald-800 dark:text-emerald-300 text-lg font-semibold">
+            Current Streak
+        </div>
+        <div class="text-emerald-600 dark:text-emerald-500 text-sm mt-2">
+            {{ 'day' if current_streak == 1 else 'days' }} in a row
+        </div>
+    </div>
+    
+    <!-- Longest Streak Card -->
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-2 border-amber-500 dark:border-amber-700 rounded-xl p-8 text-center shadow-lg">
+        <div class="flex justify-center mb-4">
+            <i data-lucide="trophy" class="w-12 h-12 text-amber-600 dark:text-amber-400"></i>
+        </div>
+        <div class="text-5xl font-bold text-amber-700 dark:text-amber-400 mb-2">
+            {{ longest_streak }}
+        </div>
+        <div class="text-amber-800 dark:text-amber-300 text-lg font-semibold">
+            Longest Streak
+        </div>
+        <div class="text-amber-600 dark:text-amber-500 text-sm mt-2">
+            Personal best
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         lucide.createIcons();
         
-        // Initialize heatmap
+        // Initialize highlight creation heatmap
         const heatmapData = {{ heatmap_data | tojson }};
         if (Object.keys(heatmapData).length > 0) {
             renderHeatmap(heatmapData);
+        }
+        
+        // Initialize review activity heatmap
+        const reviewHeatmapData = {{ review_heatmap_data | tojson }};
+        if (reviewHeatmapData && Object.keys(reviewHeatmapData).length > 0) {
+            renderReviewHeatmap(reviewHeatmapData);
         }
     });
 
@@ -243,8 +307,15 @@
         const dates = Object.keys(data).map(d => new Date(d));
         if (dates.length === 0) return;
 
-        const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+        let minDate = new Date(Math.min(...dates.map(d => d.getTime())));
         const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+
+        // Ensure we always show at least one full year of days
+        const minRangeDate = new Date(maxDate);
+        minRangeDate.setFullYear(minRangeDate.getFullYear() - 1);
+        if (minDate > minRangeDate) {
+            minDate = minRangeDate;
+        }
 
         // Start from Sunday of the first week containing data
         const startDate = new Date(minDate);
@@ -408,6 +479,182 @@
             const index = Math.ceil(ratio * (colors.length - 1));
             return colors[Math.min(index, colors.length - 1)];
         };
+    }
+
+    function renderReviewHeatmap(data) {
+        const container = document.getElementById('review-heatmap');
+        if (!container) return;
+
+        // Determine date range - if we have data, use it; otherwise show last year
+        let minDate, maxDate;
+        const dates = Object.keys(data).map(d => new Date(d));
+        
+        if (dates.length > 0) {
+            minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+            maxDate = new Date();
+        } else {
+            // Show last year even if no data
+            maxDate = new Date();
+            minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 1);
+        }
+
+        // Ensure at least one full year span even with sparse data
+        const minRangeDate = new Date(maxDate);
+        minRangeDate.setFullYear(minRangeDate.getFullYear() - 1);
+        if (minDate > minRangeDate) {
+            minDate = minRangeDate;
+        }
+
+        // Start from Sunday of the first week
+        const startDate = new Date(minDate);
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+
+        // End on Saturday of the current week
+        const endDate = new Date(maxDate);
+        endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
+
+        // Create grid
+        const weeks = [];
+        let currentWeek = [];
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const hasReview = data[dateStr] === 1;
+            const dayOfWeek = currentDate.getDay();
+
+            currentWeek.push({
+                date: new Date(currentDate),
+                dateStr: dateStr,
+                hasReview: hasReview,
+                day: dayOfWeek
+            });
+
+            if (dayOfWeek === 6) {
+                weeks.push(currentWeek);
+                currentWeek = [];
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (currentWeek.length > 0) {
+            weeks.push(currentWeek);
+        }
+
+        // Render grid
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const cellSize = 14;
+        const cellGap = 2;
+        const dayLabelWidth = 30;
+        const monthLabelHeight = 20;
+
+        // Create wrapper div
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.gap = '4px';
+        wrapper.style.alignItems = 'flex-start';
+
+        // Create SVG for sticky day labels
+        const dayLabelsSvg = document.createElementNS(svgNS, 'svg');
+        dayLabelsSvg.setAttribute('width', dayLabelWidth);
+        dayLabelsSvg.setAttribute('height', monthLabelHeight + 7 * (cellSize + cellGap) + 10);
+        dayLabelsSvg.setAttribute('class', 'dark:text-gray-300');
+        dayLabelsSvg.style.position = 'sticky';
+        dayLabelsSvg.style.left = '0';
+        dayLabelsSvg.style.zIndex = '20';
+        dayLabelsSvg.style.backgroundColor = 'white';
+        dayLabelsSvg.classList.add('dark:bg-gray-800');
+        dayLabelsSvg.style.flexShrink = '0';
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let i = 0; i < 7; i++) {
+            const text = document.createElementNS(svgNS, 'text');
+            text.setAttribute('x', 2);
+            text.setAttribute('y', monthLabelHeight + i * (cellSize + cellGap) + cellSize - 2);
+            text.setAttribute('font-size', '11');
+            text.setAttribute('fill', 'currentColor');
+            text.setAttribute('class', 'dark:text-gray-400');
+            text.textContent = days[i];
+            dayLabelsSvg.appendChild(text);
+        }
+
+        // Create main heatmap SVG
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('width', weeks.length * (cellSize + cellGap) + 10);
+        svg.setAttribute('height', monthLabelHeight + 7 * (cellSize + cellGap) + 10);
+        svg.setAttribute('class', 'dark:text-gray-300');
+
+        // Month labels
+        let lastMonth = -1;
+        for (let w = 0; w < weeks.length; w++) {
+            const week = weeks[w];
+            const firstDay = week[0].date;
+            const month = firstDay.getMonth();
+
+            if (month !== lastMonth) {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', w * (cellSize + cellGap));
+                text.setAttribute('y', 14);
+                text.setAttribute('font-size', '11');
+                text.setAttribute('fill', 'currentColor');
+                text.setAttribute('class', 'dark:text-gray-400');
+                text.textContent = monthNames[month];
+                svg.appendChild(text);
+
+                lastMonth = month;
+            }
+        }
+
+        // Cells - binary coloring
+        const noReviewColor = '#f0f0f0';
+        const reviewedColor = '#10b981';  // emerald-500
+
+        for (let w = 0; w < weeks.length; w++) {
+            const week = weeks[w];
+            for (let d = 0; d < week.length; d++) {
+                const cell = week[d];
+                const x = w * (cellSize + cellGap);
+                const y = monthLabelHeight + d * (cellSize + cellGap);
+                const color = cell.hasReview ? reviewedColor : noReviewColor;
+
+                const rect = document.createElementNS(svgNS, 'rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', cellSize);
+                rect.setAttribute('height', cellSize);
+                rect.setAttribute('fill', color);
+                rect.setAttribute('stroke', '#e5e7eb');
+                rect.setAttribute('stroke-width', '0.5');
+                rect.setAttribute('rx', '2');
+                rect.setAttribute('class', 'cursor-pointer hover:stroke-gray-400 dark:stroke-gray-600');
+
+                // Tooltip
+                const title = document.createElementNS(svgNS, 'title');
+                const dayName = days[cell.date.getDay()];
+                const monthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][cell.date.getMonth()];
+                const year = cell.date.getFullYear();
+                const status = cell.hasReview ? 'Reviewed ✓' : 'No review';
+                title.textContent = `${dayName}, ${monthName} ${cell.date.getDate()}, ${year}: ${status}`;
+                rect.appendChild(title);
+
+                svg.appendChild(rect);
+            }
+        }
+
+        wrapper.appendChild(dayLabelsSvg);
+        wrapper.appendChild(svg);
+        container.appendChild(wrapper);
+
+        // Auto-scroll to the right
+        const scrollContainer = document.getElementById('review-heatmap-container');
+        if (scrollContainer) {
+            setTimeout(() => {
+                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+            }, 0);
+        }
     }
 </script>
 {% endblock %}

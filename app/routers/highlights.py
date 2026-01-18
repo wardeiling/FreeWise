@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Optional, List, Dict
 from collections import defaultdict
 import math
@@ -11,7 +11,7 @@ from sqlmodel import Session, select, func
 from pydantic import BaseModel
 
 from app.db import get_engine
-from app.models import Highlight, Settings
+from app.models import Highlight, Settings, ReviewSession
 
 
 router = APIRouter(prefix="/highlights", tags=["highlights"])
@@ -325,15 +325,30 @@ async def ui_review(
         
         # Create new session
         new_session_id = str(uuid.uuid4())
+        now = datetime.utcnow()
         review_sessions[new_session_id] = {
             "highlight_ids": highlight_ids,
             "current_index": 0,
-            "timestamp": datetime.utcnow()
+            "timestamp": now
         }
         review_session_id = new_session_id
         
+        # Create ReviewSession database record
+        db_session = ReviewSession(
+            user_id=1,  # Default user
+            session_uuid=new_session_id,
+            started_at=now,
+            session_date=date.today(),
+            target_count=n,
+            highlights_reviewed=0,
+            highlights_discarded=0,
+            highlights_favorited=0,
+            is_completed=False
+        )
+        session.add(db_session)
+        session.commit()
+        
         # Clean up old sessions (older than 24 hours)
-        now = datetime.utcnow()
         expired = [sid for sid, data in review_sessions.items() 
                    if (now - data["timestamp"]).total_seconds() > 86400]
         for sid in expired:
@@ -396,6 +411,15 @@ async def ui_review_next(
         session.add(current_highlight)
         session.commit()
     
+    # Update ReviewSession highlights_reviewed counter
+    if review_session_id:
+        stmt = select(ReviewSession).where(ReviewSession.session_uuid == review_session_id)
+        db_review_session = session.exec(stmt).first()
+        if db_review_session:
+            db_review_session.highlights_reviewed += 1
+            session.add(db_review_session)
+            session.commit()
+    
     # Update session index
     if review_session_id and review_session_id in review_sessions:
         review_sessions[review_session_id]["current_index"] += 1
@@ -405,6 +429,15 @@ async def ui_review_next(
         
         # Check if we've reached the end
         if current_index >= len(highlight_ids):
+            # Mark session as complete in database
+            stmt = select(ReviewSession).where(ReviewSession.session_uuid == review_session_id)
+            db_review_session = session.exec(stmt).first()
+            if db_review_session:
+                db_review_session.completed_at = datetime.utcnow()
+                db_review_session.is_completed = True
+                session.add(db_review_session)
+                session.commit()
+            
             # Review complete - clean up session and show completion message
             del review_sessions[review_session_id]
             return HTMLResponse(content="""<div class="text-center">
@@ -662,6 +695,15 @@ async def toggle_favorite_html(
     session.commit()
     session.refresh(highlight)
     
+    # Update ReviewSession counter if favoriting during review
+    if context == "review" and review_session_id and favorite:
+        stmt = select(ReviewSession).where(ReviewSession.session_uuid == review_session_id)
+        db_review_session = session.exec(stmt).first()
+        if db_review_session:
+            db_review_session.highlights_favorited += 1
+            session.add(db_review_session)
+            session.commit()
+    
     # If context is book, render both highlight sections
     if context == "book":
         return render_book_highlights_sections(request, highlight.book_id, session)
@@ -715,6 +757,15 @@ async def discard_highlight_html(
     session.commit()
     session.refresh(highlight)
     
+    # Update ReviewSession counter if discarding during review
+    if context == "review" and review_session_id and new_state:
+        stmt = select(ReviewSession).where(ReviewSession.session_uuid == review_session_id)
+        db_review_session = session.exec(stmt).first()
+        if db_review_session:
+            db_review_session.highlights_discarded += 1
+            session.add(db_review_session)
+            session.commit()
+    
     # If context is book, render both highlight sections
     if context == "book":
         return render_book_highlights_sections(request, highlight.book_id, session)
@@ -728,6 +779,15 @@ async def discard_highlight_html(
         
         # Check if we've reached the end
         if current_index >= len(highlight_ids):
+            # Mark session as complete in database
+            stmt = select(ReviewSession).where(ReviewSession.session_uuid == review_session_id)
+            db_review_session = session.exec(stmt).first()
+            if db_review_session:
+                db_review_session.completed_at = datetime.utcnow()
+                db_review_session.is_completed = True
+                session.add(db_review_session)
+                session.commit()
+            
             # Review complete - clean up session
             del review_sessions[review_session_id]
             return HTMLResponse(content="""<div class="text-center">

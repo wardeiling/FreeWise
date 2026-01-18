@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -82,3 +82,21 @@ class Settings(SQLModel, table=True):
     
     def __repr__(self) -> str:
         return f"Settings(id={self.id}, daily_review_count={self.daily_review_count})"
+
+
+class ReviewSession(SQLModel, table=True):
+    """Log of daily review sessions for tracking activity and engagement."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    session_uuid: str = Field(index=True, unique=True)  # UUID for tracking across requests
+    started_at: datetime = Field(index=True)
+    completed_at: Optional[datetime] = Field(default=None, index=True)
+    session_date: date = Field(index=True)  # Date of session for easy querying
+    target_count: int = Field(default=5)  # Number of highlights intended to review
+    highlights_reviewed: int = Field(default=0)  # Highlights marked "Done"
+    highlights_discarded: int = Field(default=0)  # Highlights discarded in session
+    highlights_favorited: int = Field(default=0)  # Highlights favorited in session
+    is_completed: bool = Field(default=False, index=True)  # Whether user finished the session
+    
+    def __repr__(self) -> str:
+        return f"ReviewSession(id={self.id}, date={self.session_date}, reviewed={self.highlights_reviewed}/{self.target_count})"

@@ -6,7 +6,7 @@ from sqlmodel import Session, select, func
 from datetime import datetime, date, timedelta
 
 from app.db import get_engine
-from app.models import Book, Highlight, Settings
+from app.models import Book, Highlight, Settings, ReviewSession
 
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -106,6 +106,55 @@ async def ui_dashboard(
     if not heatmap_data:
         heatmap_data = {}
     
+    # Get review session data for review activity heatmap
+    review_sessions_stmt = select(ReviewSession).where(ReviewSession.is_completed == True)
+    completed_sessions = session.exec(review_sessions_stmt).all()
+    
+    # Create binary heatmap data (1 if reviewed that day, 0 otherwise)
+    review_heatmap_data: Dict[str, int] = {}
+    for review_session in completed_sessions:
+        date_key = review_session.session_date.isoformat()
+        review_heatmap_data[date_key] = 1  # Binary: reviewed or not
+    
+    # Calculate streaks
+    current_streak = 0
+    longest_streak = 0
+    
+    if completed_sessions:
+        # Sort sessions by date (most recent first)
+        sorted_dates = sorted([rs.session_date for rs in completed_sessions], reverse=True)
+        
+        # Calculate current streak
+        today_date = date.today()
+        yesterday = today_date - timedelta(days=1)
+        
+        # Check if there's a session today or yesterday to start the streak
+        if sorted_dates[0] >= yesterday:
+            current_streak = 1
+            check_date = sorted_dates[0] - timedelta(days=1)
+            
+            for i in range(1, len(sorted_dates)):
+                if sorted_dates[i] == check_date:
+                    current_streak += 1
+                    check_date -= timedelta(days=1)
+                elif sorted_dates[i] < check_date:
+                    # Gap found, break
+                    break
+        
+        # Calculate longest streak (including current)
+        if len(sorted_dates) > 0:
+            all_dates_sorted = sorted([rs.session_date for rs in completed_sessions])
+            temp_streak = 1
+            longest_streak = 1
+            
+            for i in range(1, len(all_dates_sorted)):
+                days_diff = (all_dates_sorted[i] - all_dates_sorted[i-1]).days
+                if days_diff == 1:
+                    temp_streak += 1
+                    longest_streak = max(longest_streak, temp_streak)
+                else:
+                    temp_streak = 1
+    
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "settings": settings,
@@ -120,5 +169,8 @@ async def ui_dashboard(
         "favorited_percentage": favorited_percentage,
         "discarded_percentage": discarded_percentage,
         "active_percentage": active_percentage,
-        "heatmap_data": heatmap_data
+        "heatmap_data": heatmap_data,
+        "review_heatmap_data": review_heatmap_data,
+        "current_streak": current_streak,
+        "longest_streak": longest_streak
     })

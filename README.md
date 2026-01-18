@@ -60,7 +60,7 @@ Core functionality:
 - [X] Show discarded higlights for each book in a dedicated section at the bottom of the book page and make sure higlights are automatically moved from and to there.
 - [X] Remove discarded text from entries (highlights) in discarded section (redundant).
 - [ ] Log daily review activity (e.g., number of highlights reviewed, number of highlights discarded with date) and provide a nice heatmap visualization of review activity over time on the dashboard page.
-- [ ] Create a nice heatmap visualization of number of highlights made over time (using the dates associated to any highlight that has this data) on the dashboard page.
+- [X] Create a nice heatmap visualization of number of highlights made over time (using the dates associated to any highlight that has this data) on the dashboard page.
 
 Nice to haves:
 - [ ] Create Favicon (small icon shown in browser tab) and add to the application.
