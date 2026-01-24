@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
     """Create database tables on startup."""
     os.makedirs("./db", exist_ok=True)
     os.makedirs("./app/static", exist_ok=True)
+    os.makedirs("./app/static/uploads/covers", exist_ok=True)
     engine = get_engine()
     SQLModel.metadata.create_all(engine)
     

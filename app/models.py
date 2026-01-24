@@ -25,6 +25,8 @@ class Book(SQLModel, table=True):
     author: Optional[str] = Field(default=None, index=True)
     document_tags: Optional[str] = None  # comma-separated tags
     review_weight: float = Field(default=1.0, index=True)  # 0.0 (Never) to 2.0 (More)
+    cover_image_url: Optional[str] = Field(default=None)
+    cover_image_source: Optional[str] = Field(default=None)
     highlights: list["Highlight"] = Relationship(back_populates="book")
     
     def __repr__(self) -> str:

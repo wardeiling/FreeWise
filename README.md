@@ -64,7 +64,7 @@ Core functionality:
 
 Nice to haves:
 - [X] Create Favicon (small icon shown in browser tab) and add to the application.
-- [ ] Create automatic import of book metadata and book cover image from external sources (e.g., Google Books API, Open Library API) based on book title and author.
+- [X] Create automatic import of book metadata and book cover image from external sources (e.g., Google Books API, Open Library API) based on book title and author.
 - [X] Enhance aestethics (make more visually appealing) of the UI 
     - [X] utilize CSS framework (e.g., Tailwind CSS, Bootstrap) for a minimalistic look with nice fonts and color schemes consistent throughout the application.
     - [X] Remove navigation header from book page (make it full screen) and create a back button to go back to the library (in a similar way as was done for daily higlight page).
@@ -79,7 +79,8 @@ Nice to haves:
 - [X] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
 - [ ] Sort higlights in favorite and discarded by the date they were favorited/discarded (more recent up top)
 - [ ] Daily Review page
-    - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight.
+    - [ ] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight. This should link to a variable that gives a weight to the highlight (low or high) that influences how often it is shown in future reviews.
     - [ ] Add cover image to higlights shown in daily review.
 - [X] Book import - The Book title should also be required column and the required boxes should not be red anymore if there is a selection made.
 restore highlights
+- [ ] Download theme, icons and fonts and serve them locally to reduce dependency on external sources.

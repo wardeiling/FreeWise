@@ -46,6 +46,22 @@
         .title-font {
             font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
         }
+
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: block;
+        }
+
+        .cover-downloading #cover-download-indicator {
+            display: block;
+        }
+
+        .cover-downloading #cover-search-results {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -59,6 +75,98 @@
 
     <!-- Content Wrapper for max-width and mobile compatibility -->
     <div class="max-w-2xl mx-auto px-4 py-20">
+        <!-- Cover Section -->
+        <div id="cover-section" class="mb-10">
+            <div class="flex flex-col items-center gap-4">
+                {% if book.cover_image_url %}
+                    <div class="w-36 h-52 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <img src="{{ book.cover_image_url }}" alt="Cover for {{ book.title }}" class="w-full h-full object-cover" />
+                    </div>
+                {% else %}
+                    <div class="w-36 h-52 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center text-gray-400">
+                        <i data-lucide="image" class="w-8 h-8 mb-2"></i>
+                        <span class="text-xs">No cover</span>
+                    </div>
+                {% endif %}
+
+                {% if book.cover_image_source %}
+                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                        {{ book.cover_image_source }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="mt-6 space-y-4">
+                <form 
+                    hx-post="/library/ui/book/{{ book.id }}/cover/upload"
+                    hx-target="#cover-section"
+                    hx-swap="outerHTML"
+                    hx-encoding="multipart/form-data"
+                    hx-indicator="#cover-upload-indicator"
+                    class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <input 
+                        type="file"
+                        name="cover_file"
+                        accept="image/jpeg,image/png,image/webp"
+                        class="block w-full sm:w-auto text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-gray-200"
+                        required>
+                    <button 
+                        type="submit"
+                        class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors">
+                        Upload Cover
+                    </button>
+                </form>
+
+                <div id="cover-upload-indicator" class="htmx-indicator">
+                    <div class="h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-amber-600 animate-pulse" style="width: 100%;"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">Uploading...</div>
+                </div>
+
+                <form 
+                    hx-post="/library/ui/book/{{ book.id }}/cover/search"
+                    hx-target="#cover-search-results"
+                    hx-swap="innerHTML"
+                    class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <input 
+                        type="text"
+                        name="query"
+                        value="{{ book.title }}"
+                        placeholder="Search Open Library"
+                        class="w-full sm:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm">
+                    <button 
+                        type="submit"
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-colors">
+                        Search Covers
+                    </button>
+                </form>
+            </div>
+
+            <div id="cover-search-results" class="mt-6"></div>
+
+            {% if book.cover_image_url %}
+            <form 
+                hx-post="/library/ui/book/{{ book.id }}/cover/delete"
+                hx-target="#cover-section"
+                hx-swap="outerHTML"
+                class="flex items-center justify-center mt-4">
+                <button 
+                    type="submit"
+                    class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition-colors">
+                    Remove Cover
+                </button>
+            </form>
+            {% endif %}
+
+            <div id="cover-download-indicator" class="htmx-indicator mt-4">
+                <div class="h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-emerald-600 animate-pulse" style="width: 100%;"></div>
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">Downloading cover...</div>
+            </div>
+        </div>
+
         <!-- Book Header (Centered, No Background) -->
         <div id="book-header" class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 title-font">
@@ -200,6 +308,42 @@
         
         document.addEventListener('htmx:afterSwap', initLucideIcons);
         document.addEventListener('htmx:afterSettle', initLucideIcons);
+
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {
+            const path = evt.detail && evt.detail.requestConfig ? evt.detail.requestConfig.path : '';
+            if (path && path.includes('/cover/select')) {
+                const coverSection = document.getElementById('cover-section');
+                if (coverSection) {
+                    coverSection.classList.add('cover-downloading');
+                    const buttons = coverSection.querySelectorAll('button');
+                    buttons.forEach(btn => btn.setAttribute('disabled', 'disabled'));
+                }
+            }
+        });
+
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            if (evt.detail && evt.detail.target && evt.detail.target.id === 'cover-section') {
+                initLucideIcons();
+            }
+        });
+
+        document.body.addEventListener('htmx:responseError', function(evt) {
+            const path = evt.detail && evt.detail.requestConfig ? evt.detail.requestConfig.path : '';
+            if (path && path.includes('/cover/select')) {
+                const coverSection = document.getElementById('cover-section');
+                if (coverSection) {
+                    coverSection.classList.remove('cover-downloading');
+                    const buttons = coverSection.querySelectorAll('button');
+                    buttons.forEach(btn => btn.removeAttribute('disabled'));
+                }
+
+                const results = document.getElementById('cover-search-results');
+                if (results && evt.detail && evt.detail.xhr && evt.detail.xhr.responseText) {
+                    results.innerHTML = evt.detail.xhr.responseText;
+                    results.style.display = 'block';
+                }
+            }
+        });
     </script>
 </body>
 </html>

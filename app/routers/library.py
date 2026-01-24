@@ -1,10 +1,14 @@
 from typing import Optional, List
-from fastapi import APIRouter, Depends, Request, Form
+from fastapi import APIRouter, Depends, Request, Form, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select, func
 from datetime import datetime
 import html
+import os
+import uuid
+import aiofiles
+import httpx
 
 from app.db import get_engine
 from app.models import Book, Highlight, Settings
@@ -12,6 +16,11 @@ from app.models import Book, Highlight, Settings
 
 router = APIRouter(prefix="/library", tags=["library"])
 templates = Jinja2Templates(directory="app/templates")
+
+COVER_UPLOAD_DIR = os.path.join("app", "static", "uploads", "covers")
+ALLOWED_COVER_TYPES = {"image/jpeg", "image/png", "image/webp"}
+ALLOWED_COVER_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+MAX_COVER_SIZE_BYTES = 5 * 1024 * 1024
 
 
 def get_session():
@@ -137,6 +146,181 @@ async def ui_book_detail(
         "book": book,
         "highlights": highlights
     })
+
+
+@router.post("/ui/book/{book_id}/cover/upload", response_class=HTMLResponse)
+async def ui_book_cover_upload(
+    request: Request,
+    book_id: int,
+    cover_file: UploadFile = File(...),
+    session: Session = Depends(get_session)
+):
+    """Upload a cover image for a book and return updated cover section."""
+    book = session.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    if cover_file.content_type not in ALLOWED_COVER_TYPES:
+        raise HTTPException(status_code=400, detail="Unsupported file type")
+
+    original_name = cover_file.filename or ""
+    ext = os.path.splitext(original_name)[1].lower()
+    if ext not in ALLOWED_COVER_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Unsupported file extension")
+
+    content = await cover_file.read()
+    if len(content) > MAX_COVER_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="File is too large")
+
+    _delete_existing_cover_file(book)
+    os.makedirs(COVER_UPLOAD_DIR, exist_ok=True)
+    filename = f"book-{book_id}-{uuid.uuid4().hex}{ext}"
+    file_path = os.path.join(COVER_UPLOAD_DIR, filename)
+
+    async with aiofiles.open(file_path, "wb") as f:
+        await f.write(content)
+
+    book.cover_image_url = f"/static/uploads/covers/{filename}"
+    book.cover_image_source = "upload"
+    session.add(book)
+    session.commit()
+    session.refresh(book)
+
+    return _render_cover_section(book)
+
+
+@router.post("/ui/book/{book_id}/cover/search", response_class=HTMLResponse)
+async def ui_book_cover_search(
+    request: Request,
+    book_id: int,
+    query: str = Form(""),
+    session: Session = Depends(get_session)
+):
+    """Search Open Library for book covers and return search results HTML."""
+    book = session.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    search_query = query.strip()
+    if not search_query:
+        return _render_cover_search_results(book_id, [], "")
+
+    results: list[dict] = []
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                "https://openlibrary.org/search.json",
+                params={"q": search_query, "limit": 8}
+            )
+            response.raise_for_status()
+            data = response.json()
+    except httpx.HTTPError:
+        return HTMLResponse(content="<div class=\"text-sm text-gray-500 dark:text-gray-400 text-center\">Open Library search failed. Please try again.</div>")
+
+    for doc in data.get("docs", []):
+        cover_id = doc.get("cover_i")
+        if not cover_id:
+            continue
+        title = doc.get("title") or "Untitled"
+        author_list = doc.get("author_name") or []
+        author = author_list[0] if author_list else "Unknown"
+        year = doc.get("first_publish_year")
+        results.append({
+            "cover_id": cover_id,
+            "title": title,
+            "author": author,
+            "year": year
+        })
+
+    return _render_cover_search_results(book_id, results, search_query)
+
+
+@router.post("/ui/book/{book_id}/cover/select", response_class=HTMLResponse)
+async def ui_book_cover_select(
+    request: Request,
+    book_id: int,
+    cover_url: str = Form(""),
+    session: Session = Depends(get_session)
+):
+    """Select an Open Library cover image for a book and return updated cover section."""
+    book = session.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    if not (cover_url.startswith("https://covers.openlibrary.org/") or cover_url.startswith("http://covers.openlibrary.org/")):
+        raise HTTPException(status_code=400, detail="Invalid cover URL")
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(cover_url, follow_redirects=True)
+            response.raise_for_status()
+            content_type = response.headers.get("Content-Type", "").split(";")[0].strip().lower()
+            content = response.content
+    except httpx.HTTPError:
+        return HTMLResponse(
+            content="<div class=\"text-sm text-red-600 dark:text-red-400 text-center\">Failed to download cover image. Please try again.</div>",
+            status_code=400
+        )
+
+    ext = os.path.splitext(cover_url)[1].lower()
+    inferred_ok = ext in ALLOWED_COVER_EXTENSIONS
+    if content_type and content_type not in ALLOWED_COVER_TYPES and not inferred_ok:
+        return HTMLResponse(
+            content="<div class=\"text-sm text-red-600 dark:text-red-400 text-center\">Unsupported cover image type.</div>",
+            status_code=400
+        )
+
+    if len(content) > MAX_COVER_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="Cover image is too large")
+
+    ext_map = {
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+    }
+    if content_type in ext_map:
+        ext = ext_map[content_type]
+    elif inferred_ok:
+        ext = os.path.splitext(cover_url)[1].lower()
+    else:
+        ext = ".jpg"
+
+    _delete_existing_cover_file(book)
+    os.makedirs(COVER_UPLOAD_DIR, exist_ok=True)
+    filename = f"book-{book_id}-{uuid.uuid4().hex}{ext}"
+    file_path = os.path.join(COVER_UPLOAD_DIR, filename)
+
+    async with aiofiles.open(file_path, "wb") as f:
+        await f.write(content)
+
+    book.cover_image_url = f"/static/uploads/covers/{filename}"
+    book.cover_image_source = "openlibrary"
+    session.add(book)
+    session.commit()
+    session.refresh(book)
+
+    return _render_cover_section(book)
+
+
+@router.post("/ui/book/{book_id}/cover/delete", response_class=HTMLResponse)
+async def ui_book_cover_delete(
+    request: Request,
+    book_id: int,
+    session: Session = Depends(get_session)
+):
+    """Delete the existing cover image for a book and return updated cover section."""
+    book = session.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    _delete_existing_cover_file(book)
+    book.cover_image_url = None
+    book.cover_image_source = None
+    session.add(book)
+    session.commit()
+    session.refresh(book)
+
+    return _render_cover_section(book)
 
 
 @router.get("/ui/book/{book_id}/edit", response_class=HTMLResponse)
@@ -441,6 +625,162 @@ async def ui_book_delete(
     )
 
 
+def _render_cover_section(book: Book) -> HTMLResponse:
+    """Render the cover image section with upload and search controls."""
+    cover_url = book.cover_image_url or ""
+    title_attr = html.escape(book.title, quote=True)
+    source_badge = ""
+    if book.cover_image_source:
+        source_badge = f"""
+            <span class=\"inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full\">
+                {html.escape(book.cover_image_source)}
+            </span>
+        """
+
+    cover_display = f"""
+        <div class=\"w-36 h-52 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center\">
+            <img src=\"{cover_url}\" alt=\"Cover for {title_attr}\" class=\"w-full h-full object-cover\" />
+        </div>
+    """ if cover_url else """
+        <div class=\"w-36 h-52 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center text-gray-400\">
+            <svg data-lucide=\"image\" class=\"w-8 h-8 mb-2\"></svg>
+            <span class=\"text-xs\">No cover</span>
+        </div>
+    """
+
+    delete_button = ""
+    if cover_url:
+        delete_button = f"""
+            <form 
+                hx-post=\"/library/ui/book/{book.id}/cover/delete\"
+                hx-target=\"#cover-section\"
+                hx-swap=\"outerHTML\"
+                class=\"flex items-center justify-center\">
+                <button 
+                    type=\"submit\"
+                    class=\"px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition-colors\">
+                    Remove Cover
+                </button>
+            </form>
+        """
+
+    html_content = f"""
+    <div id=\"cover-section\" class=\"mb-10\">
+        <div class=\"flex flex-col items-center gap-4\">
+            {cover_display}
+            {source_badge}
+        </div>
+
+        <div class=\"mt-6 space-y-4\">
+            <form 
+                hx-post=\"/library/ui/book/{book.id}/cover/upload\"
+                hx-target=\"#cover-section\"
+                hx-swap=\"outerHTML\"
+                hx-encoding=\"multipart/form-data\"
+                hx-indicator=\"#cover-upload-indicator\"
+                class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">
+                <input 
+                    type=\"file\"
+                    name=\"cover_file\"
+                    accept=\"image/jpeg,image/png,image/webp\"
+                    class=\"block w-full sm:w-auto text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-gray-200\"
+                    required>
+                <button 
+                    type=\"submit\"
+                    class=\"px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors\">
+                    Upload Cover
+                </button>
+            </form>
+
+            <div id=\"cover-upload-indicator\" class=\"htmx-indicator\">
+                <div class=\"h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">
+                    <div class=\"h-full bg-amber-600 animate-pulse\" style=\"width: 100%;\"></div>
+                </div>
+                <div class=\"text-xs text-gray-500 dark:text-gray-400 text-center mt-1\">Uploading...</div>
+            </div>
+
+            <form 
+                hx-post=\"/library/ui/book/{book.id}/cover/search\"
+                hx-target=\"#cover-search-results\"
+                hx-swap=\"innerHTML\"
+                class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">
+                <input 
+                    type=\"text\"
+                    name=\"query\"
+                    value=\"{title_attr}\"
+                    placeholder=\"Search Open Library\"
+                    class=\"w-full sm:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm\">
+                <button 
+                    type=\"submit\"
+                    class=\"px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-colors\">
+                    Search Covers
+                </button>
+            </form>
+        </div>
+
+        <div id=\"cover-search-results\" class=\"mt-6\"></div>
+        {delete_button}
+
+        <div id=\"cover-download-indicator\" class=\"htmx-indicator mt-4\">
+            <div class=\"h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">
+                <div class=\"h-full bg-emerald-600 animate-pulse\" style=\"width: 100%;\"></div>
+            </div>
+            <div class=\"text-xs text-gray-500 dark:text-gray-400 text-center mt-1\">Downloading cover...</div>
+        </div>
+    </div>
+    <script>
+        if (typeof lucide !== 'undefined') {{
+            lucide.createIcons();
+        }}
+    </script>
+    """
+
+    return HTMLResponse(content=html_content)
+
+
+def _render_cover_search_results(book_id: int, results: list[dict], query: str) -> HTMLResponse:
+    """Render Open Library cover search results list."""
+    if not query:
+        return HTMLResponse(content="<div class=\"text-sm text-gray-500 dark:text-gray-400 text-center\">Enter a search query to find covers.</div>")
+
+    if not results:
+        return HTMLResponse(content="<div class=\"text-sm text-gray-500 dark:text-gray-400 text-center\">No covers found. Try a different search.</div>")
+
+    items_html = ""
+    for item in results:
+        cover_id = item["cover_id"]
+        cover_url = f"https://covers.openlibrary.org/b/id/{cover_id}-L.jpg"
+        title = html.escape(item["title"])
+        author = html.escape(item["author"])
+        year = item.get("year")
+        year_html = f"<span class=\\\"text-xs text-gray-500 dark:text-gray-400\\\">({year})</span>" if year else ""
+        items_html += f"""
+        <div class=\"flex items-center gap-4 p-3 border border-gray-200 dark:border-gray-700 rounded-lg\">
+            <img src=\"{cover_url}\" alt=\"Cover\" class=\"w-12 h-16 object-cover rounded\" />
+            <div class=\"flex-1\">
+                <div class=\"text-sm font-semibold text-gray-900 dark:text-gray-100\">{title} {year_html}</div>
+                <div class=\"text-xs text-gray-600 dark:text-gray-400\">{author}</div>
+            </div>
+            <form 
+                hx-post=\"/library/ui/book/{book_id}/cover/select\"
+                hx-target=\"#cover-section\"
+                hx-swap=\"outerHTML\"
+                hx-indicator=\"#cover-download-indicator\">
+                <input type=\"hidden\" name=\"cover_url\" value=\"{cover_url}\">
+                <button type=\"submit\" class=\"px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-md\">Use</button>
+            </form>
+        </div>
+        """
+
+    html_content = f"""
+    <div class=\"space-y-3\">
+        {items_html}
+    </div>
+    """
+
+    return HTMLResponse(content=html_content)
+
+
 def _render_tags_section(book: Book) -> HTMLResponse:
     """Helper function to render the tags section."""
     tags_html = ""
@@ -498,6 +838,22 @@ def _render_tags_section(book: Book) -> HTMLResponse:
     """
 
     return HTMLResponse(content=full_html)
+
+
+def _delete_existing_cover_file(book: Book) -> None:
+    """Delete existing local cover file if present."""
+    if not book.cover_image_url:
+        return
+    if not book.cover_image_url.startswith("/static/uploads/covers/"):
+        return
+
+    filename = book.cover_image_url.split("/")[-1]
+    file_path = os.path.join(COVER_UPLOAD_DIR, filename)
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    except OSError:
+        pass
 
 
 def _render_book_header(book: Book, highlight_count: int) -> HTMLResponse:
