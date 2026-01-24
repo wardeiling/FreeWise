@@ -344,9 +344,17 @@ async def ui_book_edit_form(
     escaped_title = html.escape(book.title, quote=True)
     escaped_author = html.escape(book.author or '', quote=True)
     
+    cover_source_badge = ""
+    if book.cover_image_source:
+        cover_source_badge = f"""
+            <span class=\"inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full\">
+                {html.escape(book.cover_image_source)}
+            </span>
+        """
+
     form_html = f"""
     <div id="book-header" class="text-center mb-8">
-        <form hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" class="max-w-md mx-auto">
+        <div class="w-full max-w-2xl mx-auto">
             <!-- Form Header with Edit Indicator -->
             <div class="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
                 <span class="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-2">
@@ -366,6 +374,7 @@ async def ui_book_edit_form(
                     </button>
                     <button 
                         type="submit"
+                        form="book-metadata-form"
                         class="flex items-center gap-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white rounded-md font-medium text-xs transition-colors"
                         title="Save">
                         <svg data-lucide="save" class="w-4 h-4"></svg>
@@ -375,7 +384,95 @@ async def ui_book_edit_form(
             </div>
 
             <!-- Form Fields -->
-            <div class="bg-white dark:bg-gray-800 rounded-b-lg p-6 space-y-4">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-b-lg p-6 space-y-4">
+                <div class=\"border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4\">
+                    <div class=\"flex items-center justify-between mb-2\">
+                        <div class=\"text-xs font-semibold text-gray-600 dark:text-gray-300\">Cover Image</div>
+                        {cover_source_badge}
+                    </div>
+                    <p class=\"text-xs text-gray-500 dark:text-gray-400 mb-4\">Choose one option: upload your own file or search Open Library.</p>
+
+                    <div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\">
+                        <div class=\"border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/30\">
+                            <div class=\"flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3\">
+                                <svg data-lucide=\"upload\" class=\"w-4 h-4\"></svg>
+                                <span>Manual upload</span>
+                            </div>
+                            <form 
+                                hx-post=\"/library/ui/book/{book_id}/cover/upload\"
+                                hx-target=\"#cover-section\"
+                                hx-swap=\"outerHTML\"
+                                hx-encoding=\"multipart/form-data\"
+                                hx-indicator=\"#cover-upload-indicator\"
+                                class=\"flex flex-col items-center gap-3\">
+                                <input 
+                                    type=\"file\"
+                                    name=\"cover_file\"
+                                    accept=\"image/jpeg,image/png,image/webp\"
+                                    class=\"block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-gray-200\"
+                                    required>
+                                <button 
+                                    type=\"submit\"
+                                    class=\"w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors\">
+                                    Upload cover
+                                </button>
+                            </form>
+
+                            <div id=\"cover-upload-indicator\" class=\"htmx-indicator mt-3\">
+                                <div class=\"h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">
+                                    <div class=\"h-full bg-amber-600 animate-pulse\" style=\"width: 100%;\"></div>
+                                </div>
+                                <div class=\"text-xs text-gray-500 dark:text-gray-400 text-center mt-1\">Uploading...</div>
+                            </div>
+                        </div>
+
+                        <div class=\"border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/30\">
+                            <div class=\"flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3\">
+                                <svg data-lucide=\"search\" class=\"w-4 h-4\"></svg>
+                                <span>Search Open Library</span>
+                            </div>
+                            <form 
+                                hx-post=\"/library/ui/book/{book_id}/cover/search\"
+                                hx-target=\"#cover-search-results\"
+                                hx-swap=\"innerHTML\"
+                                class=\"flex flex-col items-center gap-3\">
+                                <input 
+                                    type=\"text\"
+                                    name=\"query\"
+                                    value=\"{escaped_title}\"
+                                    placeholder=\"Search by title or author\"
+                                    class=\"w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm\">
+                                <button 
+                                    type=\"submit\"
+                                    class=\"w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-colors\">
+                                    Find covers
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id=\"cover-search-results\" class=\"mt-4\"></div>
+
+                    <div id=\"cover-download-indicator\" class=\"htmx-indicator mt-4\">
+                        <div class=\"h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">
+                            <div class=\"h-full bg-emerald-600 animate-pulse\" style=\"width: 100%;\"></div>
+                        </div>
+                        <div class=\"text-xs text-gray-500 dark:text-gray-400 text-center mt-1\">Downloading cover...</div>
+                    </div>
+
+                    <form 
+                        hx-post=\"/library/ui/book/{book_id}/cover/delete\"
+                        hx-target=\"#cover-section\"
+                        hx-swap=\"outerHTML\"
+                        class=\"flex items-center justify-center mt-3\">
+                        <button 
+                            type=\"submit\"
+                            class=\"px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition-colors\">
+                            Remove cover
+                        </button>
+                    </form>
+                </div>
+                <form id="book-metadata-form" hx-post="/library/ui/book/{book_id}/edit" hx-target="#book-header" hx-swap="outerHTML" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Book Title</label>
                     <textarea 
@@ -411,10 +508,11 @@ async def ui_book_edit_form(
                         <div class="text-center text-xs text-gray-500 dark:text-gray-400 mt-1">Normally</div>
                     </div>
                 </div>
+                </form>
 
                 <!-- Action Buttons moved to header for consistency -->
             </div>
-        </form>
+        </div>
     </div>
     <script>
         (function() {{
@@ -626,16 +724,9 @@ async def ui_book_delete(
 
 
 def _render_cover_section(book: Book) -> HTMLResponse:
-    """Render the cover image section with upload and search controls."""
+    """Render the cover image display section only."""
     cover_url = book.cover_image_url or ""
     title_attr = html.escape(book.title, quote=True)
-    source_badge = ""
-    if book.cover_image_source:
-        source_badge = f"""
-            <span class=\"inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full\">
-                {html.escape(book.cover_image_source)}
-            </span>
-        """
 
     cover_display = f"""
         <div class=\"w-36 h-52 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center\">
@@ -648,84 +739,10 @@ def _render_cover_section(book: Book) -> HTMLResponse:
         </div>
     """
 
-    delete_button = ""
-    if cover_url:
-        delete_button = f"""
-            <form 
-                hx-post=\"/library/ui/book/{book.id}/cover/delete\"
-                hx-target=\"#cover-section\"
-                hx-swap=\"outerHTML\"
-                class=\"flex items-center justify-center\">
-                <button 
-                    type=\"submit\"
-                    class=\"px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition-colors\">
-                    Remove Cover
-                </button>
-            </form>
-        """
-
     html_content = f"""
     <div id=\"cover-section\" class=\"mb-10\">
         <div class=\"flex flex-col items-center gap-4\">
             {cover_display}
-            {source_badge}
-        </div>
-
-        <div class=\"mt-6 space-y-4\">
-            <form 
-                hx-post=\"/library/ui/book/{book.id}/cover/upload\"
-                hx-target=\"#cover-section\"
-                hx-swap=\"outerHTML\"
-                hx-encoding=\"multipart/form-data\"
-                hx-indicator=\"#cover-upload-indicator\"
-                class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">
-                <input 
-                    type=\"file\"
-                    name=\"cover_file\"
-                    accept=\"image/jpeg,image/png,image/webp\"
-                    class=\"block w-full sm:w-auto text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-gray-200\"
-                    required>
-                <button 
-                    type=\"submit\"
-                    class=\"px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors\">
-                    Upload Cover
-                </button>
-            </form>
-
-            <div id=\"cover-upload-indicator\" class=\"htmx-indicator\">
-                <div class=\"h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">
-                    <div class=\"h-full bg-amber-600 animate-pulse\" style=\"width: 100%;\"></div>
-                </div>
-                <div class=\"text-xs text-gray-500 dark:text-gray-400 text-center mt-1\">Uploading...</div>
-            </div>
-
-            <form 
-                hx-post=\"/library/ui/book/{book.id}/cover/search\"
-                hx-target=\"#cover-search-results\"
-                hx-swap=\"innerHTML\"
-                class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">
-                <input 
-                    type=\"text\"
-                    name=\"query\"
-                    value=\"{title_attr}\"
-                    placeholder=\"Search Open Library\"
-                    class=\"w-full sm:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm\">
-                <button 
-                    type=\"submit\"
-                    class=\"px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-colors\">
-                    Search Covers
-                </button>
-            </form>
-        </div>
-
-        <div id=\"cover-search-results\" class=\"mt-6\"></div>
-        {delete_button}
-
-        <div id=\"cover-download-indicator\" class=\"htmx-indicator mt-4\">
-            <div class=\"h-2 w-full max-w-xs mx-auto bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">
-                <div class=\"h-full bg-emerald-600 animate-pulse\" style=\"width: 100%;\"></div>
-            </div>
-            <div class=\"text-xs text-gray-500 dark:text-gray-400 text-center mt-1\">Downloading cover...</div>
         </div>
     </div>
     <script>

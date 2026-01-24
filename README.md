@@ -84,3 +84,4 @@ Nice to haves:
 - [X] Book import - The Book title should also be required column and the required boxes should not be red anymore if there is a selection made.
 restore highlights
 - [ ] Download theme, icons and fonts and serve them locally to reduce dependency on external sources.
+- [ ] Make sure it works well on mobile devices.
