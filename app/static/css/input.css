@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --border-color: #e5e7eb;
+  --highlight-bg: #f9fafb;
+  --header-border: #e5e7eb;
+  --link-color: #3b82f6;
+  --muted-text: #6b7280;
+  --success-bg: #d1fae5;
+  --success-border: #a7f3d0;
+  --success-text: #065f46;
+}
+
+[data-theme="dark"], .dark {
+  --bg-color: #111827;
+  --text-color: #f3f4f6;
+  --border-color: #374151;
+  --highlight-bg: #1f2937;
+  --header-border: #374151;
+  --link-color: #60a5fa;
+  --muted-text: #9ca3af;
+  --success-bg: #064e3b;
+  --success-border: #065f46;
+  --success-text: #a7f3d0;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] {
+    --bg-color: #111827;
+    --text-color: #f3f4f6;
+    --border-color: #374151;
+    --highlight-bg: #1f2937;
+    --header-border: #374151;
+    --link-color: #60a5fa;
+    --muted-text: #9ca3af;
+    --success-bg: #064e3b;
+    --success-border: #065f46;
+    --success-text: #a7f3d0;
+  }
+}
+
+body {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+.highlight-text {
+  font-family: 'Crimson Pro', Georgia, serif;
+}
+
+.title-font {
+  font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
+}

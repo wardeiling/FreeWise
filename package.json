@@ -1,0 +1,10 @@
+{
+  "name": "freewise",
+  "private": true,
+  "devDependencies": {
+    "tailwindcss": "^3.4.10"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i app/static/css/input.css -o app/static/css/tailwind.css --minify"
+  }
+}

@@ -5,19 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}FreeWise{% endblock %}</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/tailwind.css">
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Local JS -->
+    <script src="/static/vendor/htmx/htmx.min.js"></script>
+    <script src="/static/vendor/lucide/lucide.min.js"></script>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png">
@@ -25,90 +19,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
     <link rel="manifest" href="/static/favicons/site.webmanifest">
     
-    <script>
-        // Tailwind configuration
-        tailwind.config = {
-            darkMode: ['class', '[data-theme="dark"]'],
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
-                        serif: ['Crimson Pro', 'Georgia', 'serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
     <style>
-        /* Theme variables for compatibility with existing code */
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-            --highlight-bg: #f9fafb;
-            --header-border: #e5e7eb;
-            --link-color: #3b82f6;
-            --muted-text: #6b7280;
-            --success-bg: #d1fae5;
-            --success-border: #a7f3d0;
-            --success-text: #065f46;
-        }
-
-        [data-theme="dark"], .dark {
-            --bg-color: #111827;
-            --text-color: #f3f4f6;
-            --border-color: #374151;
-            --highlight-bg: #1f2937;
-            --header-border: #374151;
-            --link-color: #60a5fa;
-            --muted-text: #9ca3af;
-            --success-bg: #064e3b;
-            --success-border: #065f46;
-            --success-text: #a7f3d0;
-        }
-
-        /* Auto theme uses system preference */
-        @media (prefers-color-scheme: dark) {
-            [data-theme="auto"] {
-                --bg-color: #111827;
-                --text-color: #f3f4f6;
-                --border-color: #374151;
-                --highlight-bg: #1f2937;
-                --header-border: #374151;
-                --link-color: #60a5fa;
-                --muted-text: #9ca3af;
-                --success-bg: #064e3b;
-                --success-border: #065f46;
-                --success-text: #a7f3d0;
-            }
-        }
-        
         /* Apply dark class when theme is dark */
         [data-theme="dark"] {
             color-scheme: dark;
-        }
-        
-        /* Font families */
-        body {
-            font-family: 'Manrope', system-ui, -apple-system, sans-serif;
-        }
-        
-        .highlight-text {
-            font-family: 'Crimson Pro', Georgia, serif;
-        }
-
-        .title-font {
-            font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
         }
     </style>
 </head>
