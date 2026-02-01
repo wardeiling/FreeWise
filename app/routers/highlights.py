@@ -228,6 +228,11 @@ def get_review_highlights(
             return max(0.0, float(h.book.review_weight))
         return 1.0
 
+    def get_highlight_weight(h: Highlight) -> float:
+        if h.highlight_weight is not None:
+            return max(0.0, float(h.highlight_weight))
+        return 1.0
+
     def get_days_since(h: Highlight) -> float:
         anchor = h.last_reviewed_at or h.created_at
         if anchor is None:
@@ -242,7 +247,7 @@ def get_review_highlights(
     # Build candidate list with scores
     candidates = []
     for h in highlights:
-        weight = get_book_weight(h)
+        weight = get_book_weight(h) * get_highlight_weight(h)
         if weight <= 0.0:
             continue
         days = get_days_since(h)
@@ -483,6 +488,72 @@ async def ui_review_next(
             </a>
         </div>
     """)
+
+
+@router.get("/{id}/weight/options", response_class=HTMLResponse)
+async def ui_highlight_weight_options(
+    request: Request,
+    id: int,
+    session: Session = Depends(get_session)
+):
+    """Render weight feedback options for a highlight in review."""
+    highlight = session.get(Highlight, id)
+    if not highlight:
+        raise HTTPException(status_code=404, detail="Highlight not found")
+
+    current_weight = highlight.highlight_weight if highlight.highlight_weight is not None else 1.0
+
+    options = [
+        (0.25, "Much less"),
+        (0.5, "Less"),
+        (1.0, "Normal"),
+        (1.5, "More"),
+        (2.0, "Much more"),
+    ]
+
+    buttons_html = ""
+    for value, label in options:
+        active_class = "bg-primary-600 text-white border-primary-600" if abs(current_weight - value) < 0.01 else "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600"
+        buttons_html += f"""
+        <button
+            class=\"px-3 py-2 rounded-md border text-xs font-medium transition-colors {active_class}\"
+            hx-post=\"/highlights/{id}/weight\"
+            hx-vals='{{"weight": "{value}", "context": "review"}}'
+            hx-target=\"#review-weight-controls\"
+            hx-swap=\"innerHTML\">{label}</button>
+        """
+
+    html_content = f"""
+    <div class=\"flex flex-wrap justify-center gap-2\">{buttons_html}</div>
+    <div class=\"mt-2 text-xs text-gray-500 dark:text-gray-400 text-center\">How often should this highlight appear?</div>
+    """
+
+    return HTMLResponse(content=html_content)
+
+
+@router.post("/{id}/weight", response_class=HTMLResponse)
+async def ui_highlight_weight_update(
+    request: Request,
+    id: int,
+    weight: float = Form(...),
+    context: Optional[str] = Form(None),
+    session: Session = Depends(get_session)
+):
+    """Update highlight weight and return updated feedback UI."""
+    highlight = session.get(Highlight, id)
+    if not highlight:
+        raise HTTPException(status_code=404, detail="Highlight not found")
+
+    clamped = min(2.0, max(0.0, float(weight)))
+    highlight.highlight_weight = clamped
+    session.add(highlight)
+    session.commit()
+    session.refresh(highlight)
+
+    if context == "review":
+        return await ui_highlight_weight_options(request, id, session)
+
+    return HTMLResponse(content="")
 
 
 @router.get("/ui/favorites", response_class=HTMLResponse)

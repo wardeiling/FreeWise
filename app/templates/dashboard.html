@@ -82,13 +82,11 @@
 </div>
 {% endif %}
 
+<!-- Review Activity Heatmap -->
+{% if review_heatmap_data %}
 <p class="text-gray-600 dark:text-gray-400 mb-6">
     Overview of your review activity.
 </p>
-
-
-<!-- Review Activity Heatmap -->
-{% if review_heatmap_data %}
 <div class="mb-10 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
         <i data-lucide="target" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
@@ -148,7 +146,6 @@
 <p class="text-gray-600 dark:text-gray-400 mb-6">
     Overview of your reading highlights and collection.
 </p>
-
 
 <!-- Highlights Activity Heatmap -->
 {% if heatmap_data and heatmap_data|length > 0 %}

@@ -52,6 +52,7 @@ class Highlight(SQLModel, table=True):
     next_review: Optional[datetime] = Field(default=None, index=True)
     last_reviewed_at: Optional[datetime] = Field(default=None, index=True)
     review_count: int = Field(default=0)
+    highlight_weight: float = Field(default=1.0, index=True)  # 0.0 (Never) to 2.0 (More)
     user_id: int = Field(foreign_key="user.id", index=True)
     book: Optional["Book"] = Relationship(back_populates="highlights")
     

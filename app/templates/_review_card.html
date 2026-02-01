@@ -85,6 +85,21 @@
             <span class="mt-3 text-base font-semibold text-gray-900 dark:text-white">Discard</span>
         </button>
 
+        <!-- Review Frequency Button -->
+        <div class="flex flex-col items-center">
+            <button 
+                class="flex flex-col items-center group"
+                hx-get="/highlights/{{ highlight.id }}/weight/options"
+                hx-target="#review-weight-controls"
+                hx-swap="innerHTML">
+                <div class="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/30 group-hover:scale-110 transition-all border-2 border-blue-300 dark:border-blue-700 group-hover:border-blue-400 dark:group-hover:border-blue-600">
+                    <i data-lucide="sliders" class="w-10 h-10 text-blue-600 dark:text-blue-500"></i>
+                </div>
+                <span class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Review Frequency</span>
+            </button>
+            <div id="review-weight-controls" class="mt-3"></div>
+        </div>
+
         <!-- Done Button -->
         <button 
             class="flex flex-col items-center group"
