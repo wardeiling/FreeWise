@@ -1,57 +1,63 @@
-{% extends "base.html" %}
-
-{% block title %}Discarded - FreeWise{% endblock %}
-
-{% block heading %}{% endblock %}
-
-{% block content %}
-<!-- Discarded Header -->
-<div class="text-center mb-8 p-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-    <div class="flex items-center justify-center gap-3 mb-4">
-        <i data-lucide="trash-2" class="w-8 h-8 text-gray-500 dark:text-gray-400"></i>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            Discarded Highlights
-        </h1>
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ settings.theme if settings else 'light' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discarded - FreeWise</title>
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+    <script src="/static/vendor/htmx/htmx.min.js"></script>
+    <script src="/static/vendor/lucide/lucide.min.js"></script>
+    <style>
+        .title-font { font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif; }
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="absolute top-6 left-6 z-10">
+        <a href="/dashboard/ui" class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            <span class="text-sm font-medium">Dashboard</span>
+        </a>
     </div>
-    
-    <div class="text-lg text-gray-600 dark:text-gray-400 mb-4">
-        Highlights you've marked as discarded
-    </div>
-    
-    <div class="text-sm text-gray-500 dark:text-gray-400">
-        <span class="font-semibold">{{ highlights|length }}</span> discarded highlight{{ 's' if highlights|length != 1 else '' }}
-    </div>
-</div>
 
-<!-- Highlights List -->
-<div id="highlights-container">
-    {% if highlights %}
-        <div class="space-y-4 opacity-75">
-            {% for highlight in highlights %}
-                {% include "_highlight_row.html" %}
-            {% endfor %}
-        </div>
-    {% else %}
-        <!-- Empty State -->
-        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
-            <i data-lucide="trash-2" class="w-20 h-20 mx-auto mb-6 text-gray-300 dark:text-gray-600"></i>
-            <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">No Discarded Highlights</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-                Highlights you discard will appear here.
+    <div class="max-w-2xl mx-auto px-4 py-20">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 title-font">Discarded Highlights</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-2">Highlights you've marked as discarded</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                <span class="font-semibold">{{ highlights|length }}</span> discarded highlight{{ 's' if highlights|length != 1 else '' }}
             </p>
-            <a href="/highlights/ui/review" 
-               class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors">
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                <span>Start Reviewing Highlights</span>
-            </a>
         </div>
-    {% endif %}
-</div>
 
-<div class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
-    <a href="/" class="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        <span>Back to Dashboard</span>
-    </a>
-</div>
-{% endblock %}
+        <div id="highlights-container">
+            {% if highlights %}
+                <div class="space-y-4 opacity-75">
+                    {% for highlight in highlights %}
+                        {% include "_highlight_row.html" %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                    <i data-lucide="trash-2" class="w-20 h-20 mx-auto mb-6 text-gray-300 dark:text-gray-600"></i>
+                    <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">No Discarded Highlights</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">Highlights you discard will appear here.</p>
+                    <a href="/highlights/ui/review" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Start Reviewing Highlights</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function initLucideIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initLucideIcons);
+        else initLucideIcons();
+        document.addEventListener('htmx:afterSwap', initLucideIcons);
+        document.addEventListener('htmx:afterSettle', initLucideIcons);
+    </script>
+</body>
+</html>

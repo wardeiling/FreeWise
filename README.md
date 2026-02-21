@@ -90,3 +90,4 @@ restore highlights
 - [ ] Turn it into a web-app installable through browser (e.g., safari to iPhone or chrome to computer)
 - [ ] For import allow "Diagnostic mode" to be turned off, with a simple switch, speeding up import.
 - [ ] Make daily review text and icons smaller in general, but also resize if there is a lot of text (also for mobile).
+- [ ] Make the aestethics of the discarded and favorited pages consistent with the book page: (1) do not show header with links, but instead a back button at top left with text "Dashboard" (2) Use the same font and font size for book titles (and remove the box around it).
