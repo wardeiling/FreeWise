@@ -78,7 +78,6 @@ class Settings(SQLModel, table=True):
     """Application settings for customizing behavior."""
     id: Optional[int] = Field(default=None, primary_key=True)
     daily_review_count: int = Field(default=5)
-    default_sort: str = Field(default="next_review")
     theme: str = Field(default="light")
     
     def __repr__(self) -> str:

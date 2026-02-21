@@ -1,13 +1,12 @@
 import os
 from contextlib import asynccontextmanager
-from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.db import get_engine, get_settings
-from app.models import SQLModel, Settings
+from app.models import SQLModel
 from app.routers import highlights, settings, importer, library, dashboard, export
 
 @asynccontextmanager
@@ -20,14 +19,9 @@ async def lifespan(app: FastAPI):
     SQLModel.metadata.create_all(engine)
     
     # Initialize default settings if not exists
-    from sqlmodel import Session, select
+    from sqlmodel import Session
     with Session(engine) as session:
-        statement = select(Settings)
-        existing_settings = session.exec(statement).first()
-        if not existing_settings:
-            default_settings = Settings()
-            session.add(default_settings)
-            session.commit()
+        get_settings(session)
     
     yield
 
