@@ -444,22 +444,8 @@ async def ui_review_next(
                 "total": len(highlight_ids)
             })
     
-    # Fallback: No valid session, show completion
-    return HTMLResponse(content="""
-        <div class="text-center">
-            <div class="mb-6">
-                <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500"></i>
-            </div>
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Session Expired</h2>
-            <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
-                Your review session has expired. Please start a new review.
-            </p>
-            <a href="/highlights/ui/review?reset=true" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
-                <i data-lucide="refresh-cw" class="w-6 h-6"></i>
-                <span>Start New Review</span>
-            </a>
-        </div>
-    """)
+    # Fallback: No valid session, show expiry message
+    return templates.TemplateResponse("_session_expired.html", {"request": request})
 
 
 @router.get("/{id}/weight/options", response_class=HTMLResponse)
@@ -473,34 +459,10 @@ async def ui_highlight_weight_options(
     if not highlight:
         raise HTTPException(status_code=404, detail="Highlight not found")
 
-    current_weight = highlight.highlight_weight if highlight.highlight_weight is not None else 1.0
-
-    options = [
-        (0.25, "Much less"),
-        (0.5, "Less"),
-        (1.0, "Normal"),
-        (1.5, "More"),
-        (2.0, "Much more"),
-    ]
-
-    buttons_html = ""
-    for value, label in options:
-        active_class = "bg-primary-600 text-white border-primary-600" if abs(current_weight - value) < 0.01 else "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600"
-        buttons_html += f"""
-        <button
-            class=\"px-3 py-2 rounded-md border text-xs font-medium transition-colors {active_class}\"
-            hx-post=\"/highlights/{id}/weight\"
-            hx-vals='{{"weight": "{value}", "context": "review"}}'
-            hx-target=\"#review-weight-controls\"
-            hx-swap=\"innerHTML\">{label}</button>
-        """
-
-    html_content = f"""
-    <div class=\"flex flex-wrap justify-center gap-2\">{buttons_html}</div>
-    <div class=\"mt-2 text-xs text-gray-500 dark:text-gray-400 text-center\">How often should this highlight appear?</div>
-    """
-
-    return HTMLResponse(content=html_content)
+    return templates.TemplateResponse("_weight_options.html", {
+        "request": request,
+        "highlight": highlight,
+    })
 
 
 @router.post("/{id}/weight", response_class=HTMLResponse)

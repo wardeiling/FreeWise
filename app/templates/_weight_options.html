@@ -1,0 +1,20 @@
+<!-- Weight Options for a Highlight in Review -->
+<div class="flex flex-wrap justify-center gap-2">
+    {% set options = [
+        (0.25, "Much less"),
+        (0.5, "Less"),
+        (1.0, "Normal"),
+        (1.5, "More"),
+        (2.0, "Much more")
+    ] %}
+    {% set current_weight = highlight.highlight_weight if highlight.highlight_weight is not none else 1.0 %}
+    {% for value, label in options %}
+    <button
+        class="px-3 py-2 rounded-md border text-xs font-medium transition-colors {% if (current_weight - value)|abs < 0.01 %}bg-primary-600 text-white border-primary-600{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600{% endif %}"
+        hx-post="/highlights/{{ highlight.id }}/weight"
+        hx-vals='{"weight": "{{ value }}", "context": "review"}'
+        hx-target="#review-weight-controls"
+        hx-swap="innerHTML">{{ label }}</button>
+    {% endfor %}
+</div>
+<div class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">How often should this highlight appear?</div>
