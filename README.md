@@ -94,3 +94,4 @@ restore highlights
 - [ ] Make daily review text and icons smaller in general, but also resize if there is a lot of text (also for mobile).
 - [X] Make the aestethics of the discarded and favorited pages consistent with the book page: (1) do not show header with links, but instead a back button at top left with text "Dashboard" (2) Use the same font and font size for book titles (and remove the box around it).
 - [X] Fix error daily review.
+For the daily review cards, sometimes the highlights and/or comments are very long, forcing users to have to scroll. Please dynamically adjust the size of the "highlight and comment text to compensate for this, when reaching the maximum vertical height.

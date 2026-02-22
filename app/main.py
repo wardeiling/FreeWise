@@ -41,6 +41,20 @@ app.include_router(library.router)
 app.include_router(export.router)
 
 
+@app.get("/sw.js")
+async def service_worker():
+    """Serve the PWA service worker from root scope."""
+    from fastapi.responses import FileResponse
+    return FileResponse("app/static/sw.js", media_type="application/javascript")
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve favicon from root path (browsers always request it here)."""
+    from fastapi.responses import FileResponse
+    return FileResponse("app/static/favicons/favicon.ico", media_type="image/x-icon")
+
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     """Root endpoint redirects to dashboard."""
