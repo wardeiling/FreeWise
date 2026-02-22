@@ -80,12 +80,11 @@ Nice to haves:
 - [ ] Sort higlights in favorite and discarded by the date they were favorited/discarded (more recent up top)
 - [ ] Daily Review page
     - [X] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight. This should link to a variable that gives a weight to the highlight (low or high) that influences how often it is shown in future reviews.
-        - [ ] Also add this button on the highlight edit box used for the book detail page, favorite page, and discard page; and show the current state too (with number or slider).
+        - [ ] Similar to how there is a feedback button of higlight frequency on the daily review cards, with a weight, add a feedback this button on the highlight edit box used for the book detail page, favorite page, and discard page; and show the current weight state too (with number or slider).
     - [X] Add cover image to higlights shown in daily review.
 - [X] Book import - The Book title should also be required column and the required boxes should not be red anymore if there is a selection made.
 restore highlights
 - [X] Download theme, icons and fonts and serve them locally to reduce dependency on external sources.
-- [ ] Make sure it works well on mobile devices.
 - [X] Fix dark mode dashboard
     - [ ] heatmaps 
     - [X] colored text of "Discarded" and "Favorites" should be black
@@ -95,7 +94,9 @@ restore highlights
 - [X] Make the aestethics of the discarded and favorited pages consistent with the book page: (1) do not show header with links, but instead a back button at top left with text "Dashboard" (2) Use the same font and font size for book titles (and remove the box around it).
 - [X] Fix error daily review.
 For the daily review cards, sometimes the highlights and/or comments are very long, forcing users to have to scroll. Please dynamically adjust the size of the "highlight and comment text to compensate for this, when reaching the maximum vertical height.
-- [ ] For the settings page, change the "Daily Review Count" part from a text box into a slider, from 1-15; in this same box also add a Highlight Recency slider with at the left extreme older and at the right newer, for which should also be a variable created for our model that determines which entries are shown on daily review. Also add a complete reset of library button that resets the entire database, with a danger field.
+- [X] For the settings page, change the "Daily Review Count" part from a text box into a slider, from 1-15; in this same box also add a Highlight Recency slider with at the left extreme older and at the right newer, for which should also be a variable created for our model that determines which entries are shown on daily review. 
+- [ ] Add a complete reset of library button to the settings page that resets/deletes the entire database, with a danger field, saying something like that there is no going back and that everything will be permanently deleted. This should
 - [ ] Add a thunderbolt symbol to the top right of the pages with the navigation header, which should be filled in with gold/orange/yellow (whatever is best) if there is at least a one day streak. And if the streak is multiple days, there should be a number to its right indicating the length of the streak in days.
 - [ ] The main pages: dashboard, settings, library, import should all be wider when used for desktop screens (e.g., 1920x0180) to utilize more of the space available.
-- [ ] Test all functionalities of the recommendation algorithm using diagnostic tests
+- [X] Test all functionalities of the recommendation algorithm using diagnostic tests
+- [ ] Make sure it works well on mobile devices.
