@@ -59,3 +59,23 @@ async def update_settings_ui(
         "highlights_count": highlights_count,
         "success_message": "Settings saved successfully!"
     })
+
+
+@router.post("/reset-library", response_class=HTMLResponse)
+async def reset_library(request: Request):
+    """Permanently drop and recreate every table, then reinitialise default settings."""
+    from sqlmodel import SQLModel, Session
+    from app.db import get_engine
+
+    engine = get_engine()
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
+
+    with Session(engine) as s:
+        fresh_settings = get_settings(s)
+        return templates.TemplateResponse("settings.html", {
+            "request": request,
+            "settings": fresh_settings,
+            "highlights_count": 0,
+            "success_message": "Library reset — all data has been permanently deleted and settings restored to defaults."
+        })

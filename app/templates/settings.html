@@ -198,6 +198,75 @@
     </div>
 </div>
 
+<!-- Danger Zone Section -->
+<div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Danger Zone</h3>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-red-200 dark:border-red-800 p-8">
+        <div class="flex items-start gap-4 mb-6">
+            <div class="pt-1">
+                <i data-lucide="trash-2" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+            </div>
+            <div class="flex-1">
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Reset Entire Library
+                </h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    Permanently erase all highlights, books, tags, and review history.
+                    Application settings will also be reset to their defaults.
+                </p>
+
+                <button type="button"
+                    onclick="document.getElementById('reset-modal').classList.remove('hidden')"
+                    class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-md">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    <span>Reset Library</span>
+                </button>
+
+                <div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p class="text-xs text-red-700 dark:text-red-300 flex items-start gap-2">
+                        <i data-lucide="triangle-alert" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                        <span><strong>Warning:</strong> There is no going back. All highlights, books, tags, review history, and settings will be permanently and irreversibly deleted from the database.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Confirmation Modal -->
+<div id="reset-modal"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+     onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-red-200 dark:border-red-800 p-8 max-w-md w-full mx-4 shadow-xl">
+        <div class="flex items-start gap-4 mb-6">
+            <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-full flex-shrink-0">
+                <i data-lucide="triangle-alert" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Are you absolutely sure?</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    This will permanently delete <strong>all highlights, books, tags, and review history</strong>.
+                    There is no going back and no way to recover your data.
+                </p>
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end">
+            <button type="button"
+                onclick="document.getElementById('reset-modal').classList.add('hidden')"
+                class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium text-sm transition-colors">
+                Cancel
+            </button>
+            <form method="post" action="/settings/reset-library" class="inline">
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition-colors">
+                    Yes, delete everything
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function showExportProgress(event) {
         // Don't prevent default - let the download happen

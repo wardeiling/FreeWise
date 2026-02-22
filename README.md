@@ -100,3 +100,4 @@ For the daily review cards, sometimes the highlights and/or comments are very lo
 - [ ] The main pages: dashboard, settings, library, import should all be wider when used for desktop screens (e.g., 1920x0180) to utilize more of the space available.
 - [X] Test all functionalities of the recommendation algorithm using diagnostic tests
 - [ ] Make sure it works well on mobile devices.
+- [ ] Turn this application into a Dockerfile and docker-compose.yml
