@@ -95,7 +95,7 @@ restore highlights
 - [X] Fix error daily review.
 For the daily review cards, sometimes the highlights and/or comments are very long, forcing users to have to scroll. Please dynamically adjust the size of the "highlight and comment text to compensate for this, when reaching the maximum vertical height.
 - [X] For the settings page, change the "Daily Review Count" part from a text box into a slider, from 1-15; in this same box also add a Highlight Recency slider with at the left extreme older and at the right newer, for which should also be a variable created for our model that determines which entries are shown on daily review. 
-- [ ] At the bottom of the setttings tab, add a complete reset of library button to the settings page that resets/deletes the entire database, with a danger field, saying something like that there is no going back and that everything will be permanently deleted. This should
+- [X] At the bottom of the setttings tab, add a complete reset of library button to the settings page that resets/deletes the entire database, with a danger field, saying something like that there is no going back and that everything will be permanently deleted. This should
 - [ ] Add a thunderbolt symbol to the top right of the pages with the navigation header, which should be filled in with gold/orange/yellow (whatever is best) if there is at least a one day streak. And if the streak is multiple days, there should be a number to its right indicating the length of the streak in days.
 - [ ] The main pages: dashboard, settings, library, import should all be wider when used for desktop screens (e.g., 1920x0180) to utilize more of the space available.
 - [X] Test all functionalities of the recommendation algorithm using diagnostic tests
