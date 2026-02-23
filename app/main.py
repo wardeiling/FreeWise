@@ -63,9 +63,16 @@ app.include_router(export.router)
 
 @app.get("/sw.js")
 async def service_worker():
-    """Serve the PWA service worker from root scope."""
+    """Serve the PWA service worker from root scope.
+    
+    Must be served with Cache-Control: no-store so browsers always fetch the
+    latest version — otherwise SW updates are silently skipped for hours.
+    """
     from fastapi.responses import FileResponse
-    return FileResponse("app/static/sw.js", media_type="application/javascript")
+    from fastapi import Response
+    response = FileResponse("app/static/sw.js", media_type="application/javascript")
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.get("/favicon.ico")
