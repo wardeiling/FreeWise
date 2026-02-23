@@ -23,7 +23,7 @@
                         {% endif %}
                     </a>
                 </th>
-                <th class="px-4 py-3 text-left w-48">
+                <th class="hidden sm:table-cell px-4 py-3 text-left w-48">
                     <a href="/library/ui?sort=author&order={{ 'desc' if current_sort == 'author' and current_order == 'asc' else 'asc' }}" 
                        class="flex items-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                         <span>Author</span>
@@ -35,13 +35,14 @@
                 <th class="px-4 py-3 text-center w-32">
                     <a href="/library/ui?sort=highlight_count&order={{ 'desc' if current_sort == 'highlight_count' and current_order == 'asc' else 'asc' }}" 
                        class="flex items-center justify-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                        <span>Highlights</span>
+                        <span class="hidden sm:inline">Highlights</span>
+                        <i data-lucide="book-open" class="w-4 h-4 sm:hidden"></i>
                         {% if current_sort == 'highlight_count' %}
                             <i data-lucide="{{ 'chevron-down' if current_order == 'desc' else 'chevron-up' }}" class="w-4 h-4"></i>
                         {% endif %}
                     </a>
                 </th>
-                <th class="px-4 py-3 text-center w-40">
+                <th class="hidden sm:table-cell px-4 py-3 text-center w-40">
                     <a href="/library/ui?sort=last_highlight&order={{ 'desc' if current_sort == 'last_highlight' and current_order == 'asc' else 'asc' }}" 
                        class="flex items-center justify-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                        title="Last Highlighted At">
@@ -60,6 +61,9 @@
                     <a href="/library/ui/book/{{ book.id }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors">
                         {{ book.title }}
                     </a>
+                    {% if book.author %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 sm:hidden">{{ book.author }}</p>
+                    {% endif %}
                     {% if book.document_tags %}
                     <div class="flex flex-wrap gap-1 mt-1">
                         {% for tag in book.document_tags.split(',') %}
@@ -71,7 +75,7 @@
                     </div>
                     {% endif %}
                 </td>
-                <td class="px-4 py-3 text-gray-600 dark:text-gray-400 w-48">
+                <td class="hidden sm:table-cell px-4 py-3 text-gray-600 dark:text-gray-400 w-48">
                     {{ book.author }}
                 </td>
                 <td class="px-4 py-3 text-center w-32">
@@ -79,7 +83,7 @@
                         {{ book.highlight_count }}
                     </span>
                 </td>
-                <td class="px-4 py-3 text-center w-40">
+                <td class="hidden sm:table-cell px-4 py-3 text-center w-40">
                     {% if book.last_highlight_date %}
                         <span class="text-gray-500 dark:text-gray-400 text-sm">
                             {{ book.last_highlight_date.strftime('%Y-%m-%d') }}
