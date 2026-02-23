@@ -54,3 +54,11 @@ body {
 .title-font {
   font-family: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
 }
+
+/* ── Custom component overrides ─────────────────────────────────────────────
+   Add hand-written rules here when Tailwind utilities are insufficient.
+   Run `npm run build:css` after any changes to this file or to templates.
+   Use @layer to keep specificity predictable:
+     @layer components { .my-class { ... } }
+     @layer utilities  { .my-utility { ... } }
+   ─────────────────────────────────────────────────────────────────────────── */

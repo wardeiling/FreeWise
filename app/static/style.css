@@ -1,9 +1,5 @@
-/* FreeWise Styles — custom overrides loaded after tailwind.css in base.html */
-body {
-    font-family: system-ui, -apple-system, sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    line-height: 1.6;
-}
+/* FreeWise — custom CSS overrides.
+   Add rules here if Tailwind utility classes are insufficient.
+   After adding new Tailwind classes to templates, run: npm run build:css
+*/
 

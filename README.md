@@ -101,3 +101,9 @@ For the daily review cards, sometimes the highlights and/or comments are very lo
 - [X] Test all functionalities of the recommendation algorithm using diagnostic tests
 - [ ] Make sure it works well on mobile devices.
 - [ ] Turn this application into a Dockerfile and docker-compose.yml
+- [ ] Design a whole suite of tests, to test all important fuctionalities of this web app in a rigorous manner, allowing for automatic checking with a "checkmark"/pass upon success on GitHub.
+
+Upcoming:
+
+- [ ] Enable daily email notifications with X number of highlights.
+- [ ] Enable more types of import.
