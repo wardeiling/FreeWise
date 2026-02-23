@@ -4,8 +4,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlmodel import Session
 
-from app.db import get_engine, get_settings
+from app.db import get_engine, get_settings, get_current_streak
 from app.models import SQLModel
 from app.routers import highlights, settings, importer, library, dashboard, export
 
@@ -27,6 +28,25 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="FreeWise", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def inject_streak(request: Request, call_next):
+    """Attach the current review streak to request.state for every rendered page.
+
+    Skips static assets and the service worker to avoid unnecessary DB queries.
+    The value is always set (defaults to 0) so templates can rely on it.
+    """
+    request.state.streak = 0
+    path = request.url.path
+    if not path.startswith("/static") and path not in ("/sw.js", "/favicon.ico"):
+        try:
+            with Session(get_engine()) as s:
+                request.state.streak = get_current_streak(s)
+        except Exception:
+            pass
+    return await call_next(request)
+
 
 # Setup templates and static files
 templates = Jinja2Templates(directory="app/templates")

@@ -77,8 +77,7 @@ Nice to haves:
 - [X] Investigate the logic and and scripts one by one to see whether there are any optimizations possible to reduce code redundancy and improve efficiency.
 - [X] Also show page numbers for favorite and discarded html views.
 - [X] Think about how to best order higlights in book view (e.g., by date added, by location in book, by favorite status)
-- [ ] Sort higlights in favorite and discarded by the date they were favorited/discarded (more recent up top)
-- [ ] Daily Review page
+- [X] Daily Review page
     - [X] Add feedback button in between "Discard " and "Done" buttons to allow users to provide feedback on how often they would like to see this higlight. This should link to a variable that gives a weight to the highlight (low or high) that influences how often it is shown in future reviews.
         - [X] Similar to how there is a feedback button of higlight frequency on the daily review cards, with a weight, add a feedback this button on the highlight edit box used for the book detail page, favorite page, and discard page; and show the current weight state too.
     - [X] Add cover image to higlights shown in daily review.
@@ -96,14 +95,16 @@ restore highlights
 For the daily review cards, sometimes the highlights and/or comments are very long, forcing users to have to scroll. Please dynamically adjust the size of the "highlight and comment text to compensate for this, when reaching the maximum vertical height.
 - [X] For the settings page, change the "Daily Review Count" part from a text box into a slider, from 1-15; in this same box also add a Highlight Recency slider with at the left extreme older and at the right newer, for which should also be a variable created for our model that determines which entries are shown on daily review. 
 - [X] At the bottom of the setttings tab, add a complete reset of library button to the settings page that resets/deletes the entire database, with a danger field, saying something like that there is no going back and that everything will be permanently deleted. This should
-- [ ] Add a thunderbolt symbol to the top right of the pages with the navigation header, which should be filled in with gold/orange/yellow (whatever is best) if there is at least a one day streak. And if the streak is multiple days, there should be a number to its right indicating the length of the streak in days.
-- [ ] The main pages: dashboard, settings, library, import should all be wider when used for desktop screens (e.g., 1920x0180) to utilize more of the space available.
+- [X] Add a thunderbolt symbol to the top right of the pages with the navigation header, which should be filled in with gold/orange/yellow (whatever is best) if there is at least a one day streak. And if the streak is multiple days, there should be a number to its right indicating the length of the streak in days.
 - [X] Test all functionalities of the recommendation algorithm using diagnostic tests
 - [ ] Make sure it works well on mobile devices.
 - [ ] Turn this application into a Dockerfile and docker-compose.yml
 - [ ] Design a whole suite of tests, to test all important fuctionalities of this web app in a rigorous manner, allowing for automatic checking with a "checkmark"/pass upon success on GitHub.
 
-Upcoming:
+Upcoming Features:
 
+- [ ] Fix dark mode on the heatmaps displayed on the dashboard page, which currently shows a bright white background not designed with tailwind styling in mind.
+- [ ] Enable different kinds of sorting of highlights on the book page, discarded page and favorited pages, including by page number (if these exist), by date of created, data of last modified (e.g., favorited, edited text, etc.)
 - [ ] Enable daily email notifications with X number of highlights.
 - [ ] Enable more types of import.
+- [ ] Utilize more of the horizontal space available for screens with landscape orientation (e.g., monitors, tv's, tablets) for The main pages: dashboard, library, import and settings.
