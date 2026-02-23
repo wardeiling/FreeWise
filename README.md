@@ -33,6 +33,7 @@ The application will be available at http://localhost:8000
 ## To-Do
 
 - [X] Make sure it works well on mobile devices (e.g., Library page).
+- [ ] Create import option from Meebook e-reader.
 - [ ] Fix dark mode on the heatmaps displayed on the dashboard page, which currently shows a bright white background not designed with tailwind styling in mind.
 - [ ] Turn this application into a Dockerfile and docker-compose.yml
 - [ ] Design a whole suite of tests, to test all important fuctionalities of this web app in a rigorous manner, allowing for automatic checking with a "checkmark"/pass upon success on GitHub.
