@@ -67,18 +67,17 @@
   }
 }
 
-/* ── Mobile-first font scaling ─────────────────────────────────────────────
-   Tailwind uses rem throughout, so reducing the root font-size proportionally
-   shrinks all text, padding, and spacing on small screens without touching
-   individual templates.
-   16px (default) on sm+ screens, 14px on phones. ─────────────────────────── */
+/* Responsive root font-size: shrinks all rem-based Tailwind utilities on
+   smaller viewports so the UI feels proportional on mobile.
+   Mobile (<640px): 14px  |  sm (640-767px): 15px  |  md+ (≥768px): 16px */
 html {
   font-size: 14px;
 }
 @media (min-width: 640px) {
-  html {
-    font-size: 16px;
-  }
+  html { font-size: 15px; }
+}
+@media (min-width: 768px) {
+  html { font-size: 16px; }
 }
 
 body {

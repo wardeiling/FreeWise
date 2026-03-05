@@ -8,11 +8,11 @@
 <!-- Daily Review Call-to-Action -->
 {% if total_highlights == 0 %}
 <div class="mb-8">
-    <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-10 text-center shadow-xl border border-amber-700/30">
+    <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-6 sm:p-10 text-center shadow-xl border border-amber-700/30">
         <div class="flex justify-center mb-4">
             <i data-lucide="book-open" class="w-16 h-16 text-amber-200"></i>
         </div>
-        <h2 class="text-3xl font-semibold mb-3 text-amber-50">
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-3 text-amber-50">
             No Highlights Available
         </h2>
         <p class="text-lg mb-6 text-amber-100/90">
@@ -26,11 +26,11 @@
 </div>
 {% elif active_highlights < daily_review_count and not reviewed_today %}
 <div class="mb-8">
-    <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-10 text-center shadow-xl border border-amber-700/30">
+    <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-6 sm:p-10 text-center shadow-xl border border-amber-700/30">
         <div class="flex justify-center mb-4">
             <i data-lucide="zap" class="w-16 h-16 text-amber-200"></i>
         </div>
-        <h2 class="text-3xl font-semibold mb-3 text-amber-50">
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-3 text-amber-50">
             Only {{ active_highlights }} Highlight{{ 's' if active_highlights != 1 else '' }} Available
         </h2>
         <p class="text-lg mb-6 text-amber-100/90">
@@ -51,11 +51,11 @@
 {% elif not reviewed_today %}
 <div class="mb-8">
     <a href="/highlights/ui/review" class="block no-underline">
-        <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-10 text-center shadow-xl border border-amber-700/30 hover:-translate-y-1 hover:shadow-2xl transition-all cursor-pointer">
+        <div class="bg-gradient-to-br from-yellow-400 to-amber-800 text-amber-50 rounded-2xl p-6 sm:p-10 text-center shadow-xl border border-amber-700/30 hover:-translate-y-1 hover:shadow-2xl transition-all cursor-pointer">
             <div class="flex justify-center mb-4">
                 <i data-lucide="book-open" class="w-16 h-16 text-amber-200"></i>
             </div>
-            <h2 class="text-3xl font-semibold mb-3 text-amber-50">
+            <h2 class="text-2xl sm:text-3xl font-semibold mb-3 text-amber-50">
                 Start Your Daily Review
             </h2>
             <p class="text-xl text-amber-100/90">
@@ -65,11 +65,11 @@
     </a>
 </div>
 {% else %}
-<div class="mb-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 border-emerald-700 dark:border-emerald-800 rounded-2xl p-8 text-center shadow-lg">
+<div class="mb-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 border-emerald-700 dark:border-emerald-800 rounded-2xl p-5 sm:p-8 text-center shadow-lg">
     <div class="flex justify-center mb-4">
         <i data-lucide="check-circle" class="w-16 h-16 text-emerald-700 dark:text-emerald-600"></i>
     </div>
-    <h2 class="text-3xl font-bold text-emerald-900 dark:text-emerald-100 mb-2">
+    <h2 class="text-2xl sm:text-3xl font-bold text-emerald-900 dark:text-emerald-100 mb-2">
         Great Job!
     </h2>
     <p class="text-emerald-800 dark:text-emerald-300 text-lg mb-6">
@@ -114,7 +114,7 @@
         <div class="flex justify-center mb-4">
             <i data-lucide="zap" class="w-12 h-12 text-emerald-600 dark:text-emerald-400"></i>
         </div>
-        <div class="text-5xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">
+        <div class="text-4xl sm:text-5xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">
             {{ current_streak }}
         </div>
         <div class="text-emerald-800 dark:text-emerald-300 text-lg font-semibold">
@@ -130,7 +130,7 @@
         <div class="flex justify-center mb-4">
             <i data-lucide="trophy" class="w-12 h-12 text-amber-600 dark:text-amber-400"></i>
         </div>
-        <div class="text-5xl font-bold text-amber-700 dark:text-amber-400 mb-2">
+        <div class="text-4xl sm:text-5xl font-bold text-amber-700 dark:text-amber-400 mb-2">
             {{ longest_streak }}
         </div>
         <div class="text-amber-800 dark:text-amber-300 text-lg font-semibold">
@@ -179,7 +179,7 @@
             <div class="flex justify-center mb-3">
                 <i data-lucide="book" class="w-12 h-12 text-amber-800 dark:text-amber-600"></i>
             </div>
-            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <div class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_books }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -194,7 +194,7 @@
             <div class="flex justify-center mb-3">
                 <i data-lucide="lightbulb" class="w-12 h-12 text-amber-500"></i>
             </div>
-            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <div class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_highlights }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -209,7 +209,7 @@
             <div class="flex justify-center mb-3">
                 <i data-lucide="star" class="w-12 h-12 text-yellow-500 dark:text-yellow-400"></i>
             </div>
-            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <div class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_favorited }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -224,7 +224,7 @@
             <div class="flex justify-center mb-3">
                 <i data-lucide="trash-2" class="w-12 h-12 text-rose-500 dark:text-rose-400"></i>
             </div>
-            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <div class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ total_discarded }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">

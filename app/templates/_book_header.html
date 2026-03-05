@@ -1,7 +1,7 @@
 {% set active_highlights = book.highlights | selectattr("is_discarded", "equalto", false) | list if book.highlights else [] %}
 {% set discarded_highlights = book.highlights | selectattr("is_discarded", "equalto", true) | list if book.highlights else [] %}
 <div id="book-header" class="text-center mb-8">
-    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 title-font">
+    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3 title-font">
         {{ book.title }}
     </h1>
 

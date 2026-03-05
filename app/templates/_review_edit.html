@@ -2,8 +2,8 @@
 <div class="space-y-8">
     <!-- Progress Indicator -->
     <div class="text-center mb-8">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 title-font">Daily Review</h1>
-        <p class="text-base sm:text-lg text-gray-600 dark:text-gray-400">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 title-font">Daily Review</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-400">
             <span class="font-semibold text-primary-600 dark:text-primary-400">{{ current }}</span> of <span class="font-semibold">{{ total }}</span>
         </p>
     </div>
@@ -62,7 +62,7 @@
                 <textarea 
                     name="text"
                     rows="1"
-                    class="w-full px-4 py-3 font-serif leading-relaxed border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors resize-none overflow-hidden" style="font-size: clamp(1.1rem, 4vw, 1.375rem)"
+                    class="w-full px-4 py-3 font-serif leading-relaxed border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors resize-none overflow-hidden" style="font-size: 1.375rem"
                     oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
                     required>{{ highlight.text }}</textarea>
             </div>
