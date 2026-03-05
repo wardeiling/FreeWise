@@ -67,6 +67,20 @@
   }
 }
 
+/* ── Mobile-first font scaling ─────────────────────────────────────────────
+   Tailwind uses rem throughout, so reducing the root font-size proportionally
+   shrinks all text, padding, and spacing on small screens without touching
+   individual templates.
+   16px (default) on sm+ screens, 14px on phones. ─────────────────────────── */
+html {
+  font-size: 14px;
+}
+@media (min-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 body {
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
 }

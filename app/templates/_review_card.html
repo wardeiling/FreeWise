@@ -2,14 +2,14 @@
 <div class="space-y-5">
     <!-- Progress Indicator -->
     <div class="text-center mb-4">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 title-font">Daily Review</h1>
-        <p class="text-lg text-gray-600 dark:text-gray-400">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 title-font">Daily Review</h1>
+        <p class="text-base sm:text-lg text-gray-600 dark:text-gray-400">
             <span class="font-semibold text-primary-600 dark:text-primary-400">{{ current }}</span> of <span class="font-semibold">{{ total }}</span>
         </p>
     </div>
 
     <!-- Highlight Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700 p-8 md:p-12">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700 p-5 sm:p-8 md:p-12">
         <!-- Book Information (Top-left) -->
         {% if highlight.book %}
         <div class="mb-6 flex items-start gap-4">
@@ -28,7 +28,7 @@
         {% endif %}
 
         <!-- Highlight Text -->
-        <div class="font-serif leading-relaxed text-gray-900 dark:text-gray-100 mb-6" style="font-size: 1.375rem">
+        <div class="font-serif leading-relaxed text-gray-900 dark:text-gray-100 mb-6" style="font-size: clamp(1.1rem, 4vw, 1.375rem)">
             {{ highlight.text }}
         </div>
 
@@ -77,10 +77,10 @@
             hx-vals='{"context": "review"}'
             hx-target="#review-container"
             hx-swap="innerHTML">
-            <div class="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/30 group-hover:scale-110 transition-all border-2 border-red-300 dark:border-red-700 group-hover:border-red-400 dark:group-hover:border-red-600">
-                <i data-lucide="x" class="w-10 h-10 text-red-600 dark:text-red-500"></i>
+            <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/30 group-hover:scale-110 transition-all border-2 border-red-300 dark:border-red-700 group-hover:border-red-400 dark:group-hover:border-red-600">
+                <i data-lucide="x" class="w-7 h-7 sm:w-10 sm:h-10 text-red-600 dark:text-red-500"></i>
             </div>
-            <span class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Discard</span>
+            <span class="mt-2 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">Discard</span>
         </button>
 
         <!-- Review Frequency Button -->
@@ -90,10 +90,10 @@
                 hx-get="/highlights/{{ highlight.id }}/weight/options"
                 hx-target="#review-weight-controls"
                 hx-swap="innerHTML">
-                <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/30 group-hover:scale-110 transition-all border-2 border-blue-300 dark:border-blue-700 group-hover:border-blue-400 dark:group-hover:border-blue-600">
-                    <i data-lucide="sliders" class="w-8 h-8 text-blue-600 dark:text-blue-500"></i>
+                <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/30 group-hover:scale-110 transition-all border-2 border-blue-300 dark:border-blue-700 group-hover:border-blue-400 dark:group-hover:border-blue-600">
+                    <i data-lucide="sliders" class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-500"></i>
                 </div>
-                <span class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Frequency</span>
+                <span class="mt-2 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">Frequency</span>
             </button>
             <div id="review-weight-controls" class="mt-3"></div>
         </div>
@@ -105,10 +105,10 @@
             hx-vals='{"current_id": "{{ highlight.id }}"}'
             hx-target="#review-container"
             hx-swap="innerHTML">
-            <div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center group-hover:bg-green-200 dark:group-hover:bg-green-900/30 group-hover:scale-110 transition-all border-2 border-green-300 dark:border-green-700 group-hover:border-green-400 dark:group-hover:border-green-600">
-                <i data-lucide="check" class="w-10 h-10 text-green-600 dark:text-green-500"></i>
+            <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center group-hover:bg-green-200 dark:group-hover:bg-green-900/30 group-hover:scale-110 transition-all border-2 border-green-300 dark:border-green-700 group-hover:border-green-400 dark:group-hover:border-green-600">
+                <i data-lucide="check" class="w-7 h-7 sm:w-10 sm:h-10 text-green-600 dark:text-green-500"></i>
             </div>
-            <span class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Done</span>
+            <span class="mt-2 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">Done</span>
         </button>
     </div>
 </div>
